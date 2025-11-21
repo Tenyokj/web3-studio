@@ -1,0 +1,1470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Web3 Studio — Learn Web3 & Blockchain Development</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
+    rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #05060a;
+      --bg-elevated: #10121a;
+      --bg-soft: #151827;
+      --border-subtle: rgba(255, 255, 255, 0.05);
+      --text-main: #f5f5f7;
+      --text-muted: #9ca3af;
+      --accent: #facc15;
+      --accent-soft: rgba(250, 204, 21, 0.15);
+      --danger: #f97373;
+      --success: #4ade80;
+      --radius-lg: 18px;
+      --radius-xl: 26px;
+      --shadow-soft: 0 24px 60px rgba(0, 0, 0, 0.6);
+      --max-width: 1120px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #111827 0, #020617 55%, #000 100%);
+      color: var(--text-main);
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* Layout */
+
+    .page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .container {
+      width: 100%;
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+      background: linear-gradient(
+          to bottom,
+          rgba(2, 6, 23, 0.92),
+          rgba(2, 6, 23, 0.78),
+          transparent
+      );
+      backdrop-filter: blur(16px);
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.85rem 0;
+      gap: 1.5rem;
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .logo-mark {
+      width: 32px;
+      height: 32px;
+      border-radius: 12px;
+      background:
+        radial-gradient(circle at 20% 20%, #facc15 0, transparent 55%),
+        radial-gradient(circle at 80% 80%, #22d3ee 0, transparent 55%),
+        #020617;
+      border: 1px solid rgba(248, 250, 252, 0.15);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .logo-mark::after {
+      content: "";
+      position: absolute;
+      inset: 4px;
+      border-radius: 10px;
+      border: 1px solid rgba(15, 23, 42, 0.9);
+    }
+
+    .logo-mark span {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 14px;
+      font-weight: 600;
+      color: #e5e7eb;
+    }
+
+    .logo-text-main {
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: lowercase;
+    }
+
+    .logo-text-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .nav-links a {
+      position: relative;
+      padding-bottom: 2px;
+    }
+
+    .nav-links a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 0%;
+      height: 1px;
+      background: linear-gradient(to right, #facc15, #22c55e);
+      transition: width 0.18s ease-out;
+    }
+
+    .nav-links a:hover {
+      color: var(--text-main);
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .badge-pill {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.13em;
+      padding: 0.22rem 0.6rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      color: var(--text-muted);
+    }
+
+    .btn {
+      border-radius: 999px;
+      padding: 0.45rem 1rem;
+      font-size: 0.85rem;
+      border: 1px solid rgba(248, 250, 252, 0.1);
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-main);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      cursor: pointer;
+      transition: background 0.16s ease-out, transform 0.12s ease-out,
+      box-shadow 0.16s ease-out, border-color 0.16s ease-out;
+    }
+
+    .btn svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .btn:hover {
+      background: #020617;
+      transform: translateY(-1px);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65);
+      border-color: rgba(250, 204, 21, 0.4);
+    }
+
+    .btn-primary {
+      background: radial-gradient(circle at top left, #facc15, #eab308);
+      color: #020617;
+      border: none;
+      font-weight: 600;
+      padding-inline: 1.2rem;
+      box-shadow: 0 18px 40px rgba(250, 204, 21, 0.35);
+    }
+
+    .btn-primary:hover {
+      background: radial-gradient(circle at top left, #fde047, #eab308);
+      transform: translateY(-2px);
+      box-shadow: 0 24px 55px rgba(250, 204, 21, 0.45);
+    }
+
+    main {
+      flex: 1;
+    }
+
+    section {
+      padding: 4rem 0;
+    }
+
+    section + section {
+      border-top: 1px solid rgba(148, 163, 184, 0.16);
+    }
+
+    /* Hero */
+
+    .hero {
+      padding-top: 4.5rem;
+      padding-bottom: 4.5rem;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2.7fr);
+      gap: 3rem;
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.65rem;
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 999px;
+      padding: 0.2rem 0.4rem 0.2rem 0.25rem;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      margin-bottom: 1.5rem;
+    }
+
+    .eyebrow-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      background:
+        radial-gradient(circle at 30% 30%, #facc15 0, transparent 45%),
+        radial-gradient(circle at 80% 80%, #22c55e 0, transparent 45%),
+        #020617;
+      border: 1px solid rgba(248, 250, 252, 0.18);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.8);
+    }
+
+    .eyebrow-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .eyebrow-tag {
+      font-size: 0.7rem;
+      border-radius: 999px;
+      padding: 0.15rem 0.55rem;
+      background: rgba(22, 163, 74, 0.18);
+      color: #bbf7d0;
+      border: 1px solid rgba(34, 197, 94, 0.4);
+    }
+
+    .hero-title {
+      font-size: clamp(2.6rem, 4vw, 3.4rem);
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+      margin: 0 0 1rem;
+    }
+
+    .hero-title span.accent {
+      background: linear-gradient(to right, #facc15, #22c55e);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .hero-subtitle {
+      margin: 0 0 1.75rem;
+      max-width: 30rem;
+      color: var(--text-muted);
+      font-size: 0.98rem;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      align-items: center;
+      margin-top: 1.6rem;
+    }
+
+    .hero-meta-item {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .pill-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 0 5px rgba(34, 197, 94, 0.15);
+    }
+
+    /* Hero visual */
+
+    .hero-visual {
+      border-radius: var(--radius-xl);
+      background: radial-gradient(circle at top left, rgba(250, 204, 21, 0.16), transparent 55%),
+      radial-gradient(circle at bottom right, rgba(56, 189, 248, 0.16), transparent 55%),
+      var(--bg-elevated);
+      padding: 1.2rem;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-visual-inner {
+      border-radius: 18px;
+      background: radial-gradient(circle at top, rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.98));
+      border: 1px solid rgba(15, 23, 42, 0.9);
+      padding: 1.2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-visual-grid {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 1.2rem;
+    }
+
+    .code-panel {
+      border-radius: 14px;
+      background: linear-gradient(to bottom right, #020617, #020617, #020617);
+      border: 1px solid rgba(15, 23, 42, 0.95);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.9);
+      overflow: hidden;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.7rem;
+      color: #e5e7eb;
+    }
+
+    .code-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 0.7rem;
+      background: radial-gradient(circle at top left, rgba(148, 163, 184, 0.2), rgba(15, 23, 42, 0.95));
+      border-bottom: 1px solid rgba(15, 23, 42, 0.9);
+    }
+
+    .code-dots {
+      display: flex;
+      gap: 0.3rem;
+    }
+
+    .code-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+    }
+
+    .code-dot.red {
+      background: #f97373;
+    }
+
+    .code-dot.yellow {
+      background: #facc15;
+    }
+
+    .code-dot.green {
+      background: #4ade80;
+    }
+
+    .code-title {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .code-body {
+      padding: 0.75rem 0.9rem 0.85rem;
+      white-space: pre;
+      line-height: 1.45;
+    }
+
+    .code-kw {
+      color: #60a5fa;
+    }
+
+    .code-type {
+      color: #a78bfa;
+    }
+
+    .code-fn {
+      color: #22d3ee;
+    }
+
+    .code-str {
+      color: #facc15;
+    }
+
+    .code-num {
+      color: #fb7185;
+    }
+
+    .code-comment {
+      color: #6b7280;
+    }
+
+    .code-highlight-line {
+      display: inline-block;
+      background: rgba(250, 204, 21, 0.06);
+      border-radius: 999px;
+      padding: 0 0.4rem;
+      margin-left: -0.4rem;
+      border-left: 2px solid rgba(250, 204, 21, 0.6);
+    }
+
+    .stack-panel {
+      border-radius: 14px;
+      background: #020617;
+      border: 1px solid rgba(30, 64, 175, 0.7);
+      padding: 0.8rem 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.9);
+    }
+
+    .stack-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .stack-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--text-muted);
+    }
+
+    .stack-badge {
+      font-size: 0.7rem;
+      padding: 0.15rem 0.55rem;
+      border-radius: 999px;
+      background: rgba(30, 64, 175, 0.6);
+      color: #dbeafe;
+      border: 1px solid rgba(59, 130, 246, 0.7);
+    }
+
+    .stack-items {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-top: 0.3rem;
+    }
+
+    .stack-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      padding: 0.4rem 0.45rem;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(55, 65, 81, 0.7);
+    }
+
+    .stack-row span.label {
+      color: #e5e7eb;
+    }
+
+    .stack-row span.value {
+      font-family: "JetBrains Mono", monospace;
+      color: #9ca3af;
+      font-size: 0.75rem;
+    }
+
+    .stack-row.highlight {
+      border-color: rgba(250, 204, 21, 0.7);
+      background: radial-gradient(circle at left, rgba(250, 204, 21, 0.18), rgba(15, 23, 42, 0.95));
+      color: #fef9c3;
+    }
+
+    .stack-row.highlight span.value {
+      color: #fef9c3;
+    }
+
+    .hero-ornament {
+      position: absolute;
+      inset: -80px;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(250, 204, 21, 0.14), transparent 60%),
+        radial-gradient(circle at 100% 100%, rgba(56, 189, 248, 0.13), transparent 60%);
+      pointer-events: none;
+      opacity: 0.7;
+    }
+
+    .hero-orbit {
+      position: absolute;
+      inset: 8%;
+      border-radius: 999px;
+      border: 1px dashed rgba(148, 163, 184, 0.3);
+      transform: rotate(-12deg);
+    }
+
+    .hero-orbit-dot {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: #facc15;
+      box-shadow: 0 0 0 8px rgba(250, 204, 21, 0.2);
+      top: 12%;
+      right: 20%;
+    }
+
+    /* Sections */
+
+    .section-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .section-title-block {
+      max-width: 30rem;
+    }
+
+    .section-eyebrow {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      margin: 0 0 0.5rem;
+    }
+
+    .section-subtitle {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .section-tagline {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      max-width: 22rem;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card {
+      border-radius: var(--radius-lg);
+      background: linear-gradient(to bottom, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 1));
+      border: 1px solid rgba(51, 65, 85, 0.9);
+      padding: 1.3rem 1.3rem 1.4rem;
+      box-shadow: 0 22px 50px rgba(0, 0, 0, 0.85);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      background: radial-gradient(circle at top left, rgba(250, 204, 21, 0.1), transparent 55%);
+      transition: opacity 0.16s ease-out;
+      pointer-events: none;
+    }
+
+    .card:hover::before {
+      opacity: 1;
+    }
+
+    .card-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      margin-bottom: 0.3rem;
+    }
+
+    .card-title {
+      font-size: 1rem;
+      margin: 0 0 0.5rem;
+    }
+
+    .card-body {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .card-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      border-radius: 999px;
+      padding: 0.18rem 0.55rem;
+      font-size: 0.75rem;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      color: var(--text-muted);
+      margin-bottom: 0.6rem;
+    }
+
+    .card-pill-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    .pill-status {
+      font-size: 0.75rem;
+      padding: 0.1rem 0.4rem;
+      border-radius: 999px;
+      background: rgba(34, 197, 94, 0.15);
+      color: #a7f3d0;
+      border: 1px solid rgba(34, 197, 94, 0.5);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .pill-status-bullet {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #22c55e;
+    }
+
+    /* Stack section */
+
+    .stack-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 1.75rem;
+      align-items: flex-start;
+    }
+
+    .stack-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .stack-item {
+      border-radius: var(--radius-lg);
+      padding: 1rem 1.1rem;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0.25rem 1rem;
+      align-items: center;
+    }
+
+    .stack-item h3 {
+      margin: 0;
+      font-size: 0.9rem;
+    }
+
+    .stack-item p {
+      margin: 0;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .stack-tag {
+      font-size: 0.75rem;
+      border-radius: 999px;
+      padding: 0.15rem 0.55rem;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      color: var(--text-muted);
+    }
+
+    .stack-item strong {
+      font-size: 0.8rem;
+      color: #e5e7eb;
+    }
+
+    /* Comparison */
+
+    .comparison-card {
+      border-radius: var(--radius-lg);
+      background: linear-gradient(to bottom right, #020617, #020617, #020617);
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      padding: 1.4rem;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.9);
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    th, td {
+      padding: 0.55rem 0.5rem;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    th {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      border-bottom: 1px solid rgba(55, 65, 81, 0.9);
+    }
+
+    tr:nth-child(odd) td {
+      background: rgba(15, 23, 42, 0.7);
+    }
+
+    tr:nth-child(even) td {
+      background: rgba(15, 23, 42, 0.3);
+    }
+
+    td:first-child {
+      font-weight: 500;
+      color: #e5e7eb;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      border-radius: 999px;
+      padding: 0.1rem 0.45rem;
+      font-size: 0.75rem;
+    }
+
+    .chip.good {
+      background: rgba(34, 197, 94, 0.12);
+      color: #bbf7d0;
+      border: 1px solid rgba(34, 197, 94, 0.6);
+    }
+
+    .chip.warn {
+      background: rgba(234, 179, 8, 0.12);
+      color: #fef9c3;
+      border: 1px solid rgba(250, 204, 21, 0.6);
+    }
+
+    .chip.bad {
+      background: rgba(248, 113, 113, 0.12);
+      color: #fecaca;
+      border: 1px solid rgba(248, 113, 113, 0.6);
+    }
+
+    .chip-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: currentColor;
+    }
+
+    /* Learning paths */
+
+    .paths-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1.3rem;
+    }
+
+    .path-card {
+      border-radius: var(--radius-lg);
+      background: radial-gradient(circle at top, rgba(37, 99, 235, 0.32), rgba(15, 23, 42, 1));
+      padding: 1.2rem 1.25rem 1.35rem;
+      border: 1px solid rgba(59, 130, 246, 0.7);
+      box-shadow: 0 24px 60px rgba(15, 23, 42, 0.95);
+    }
+
+    .path-card:nth-child(2) {
+      background: radial-gradient(circle at top, rgba(250, 204, 21, 0.35), rgba(15, 23, 42, 1));
+      border-color: rgba(250, 204, 21, 0.8);
+    }
+
+    .path-card:nth-child(3) {
+      background: radial-gradient(circle at top, rgba(16, 185, 129, 0.35), rgba(15, 23, 42, 1));
+      border-color: rgba(16, 185, 129, 0.8);
+    }
+
+    .path-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 0.7rem;
+    }
+
+    .path-title {
+      margin: 0;
+      font-size: 1rem;
+    }
+
+    .path-level {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #e5e7eb;
+      opacity: 0.8;
+    }
+
+    .path-body {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 0.7rem;
+    }
+
+    .path-list {
+      margin: 0;
+      padding-left: 1.1rem;
+      font-size: 0.85rem;
+      color: #e5e7eb;
+    }
+
+    .path-list li + li {
+      margin-top: 0.3rem;
+    }
+
+    /* Footer */
+
+    footer {
+      border-top: 1px solid rgba(148, 163, 184, 0.3);
+      padding: 1.6rem 0;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      background: rgba(2, 6, 23, 0.95);
+      backdrop-filter: blur(14px);
+      margin-top: 3rem;
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: var(--text-muted);
+    }
+
+    .footer-links a:hover {
+      color: var(--text-main);
+    }
+
+    /* Responsive */
+
+    @media (max-width: 960px) {
+      .hero-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .hero-visual {
+        order: -1;
+      }
+
+      .stack-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .cards-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .paths-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 720px) {
+      .nav-links {
+        display: none;
+      }
+
+      .hero {
+        padding-top: 3.2rem;
+      }
+
+      .cards-grid,
+      .paths-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .hero-title {
+        font-size: 2.1rem;
+      }
+    }
+
+    .nav-donate-btn {
+      padding: 0.55rem 1.2rem;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      background: radial-gradient(circle at 0 0, #facc15, #f97316);
+      color: #030712;
+      border: 1px solid transparent;
+      box-shadow: 0 10px 24px rgba(250, 204, 21, 0.45);
+      transition: 0.18s ease;
+      line-height: 1;
+      height: 32px;
+    }
+
+    .nav-donate-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 35px rgba(250, 204, 21, 0.65);
+    }
+
+  </style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <div class="container">
+      <div class="nav">
+        <div class="nav-left">
+          <div class="logo-mark">
+            <span>W3</span>
+          </div>
+          <div>
+            <div class="logo-text-main">web3.studio</div>
+            <div class="logo-text-sub">Hardhat-style web3 handbook</div>
+          </div>
+        </div>
+
+        <nav class="nav-links">
+          <a href="#overview">Overview</a>
+          <a href="#stack">Stack</a>
+          <a href="#compare">Hardhat vs Foundry</a>
+          <a href="#learn">Learning paths</a>
+          <a href="donate.html" class="nav-donate-btn">Donate</a>
+
+        </nav>
+
+        <div class="nav-actions">
+          <span class="badge-pill">Beta • v0.1</span>
+          <button class="btn">
+            <a href="docs/docs.html"><span>View docs</span></a>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="currentColor" d="M7 17.5 8.5 19l9-9V15h2V5h-10v2h6.5z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero -->
+    <section class="hero" id="overview">
+      <div class="container">
+        <div class="hero-grid">
+          <div>
+            <div class="eyebrow">
+              <div class="eyebrow-dot"></div>
+              <span class="eyebrow-label">Web3 & Solidity development stack</span>
+              <span class="eyebrow-tag">For builders</span>
+            </div>
+
+            <h1 class="hero-title">
+              Learn <span class="accent">Web3 development</span> with tools
+              you’ll actually use.
+            </h1>
+
+            <p class="hero-subtitle">
+              A minimal, Hardhat-inspired guide to building, testing and shipping
+              smart contracts with Hardhat, Foundry & OpenZeppelin — without
+              getting lost in buzzwords.
+            </p>
+
+            <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+              <button class="btn btn-primary">
+                <a href="guides.html"><span>Start learning</span></a>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path fill="currentColor" d="M5 12h12.17l-4.58-4.59L13 6l7 7-7 7-1.41-1.41L17.17 13H5z" />
+                </svg>
+              </button>
+              <button class="btn">
+                <span>Open on GitHub</span>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path fill="currentColor"
+                        d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.61-3.37-1.34-3.37-1.34-.46-1.17-1.11-1.48-1.11-1.48-.9-.61.07-.6.07-.6 1 .07 1.53 1.04 1.53 1.04.9 1.53 2.37 1.09 2.95.83.09-.66.35-1.1.63-1.35-2.22-.25-4.55-1.11-4.55-4.95 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02A9.56 9.56 0 0 1 12 6.84a9.6 9.6 0 0 1 2.5.34c1.9-1.29 2.74-1.02 2.74-1.02.56 1.38.21 2.4.11 2.65.64.7 1.03 1.59 1.03 2.68 0 3.85-2.34 4.7-4.57 4.95.36.32.68.94.68 1.9v2.81c0 .27.18.58.69.48A10 10 0 0 0 12 2Z" />
+                </svg>
+              </button>
+            </div>
+
+            <div class="hero-meta">
+              <div class="hero-meta-item">
+                <span class="pill-dot"></span>
+                <span>Hardhat, Foundry & OpenZeppelin, one place</span>
+              </div>
+              <div class="hero-meta-item">
+                <span style="width:8px; height:8px; border-radius:999px; background:#38bdf8;"></span>
+                <span>Focus on practice, not theory overload</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero-visual">
+            <div class="hero-ornament"></div>
+            <div class="hero-visual-inner">
+              <div class="hero-orbit"></div>
+              <div class="hero-orbit-dot"></div>
+              <div class="hero-visual-grid">
+                <div class="code-panel">
+                  <div class="code-header">
+                    <div class="code-dots">
+                      <span class="code-dot red"></span>
+                      <span class="code-dot yellow"></span>
+                      <span class="code-dot green"></span>
+                    </div>
+                    <span class="code-title">DemoVault.sol</span>
+                    <span style="font-size:0.7rem; color:#6b7280; margin-left: 4px;">Hardhat</span>
+                  </div>
+                  <div class="code-body">
+<span class="code-comment">// SPDX-License-Identifier: MIT</span>
+<span class="code-kw">pragma</span> <span class="code-type">solidity</span> <span class="code-num">^0.8.24</span>;
+
+<span class="code-kw">import</span> <span class="code-str">"@openzeppelin/contracts/token/ERC20/IERC20.sol"</span>;
+
+<span class="code-kw">contract</span> <span class="code-type">DemoVault</span> {
+    <span class="code-type">IERC20</span> <span class="code-fn">public</span> asset;
+
+    <span class="code-kw">constructor</span>(<span class="code-type">IERC20</span> _asset) {
+        <span class="code-highlight-line">asset = _asset;</span>
+    }
+
+    <span class="code-kw">function</span> <span class="code-fn">deposit</span>(uint256 amount) <span class="code-kw">external</span> {
+        asset.transferFrom(msg.sender, <span class="code-kw">address</span>(<span class="code-kw">this</span>), amount);
+    }
+}</div>
+                </div>
+
+                <div class="stack-panel">
+                  <div class="stack-header">
+                    <div>
+                      <div class="stack-label">Execution stack</div>
+                      <div style="font-size:0.85rem; color:#e5e7eb;">Local dev → Testnet → Mainnet</div>
+                    </div>
+                    <span class="stack-badge">web3.studio</span>
+                  </div>
+
+                  <div class="stack-items">
+                    <div class="stack-row highlight">
+                      <span class="label">Hardhat Network</span>
+                      <span class="value">fork: mainnet</span>
+                    </div>
+                    <div class="stack-row">
+                      <span class="label">Foundry</span>
+                      <span class="value" style="margin: 7px;">fuzz &amp; invariants</span>
+                    </div>
+                    <div class="stack-row">
+                      <span class="label">OpenZeppelin</span>
+                      <span class="value"style="margin: 7px;">battle-tested contracts</span>
+                    </div>
+                    <div class="stack-row">
+                      <span class="label">Ethers.js</span>
+                      <span class="value"style="margin: 7px;">type-safe scripts</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Why Web3 -->
+    <section id="why">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-title-block">
+            <div class="section-eyebrow">Why web3 development</div>
+            <h2 class="section-title">Not just hype, but a new execution layer for the internet.</h2>
+            <p class="section-subtitle">
+              Web3 is about programmable ownership, composable protocols and transparent state.
+              You write code that controls assets, not just UI.
+            </p>
+          </div>
+          <p class="section-tagline">
+            This site explains the core ideas of web3 by walking through the dev stack: Hardhat,
+            Foundry, OpenZeppelin, testnets, mainnet deployments and security basics.
+          </p>
+        </div>
+
+        <div class="cards-grid">
+          <article class="card">
+            <div class="card-pill">
+              <span class="card-pill-dot"></span>
+              <span>Ownership</span>
+            </div>
+            <div class="card-label">Concept</div>
+            <h3 class="card-title">Programmable assets</h3>
+            <p class="card-body">
+              Tokens, NFTs and vaults are just smart contracts. You define rules: who can move funds,
+              under which conditions and how protocols interact with each other.
+            </p>
+          </article>
+
+          <article class="card">
+            <div class="card-pill">
+              <span class="card-pill-dot" style="background:#22c55e;"></span>
+              <span>Composability</span>
+            </div>
+            <div class="card-label">Ecosystem</div>
+            <h3 class="card-title">Lego-bricks of finance</h3>
+            <p class="card-body">
+              Protocols like Uniswap, Aave or Maker are open by default. Your contracts can integrate
+              them like libraries, reusing liquidity and security instead of starting from scratch.
+            </p>
+          </article>
+
+          <article class="card">
+            <div class="card-pill">
+              <span class="card-pill-dot" style="background:#38bdf8;"></span>
+              <span>Transparency</span>
+            </div>
+            <div class="card-label">Mindset</div>
+            <h3 class="card-title">Code is the agreement</h3>
+            <p class="card-body">
+              Users don’t “trust the brand”, they trust verified smart contracts and audits. This is
+              why testing, security patterns and minimalism matter so much in web3.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stack -->
+    <section id="stack">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-title-block">
+            <div class="section-eyebrow">Core dev stack</div>
+            <h2 class="section-title">From idea to mainnet: three tools that matter.</h2>
+            <p class="section-subtitle">
+              There are thousands of frameworks, but most serious teams converge on a small set of
+              tools. Learn them deeply instead of collecting logos.
+            </p>
+          </div>
+          <p class="section-tagline">
+            web3.studio focuses on Hardhat, Foundry and OpenZeppelin:
+            scripting + testing + secure building blocks.
+          </p>
+        </div>
+
+        <div class="stack-grid">
+          <div class="stack-list">
+            <div class="stack-item">
+              <div>
+                <h3>Hardhat</h3>
+                <p>Task runner & dev environment for scripts, deployments and plugins.</p>
+              </div>
+              <div style="display:flex; flex-direction:column; align-items:flex-end; gap:0.25rem;">
+                <span class="stack-tag">Node.js • TypeScript</span>
+                <strong>Great for product teams</strong>
+              </div>
+            </div>
+
+            <div class="stack-item">
+              <div>
+                <h3>Foundry</h3>
+                <p>Blazing-fast Solidity test framework with fuzzing & invariants.</p>
+              </div>
+              <div style="display:flex; flex-direction:column; align-items:flex-end; gap:0.25rem;">
+                <span class="stack-tag">Rust-powered</span>
+                <strong>Perfect for protocol testing</strong>
+              </div>
+            </div>
+
+            <div class="stack-item">
+              <div>
+                <h3>OpenZeppelin</h3>
+                <p>Battle-tested contracts for ERC-20, ERC-721, access control & more.</p>
+              </div>
+              <div style="display:flex; flex-direction:column; align-items:flex-end; gap:0.25rem;">
+                <span class="stack-tag">Security first</span>
+                <strong>Don’t reinvent primitives</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-label">Workflow sketch</div>
+            <h3 class="card-title">A realistic day-to-day loop</h3>
+            <p class="card-body" style="margin-bottom:0.9rem;">
+              A typical web3 dev flow looks like this:
+            </p>
+            <ol style="margin:0; padding-left:1.1rem; font-size:0.85rem; color:var(--text-muted); display:flex; flex-direction:column; gap:0.3rem;">
+              <li>Design your contract using OpenZeppelin base contracts.</li>
+              <li>Prototype locally with Hardhat Network and simple scripts.</li>
+              <li>Stress-test behavior with Foundry fuzzing & invariants.</li>
+              <li>Deploy to testnet, integrate with frontend, gather feedback.</li>
+              <li>Only then ship to mainnet with small, well-audited changes.</li>
+            </ol>
+            <div style="margin-top:0.9rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
+              <span class="pill-status">
+                <span class="pill-status-bullet"></span>
+                <span>Guides coming soon</span>
+              </span>
+              <span class="pill-status" style="background:rgba(56,189,248,0.18); border-color:rgba(56,189,248,0.5); color:#e0f2fe;">
+                <span class="pill-status-bullet" style="background:#38bdf8;"></span>
+                <span>Code samples & tests</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Hardhat vs Foundry -->
+    <section id="compare">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-title-block">
+            <div class="section-eyebrow">Hardhat vs Foundry</div>
+            <h2 class="section-title">They are not enemies. They are layers.</h2>
+            <p class="section-subtitle">
+              You don’t have to “pick a side”. Most teams use both: Hardhat for scripting
+              & deployments, Foundry for heavy-duty testing.
+            </p>
+          </div>
+          <p class="section-tagline">
+            Use this comparison as a mental model, not a war. The best stack is usually
+            “Hardhat + Foundry + OZ”.
+          </p>
+        </div>
+
+        <div class="comparison-card">
+          <table>
+            <thead>
+            <tr>
+              <th>Dimension</th>
+              <th>Hardhat</th>
+              <th>Foundry</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td>Primary focus</td>
+              <td>Dev environment, scripts, plugins</td>
+              <td>Testing, fuzzing, invariants</td>
+            </tr>
+            <tr>
+              <td>Language</td>
+              <td>TypeScript / JavaScript</td>
+              <td>Solidity-native tests</td>
+            </tr>
+            <tr>
+              <td>Speed</td>
+              <td>
+                <span class="chip warn">
+                  <span class="chip-dot"></span>
+                  fast enough
+                </span>
+              </td>
+              <td>
+                <span class="chip good">
+                  <span class="chip-dot"></span>
+                  extremely fast
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td>Learning curve</td>
+              <td>
+                <span class="chip good">
+                  <span class="chip-dot"></span>
+                  easy for web devs
+                </span>
+              </td>
+              <td>
+                <span class="chip warn">
+                  <span class="chip-dot"></span>
+                  more low-level
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td>Plugins ecosystem</td>
+              <td>Huge: ethers, wagmi, deployments, gas reports</td>
+              <td>Growing, but more focused on core tools</td>
+            </tr>
+            <tr>
+              <td>Best fit</td>
+              <td>dApps, teams with TS/JS background</td>
+              <td>Protocols, auditors, test-heavy projects</td>
+            </tr>
+            <tr>
+              <td>Recommended use</td>
+              <td>Keep as main “control panel” for your project</td>
+              <td>Plug in when you outgrow basic tests</td>
+            </tr>
+            <tr>
+              <td>Our opinion</td>
+              <td>
+                <span class="chip good">
+                  <span class="chip-dot"></span>
+                  start here
+                </span>
+              </td>
+              <td>
+                <span class="chip good">
+                  <span class="chip-dot"></span>
+                  level-up here
+                </span>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Learning paths -->
+    <section id="learn">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-title-block">
+            <div class="section-eyebrow">Learning paths</div>
+            <h2 class="section-title">Choose how deep you want to go.</h2>
+            <p class="section-subtitle">
+              You don’t need to become a protocol engineer on day one. Start where you are
+              and slowly move down the stack.
+            </p>
+          </div>
+          <p class="section-tagline">
+            Each path will have checklists, example repos and test suites you can run locally
+            with Hardhat and Foundry.
+          </p>
+        </div>
+
+        <div class="paths-grid">
+          <article class="path-card">
+            <div class="path-header">
+              <h3 class="path-title">Beginner: from zero to first contract</h3>
+              <span class="path-level">Level 1</span>
+            </div>
+            <p class="path-body">
+              Ideal if you know a bit of JS/TS and want to understand how smart contracts work
+              without drowning in protocol details.
+            </p>
+            <ul class="path-list">
+              <li>Set up Hardhat project with TypeScript.</li>
+              <li>Write a simple ERC-20 using OpenZeppelin.</li>
+              <li>Deploy to a testnet & interact with a script.</li>
+            </ul>
+          </article>
+
+          <article class="path-card">
+            <div class="path-header">
+              <h3 class="path-title">Solidity dev: shipping real dApps</h3>
+              <span class="path-level">Level 2</span>
+            </div>
+            <p class="path-body">
+              For developers who want to build production-ready contracts that integrate existing
+              DeFi protocols.
+            </p>
+            <ul class="path-list">
+              <li>Design upgradeable contracts & roles.</li>
+              <li>Mix Hardhat & Foundry in one repo.</li>
+              <li>Write meaningful unit & integration tests.</li>
+            </ul>
+          </article>
+
+          <article class="path-card">
+            <div class="path-header">
+              <h3 class="path-title">Protocol engineer: testing the edges</h3>
+              <span class="path-level">Level 3</span>
+            </div>
+            <p class="path-body">
+              For those who care about invariants, attack surfaces and formal-ish reasoning
+              about money flows.
+            </p>
+            <ul class="path-list">
+              <li>Model protocol state transitions.</li>
+              <li>Use Foundry fuzzing & invariant tests.</li>
+              <li>Build internal dashboards for risk checks.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footer-inner">
+        <div>
+          © <span id="year"></span> web3.studio — a minimal handbook for modern web3 devs.
+        </div>
+        <div class="footer-links">
+          <a href="#overview">Overview</a>
+          <a href="#stack">Stack</a>
+          <a href="#compare">Compare</a>
+          <a href="#learn">Learn</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<script>
+  document.getElementById("year").textContent = new Date().getFullYear();
+</script>
+</body>
+</html>

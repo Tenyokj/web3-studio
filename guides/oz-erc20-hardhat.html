@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Intermediate Guide — ERC-20 Extensions with OpenZeppelin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg: #020617;
+      --bg-elevated: #020617;
+      --card: #020617;
+      --card-soft: #030712;
+      --accent: #facc15;
+      --accent-soft: rgba(250, 204, 21, 0.1);
+      --accent-strong: rgba(250, 204, 21, 0.18);
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --border-subtle: rgba(148, 163, 184, 0.3);
+      --border-soft: rgba(148, 163, 184, 0.2);
+      --radius-lg: 22px;
+      --radius-md: 14px;
+      --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.9);
+      --shadow-glow: 0 0 80px rgba(250, 204, 21, 0.18);
+      --blue: #38bdf8;
+      --green: #22c55e;
+      --red: #f87171;
+      --orange: #f97316;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: radial-gradient(circle at top left, #0f172a 0, #020617 45%, #000 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* Top nav */
+    .nav {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 1.2rem 1.4rem 0.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(22px);
+      background: linear-gradient(to bottom, rgba(2, 6, 23, 0.96), rgba(2, 6, 23, 0.75), transparent);
+    }
+
+    .nav-left { display: flex; align-items: center; gap: 0.65rem; }
+    .nav-orb {
+      width: 26px; height: 26px; border-radius: 999px;
+      background: radial-gradient(circle at 30% 20%, #fde047 0, #facc15 26%, #a16207 70%, #0f172a 100%);
+      box-shadow: 0 0 30px rgba(250, 204, 21, 0.6);
+    }
+    .nav-title { font-weight: 600; letter-spacing: -0.03em; font-size: 1rem;}
+    .nav-tagline { font-size: 0.78rem; color: var(--text-muted); }
+
+    .nav-right { display: flex; align-items: center; gap: 0.75rem; font-size: 0.85rem;}
+    .nav-link {
+      padding: 0.4rem 0.7rem; border-radius: 999px; color: var(--text-muted);
+      border: 1px solid transparent; transition: 0.18s ease;
+    }
+    .nav-link:hover {
+      border-color: rgba(148, 163, 184, 0.5);
+      color: var(--text-main);
+      background: rgba(15, 23, 42, 0.8);
+    }
+    .nav-pill {
+      border-radius: 999px; padding: 0.4rem 0.9rem;
+      border: 1px solid var(--border-subtle);
+      background: radial-gradient(circle at top left, rgba(250, 204, 21, 0.14), rgba(15, 23, 42, 0.8));
+      color: #fefce8; display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.8rem;
+    }
+    .nav-pill-dot {
+      width: 6px; height: 6px; border-radius: 999px;
+      background: #bbf7d0; box-shadow: 0 0 11px rgba(74, 222, 128, 0.9);
+    }
+
+    /* Page shell */
+    .page { max-width: 1120px; margin: 0 auto; padding: 0 1.4rem 3.5rem; }
+
+    /* Hero */
+    .hero {
+      display: grid; grid-template-columns: minmax(0, 3.5fr) minmax(0, 2.3fr);
+      gap: 2.6rem; padding: 2.2rem 0 1.4rem; align-items: center;
+    }
+    @media (max-width: 920px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+
+    .hero-left-label {
+      display: inline-flex; align-items: center; gap: 0.45rem;
+      padding: 0.22rem 0.4rem; border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(148, 163, 184, 0.4);
+      font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.8rem;
+    }
+    .hero-left-label span {
+      padding: 0.16rem 0.5rem; border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(148, 163, 184, 0.6);
+    }
+
+    .hero-h1 { font-size: clamp(2.35rem, 3vw, 2.9rem); letter-spacing: -0.05em; margin: 0.15rem 0 0.65rem; line-height: 1.05; }
+    .hero-h1 span { background: linear-gradient(120deg, #facc15, #f97316, #22c55e); -webkit-background-clip: text; color: transparent;}
+    .hero-lead { color: var(--text-muted); font-size: 0.98rem; max-width: 32rem; line-height: 1.8; margin-bottom: 1.4rem; }
+    .hero-meta { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 1.8rem; }
+    .hero-chip {
+      padding: 0.32rem 0.75rem; border-radius: 999px; border: 1px solid rgba(148, 163, 184, 0.45);
+      font-size: 0.78rem; color: var(--text-muted); background: rgba(15, 23, 42, 0.85);
+    }
+    .hero-chip b { color: #e5e7eb; font-weight: 600; }
+
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; }
+    .btn-primary {
+      padding: 0.7rem 1.4rem; border-radius: 999px; border: 1px solid transparent;
+      background: radial-gradient(circle at 0 0, #facc15, #f97316); color: #030712; font-weight: 600; font-size: 0.9rem;
+      box-shadow: 0 14px 35px rgba(250, 204, 21, 0.45);
+      display: inline-flex; align-items: center; gap: 0.4rem; cursor: pointer; transition: 0.18s ease;
+    }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 20px 55px rgba(250, 204, 21, 0.65); }
+    .btn-ghost {
+      padding: 0.65rem 1.1rem; border-radius: 999px; border: 1px solid rgba(148, 163, 184, 0.55);
+      background: rgba(15, 23, 42, 0.9); font-size: 0.85rem; color: var(--text-muted);
+      display: inline-flex; align-items: center; gap: 0.4rem; cursor: pointer; transition: 0.18s ease;
+    }
+    .btn-ghost:hover { border-color: rgba(249, 250, 251, 0.9); color: #e5e7eb; background: rgba(15, 23, 42, 1); }
+
+    .hero-right { position: relative; }
+    .hero-card {
+      border-radius: var(--radius-lg);
+      background:
+        radial-gradient(circle at top left, rgba(250, 204, 21, 0.14), transparent 55%),
+        radial-gradient(circle at bottom right, rgba(56, 189, 248, 0.14), transparent 55%),
+        linear-gradient(to bottom right, #020617, #020617);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      box-shadow: var(--shadow-soft), var(--shadow-glow);
+      padding: 1rem 1.1rem 1.05rem;
+      position: relative; overflow: hidden;
+    }
+    .hero-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.65rem; font-size: 0.8rem; color: var(--text-muted);}
+    .hero-card-badge {
+      padding: 0.16rem 0.55rem; border-radius: 999px; border: 1px solid rgba(148, 163, 184, 0.7);
+      background: rgba(15, 23, 42, 0.9); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; color: #e5e7eb;
+    }
+    .hero-metric-row { display: flex; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.6rem; font-size: 0.78rem;}
+    .hero-metric-label { color: var(--text-muted); }
+    .hero-metric-value { font-family: "JetBrains Mono", monospace; color: #e5e7eb; }
+    .hero-code-box {
+      margin-top: 0.7rem; padding: 0.75rem 0.8rem; border-radius: 16px;
+      background: rgba(15, 23, 42, 0.88); border: 1px solid rgba(148, 163, 184, 0.45);
+      font-family: "JetBrains Mono", monospace; font-size: 0.78rem; color: #e5e7eb; overflow-x: auto; line-height: 1.6;
+    }
+    .hero-code-box code { white-space: pre; }
+    .hero-code-label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; font-size: 0.75rem; color: var(--text-muted); }
+
+    /* Section wrappers */
+    .section { margin-top: 2.6rem; }
+    .section-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--text-muted); margin-bottom: 0.4rem; }
+    .section-title { font-size: 1.25rem; letter-spacing: -0.02em; margin-bottom: 1rem; }
+    .section-grid { display: grid; grid-template-columns: minmax(0, 3.2fr) minmax(0, 2.4fr); gap: 1.8rem; }
+    @media (max-width: 900px) { .section-grid { grid-template-columns: minmax(0, 1fr); } }
+    .section-text { font-size: 0.96rem; color: var(--text-muted); line-height: 1.7; }
+    .pill-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.7rem; font-size: 0.8rem; }
+    .pill {
+      padding: 0.3rem 0.65rem; border-radius: 999px; border: 1px solid rgba(148, 163, 184, 0.5);
+      background: rgba(15, 23, 42, 0.9); color: var(--text-muted);
+    }
+
+    .card {
+      border-radius: var(--radius-lg); border: 1px solid rgba(148, 163, 184, 0.45);
+      background: radial-gradient(circle at top left, rgba(250, 204, 21, 0.16), transparent 60%), #020617;
+      padding: 1.2rem 1.25rem; box-shadow: 0 14px 35px rgba(15, 23, 42, 0.9);
+    }
+    .card-soft {
+      border-radius: var(--radius-md); border: 1px solid rgba(148, 163, 184, 0.35);
+      background: rgba(15, 23, 42, 0.9); padding: 1rem 1.05rem; font-size: 0.9rem;
+    }
+    .card-title { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.4rem; }
+    .card-meta { font-size: 0.8rem; color: var(--text-muted); }
+
+    .step-list { list-style: none; padding: 0; margin: 0.4rem 0 0; font-size: 0.9rem; }
+    .step-list li { margin-bottom: 0.35rem; color: var(--text-muted); }
+
+    /* Code blocks */
+    pre {
+      margin: 1rem 0 1.6rem; padding: 0.9rem 1rem; border-radius: 16px;
+      background: rgba(15, 23, 42, 0.94); border: 1px solid var(--border-soft);
+      box-shadow: 0 16px 34px rgba(15, 23, 42, 0.85);
+      font-family: "JetBrains Mono", monospace; font-size: 0.82rem; color: #e5e7eb;
+      overflow-x: auto; line-height: 1.7;
+    }
+    pre code { white-space: pre; }
+
+    .inline-code {
+      font-family: "JetBrains Mono", monospace; font-size: 0.82rem;
+      padding: 0.1rem 0.35rem; border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(148, 163, 184, 0.7);
+      color: #e5e7eb;
+    }
+
+    .tip, .note, .warning {
+      margin: 1rem 0 1.4rem; padding: 0.8rem 0.95rem; border-radius: 14px;
+      font-size: 0.88rem; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(148, 163, 184, 0.5);
+    }
+    .note {
+      border-color: rgba(56, 189, 248, 0.8);
+      background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.18), rgba(15, 23, 42, 0.9));
+    }
+    .warning {
+      border-color: rgba(248, 113, 113, 0.9);
+      background: radial-gradient(circle at top left, rgba(248, 113, 113, 0.16), rgba(15, 23, 42, 0.96));
+    }
+    .success {
+      border-color: rgba(34, 197, 94, 0.8);
+      background: radial-gradient(circle at top left, rgba(34, 197, 94, 0.16), rgba(15, 23, 42, 0.96));
+    }
+
+    .tip-title { font-weight: 600; margin-bottom: 0.25rem; color: #e5e7eb; }
+    .tip p,.note p,.warning p { margin: 0; color: var(--text-muted); }
+
+    .two-col { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.7fr); gap: 1.2rem; }
+    @media (max-width: 860px) { .two-col { grid-template-columns: minmax(0, 1fr); } }
+
+    .checklist { list-style: none; padding: 0; margin: 0.4rem 0 0; font-size: 0.9rem; }
+    .checklist li { margin-bottom: 0.35rem; color: var(--text-muted); }
+    .checkmark { color: #bbf7d0; margin-right: 0.4rem; }
+
+    /* small interactive bits */
+    .accordion {
+      border: 1px solid var(--border-soft);
+      border-radius: 16px;
+      overflow: hidden;
+      background: rgba(15, 23, 42, 0.85);
+      margin: 1rem 0 1.6rem;
+    }
+    .accordion summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 0.9rem 1rem;
+      font-weight: 600;
+      font-size: 0.92rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .accordion summary::-webkit-details-marker { display: none; }
+    .accordion summary span { color: var(--text-muted); font-weight: 500; font-size: 0.85rem;}
+    .accordion .acc-body { padding: 0 1rem 1rem; color: var(--text-muted); font-size: 0.95rem; line-height: 1.7; }
+
+    .code-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: -0.6rem;
+      margin-bottom: 0.7rem;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+    .copy-btn {
+      border: 1px solid var(--border-subtle);
+      background: rgba(2,6,23,0.9);
+      color: var(--text-muted);
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: 0.15s ease;
+      font-size: 0.75rem;
+    }
+    .copy-btn:hover { color: var(--text-main); border-color: rgba(250,204,21,0.8); }
+
+    /* progress / aside */
+    .progress-wrap {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 50;
+      display: grid;
+      gap: 0.5rem;
+      place-items: end;
+      pointer-events: none;
+    }
+    .progress {
+      width: 54px;
+      height: 54px;
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      background: rgba(2,6,23,0.8);
+      display: grid;
+      place-items: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.45);
+      pointer-events: auto;
+      cursor: pointer;
+    }
+    .progress b { color: var(--text-main); font-weight: 700; }
+
+    footer {
+      max-width: 1120px; margin: 0 auto;
+      padding: 2rem 1.4rem 2.4rem;
+      border-top: 1px solid rgba(51, 65, 85, 0.8);
+      color: var(--text-muted); font-size: 0.9rem;
+      display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.6rem;
+    }
+    .footer-links { display: flex; flex-wrap: wrap; gap: 0.7rem; font-size: 0.84rem; }
+    .footer-links a { color: var(--text-muted); }
+    .footer-links a:hover { color: #e5e7eb; }
+
+    section[id] { scroll-margin-top: 90px; }
+
+    .divider {
+      height: 1px;
+      background: rgba(148,163,184,0.25);
+      margin: 1.7rem 0;
+      border-radius: 999px;
+      max-width: 920px;
+    }
+
+        .nav-donate-btn {
+      padding: 0.55rem 1.2rem;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      background: radial-gradient(circle at 0 0, #facc15, #f97316);
+      color: #030712;
+      border: 1px solid transparent;
+      box-shadow: 0 10px 24px rgba(250, 204, 21, 0.45);
+      transition: 0.18s ease;
+      line-height: 1;
+      height: 32px;
+    }
+
+    .nav-donate-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 35px rgba(250, 204, 21, 0.65);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- TOP NAV -->
+  <header class="nav">
+    <div class="nav-left">
+      <div class="nav-orb"></div>
+      <div>
+        <div class="nav-title">web3.studio</div>
+        <div class="nav-tagline">Guides • OZ • Solidity • Security</div>
+      </div>
+    </div>
+
+    <div class="nav-right">
+      <a href="../index.html" class="nav-link">Home</a>
+      <a href="../guides.html" class="nav-link">All guides</a>
+      <a href="../docs/oz.html" class="nav-link">OZ docs</a>
+       <a href="../donate.html" class="nav-donate-btn">Donate</a>
+      <span class="nav-pill">
+        <span class="nav-pill-dot"></span>
+        Intermediate track
+      </span>
+    </div>
+  </header>
+
+  <main class="page">
+
+    <!-- HERO -->
+    <section class="hero">
+      <div>
+        <div class="hero-left-label">
+          <span>Intermediate • OpenZeppelin</span>
+          ERC-20 extensions in practice
+        </div>
+
+        <h1 class="hero-h1">
+          Level‑up your <span>ERC‑20 token</span><br/>with real extensions.
+        </h1>
+
+        <p class="hero-lead">
+          In this guide you’ll take a simple ERC‑20 and turn it into a production‑ready token:
+          snapshots for voting, pausing for emergencies, and role‑based access control for safe minting.
+          Everything is hands‑on, using OpenZeppelin Contracts and Hardhat 3.
+        </p>
+
+        <div class="hero-meta">
+          <div class="hero-chip"><b>Level</b> · Intermediate</div>
+          <div class="hero-chip"><b>Stack</b> · OZ Contracts, Solidity, Hardhat 3</div>
+          <div class="hero-chip"><b>Time</b> · ~75 minutes</div>
+        </div>
+
+        <div class="hero-actions">
+          <a href="#overview" class="btn-primary">
+            Start guide
+            <span>↓</span>
+          </a>
+          <a href="#acl" class="btn-ghost">
+            Jump to AccessControl
+          </a>
+        </div>
+      </div>
+
+      <div class="hero-right">
+        <div class="hero-card">
+          <div class="hero-card-header">
+            <span>What you’ll ship</span>
+            <span class="hero-card-badge">EXTENDED ERC‑20</span>
+          </div>
+
+          <div class="hero-metric-row">
+            <span class="hero-metric-label">Extensions</span>
+            <span class="hero-metric-value">Snapshot · Pausable · ACL</span>
+          </div>
+          <div class="hero-metric-row">
+            <span class="hero-metric-label">Roles</span>
+            <span class="hero-metric-value">Admin · Pauser · Snapshotter · Minter</span>
+          </div>
+          <div class="hero-metric-row">
+            <span class="hero-metric-label">Use‑cases</span>
+            <span class="hero-metric-value">Voting · Emergency stop · Safe minting</span>
+          </div>
+
+          <div class="hero-code-box">
+            <div class="hero-code-label">
+              <span>contracts/StudioToken.sol</span>
+              <span>OpenZeppelin extensions</span>
+            </div>
+<code>contract StudioToken is
+  ERC20,
+  ERC20Snapshot,
+  ERC20Pausable,
+  AccessControl
+{
+  bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
+  bytes32 public constant SNAPSHOT_ROLE = keccak256("SNAPSHOT_ROLE");
+  bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
+  ...
+}</code>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- OVERVIEW -->
+    <section id="overview" class="section">
+      <div class="section-label">Overview</div>
+      <h2 class="section-title">What you’ll learn</h2>
+
+      <div class="section-grid">
+        <div class="section-text">
+          <p>
+            This intermediate guide is all about using OZ extensions the way real projects do:
+            not “import everything”, but understanding why each piece exists and how to combine them safely.
+          </p>
+
+          <ul>
+            <li>How snapshots store historical balances for voting and airdrops</li>
+            <li>How pausing actually blocks transfers and minting</li>
+            <li>How to set up AccessControl with minimal power per role</li>
+            <li>How to resolve multiple‑inheritance hooks correctly</li>
+            <li>Writing tests that prove extensions work together</li>
+          </ul>
+
+          <div class="note">
+            <div class="tip-title">Who is this for?</div>
+            <p>
+              You already shipped a basic ERC‑20 (maybe via the previous guide).
+              Now you want to add real‑world features without writing fragile code.
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <div class="card-title">Prerequisites</div>
+            <div class="card-meta">You should know:</div>
+            <ul class="checklist">
+              <li><span class="checkmark">✓</span> Basic ERC‑20 flow (balances, transfer, mint)</li>
+              <li><span class="checkmark">✓</span> How Hardhat 3 projects are structured</li>
+              <li><span class="checkmark">✓</span> Solidity inheritance</li>
+            </ul>
+            <div class="card-meta" style="margin-top:0.6rem;">Nice to have:</div>
+            <ul class="checklist">
+              <li><span class="checkmark">•</span> Familiarity with roles / RBAC</li>
+              <li><span class="checkmark">•</span> Having Sepolia RPC & test ETH</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="pill-list">
+        <div class="pill">Snapshots</div>
+        <div class="pill">Pausable</div>
+        <div class="pill">AccessControl</div>
+        <div class="pill">Multiple inheritance</div>
+        <div class="pill">Hardhat 3 + TS tests</div>
+      </div>
+    </section>
+
+    <!-- STEP 1 -->
+    <section id="setup" class="section">
+      <div class="section-label">Step 1</div>
+      <h2 class="section-title">Set up a clean workspace</h2>
+
+      <div class="two-col">
+        <div class="section-text">
+          <p>
+            We’ll start from a fresh Hardhat 3 TypeScript project.
+            If you already have one, you can reuse it — just adapt paths.
+          </p>
+
+          <p>1. Create a folder:</p>
+<pre><code>mkdir oz-erc20-extensions
+cd oz-erc20-extensions
+npm init -y</code></pre>
+
+          <p>2. Install Hardhat 3:</p>
+<pre><code>npm install --save-dev hardhat</code></pre>
+
+          <p>3. Initialize TS template:</p>
+<pre><code>npx hardhat</code></pre>
+
+          <p>Choose:</p>
+          <ul>
+            <li><b>Create a TypeScript project</b></li>
+            <li>Add <span class="inline-code">.gitignore</span></li>
+            <li>Install recommended deps</li>
+          </ul>
+
+          <div class="tip">
+            <div class="tip-title">Remove template noise</div>
+            <p>
+              Delete the sample <span class="inline-code">Lock.sol</span> and its test. We’ll build our own token.
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <div class="card-soft">
+            <div class="card-title">After init you should have:</div>
+            <ul class="step-list">
+              <li><span class="checkmark">✓</span> <span class="inline-code">hardhat.config.ts</span></li>
+              <li><span class="checkmark">✓</span> <span class="inline-code">contracts/</span></li>
+              <li><span class="checkmark">✓</span> <span class="inline-code">test/</span></li>
+              <li><span class="checkmark">✓</span> toolbox‑ethers installed</li>
+            </ul>
+
+            <div class="divider"></div>
+
+            <div class="card-title">We will add:</div>
+            <ul class="step-list">
+              <li><span class="checkmark">→</span> OpenZeppelin Contracts</li>
+              <li><span class="checkmark">→</span> An extended token</li>
+              <li><span class="checkmark">→</span> TS tests for each extension</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 2 -->
+    <section id="install-oz" class="section">
+      <div class="section-label">Step 2</div>
+      <h2 class="section-title">Install OpenZeppelin Contracts</h2>
+
+      <div class="section-text">
+        <p>
+          OZ Contracts is basically the standard library of Ethereum.
+          We’ll use it for safe, audited extensions.
+        </p>
+
+<pre><code>npm install @openzeppelin/contracts</code></pre>
+
+        <p>
+          In this guide we’ll rely on OZ v5+ style (Solidity ≥ 0.8.20).
+          If your project is older, upgrade first.
+        </p>
+
+        <details class="accordion">
+          <summary>What extensions are we using? <span>click to expand</span></summary>
+          <div class="acc-body">
+            <ul>
+              <li><b>ERC20Snapshot</b> — saves historical balances at a “snapshot id”. Useful for voting or airdrops.</li>
+              <li><b>ERC20Pausable</b> — allows an authorized account to pause/unpause transfers.</li>
+              <li><b>AccessControl</b> — role‑based access control. Safer than a single owner key.</li>
+            </ul>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- STEP 3 -->
+    <section id="base-token" class="section">
+      <div class="section-label">Step 3</div>
+      <h2 class="section-title">Create a base ERC‑20 token</h2>
+
+      <div class="section-text">
+        <p>
+          Create <span class="inline-code">contracts/StudioToken.sol</span>.
+          Start with a minimal ERC‑20 that we’ll extend.
+        </p>
+
+        <div class="code-toolbar">
+          <span>contracts/StudioToken.sol (base)</span>
+          <button class="copy-btn" data-copy="#code-base">Copy</button>
+        </div>
+<pre id="code-base"><code>// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+
+contract StudioToken is ERC20 {
+    constructor(uint256 initialSupply)
+        ERC20("StudioToken", "STUDIO")
+    {
+        _mint(msg.sender, initialSupply);
+    }
+}</code></pre>
+
+        <p>Compile to confirm setup:</p>
+<pre><code>npx hardhat compile</code></pre>
+
+        <div class="note">
+          <div class="tip-title">This is just a starting point</div>
+          <p>
+            We keep it simple so that extension effects are easy to verify.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 4 SNAPSHOTS -->
+    <section id="snapshots" class="section">
+      <div class="section-label">Step 4</div>
+      <h2 class="section-title">Add Snapshots (historical balances)</h2>
+
+      <div class="section-text">
+        <p>
+          Snapshots record account balances at a point in time.
+          This solves a common problem in governance:
+          <b>you want to know how many tokens someone had when voting started, not today</b>.
+        </p>
+
+        <p>
+          We’ll extend our token with <span class="inline-code">ERC20Snapshot</span>.
+          That gives us:
+        </p>
+        <ul>
+          <li><span class="inline-code">snapshot()</span> → creates a new snapshot id</li>
+          <li><span class="inline-code">balanceOfAt(account, id)</span></li>
+          <li><span class="inline-code">totalSupplyAt(id)</span></li>
+        </ul>
+
+        <div class="code-toolbar">
+          <span>contracts/StudioToken.sol (snapshots)</span>
+          <button class="copy-btn" data-copy="#code-snap">Copy</button>
+        </div>
+<pre id="code-snap"><code>// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Snapshot.sol";
+
+contract StudioToken is ERC20, ERC20Snapshot {
+
+    constructor(uint256 initialSupply)
+        ERC20("StudioToken", "STUDIO")
+    {
+        _mint(msg.sender, initialSupply);
+    }
+
+    function snapshot() external returns (uint256) {
+        return _snapshot();
+    }
+
+    // --- Overrides required by Solidity ---
+    function _update(address from, address to, uint256 value)
+        internal
+        override(ERC20, ERC20Snapshot)
+    {
+        super._update(from, to, value);
+    }
+}</code></pre>
+
+        <div class="warning">
+          <div class="tip-title">Why do we override _update?</div>
+          <p>
+            In OZ v5, transfer/mint/burn logic funnels through <span class="inline-code">_update</span>.
+            Both ERC20 and Snapshot modify it, so Solidity needs a single final override.
+          </p>
+        </div>
+
+        <p>Recompile:</p>
+<pre><code>npx hardhat compile</code></pre>
+
+        <details class="accordion">
+          <summary>Snapshot mental model <span>read this if unsure</span></summary>
+          <div class="acc-body">
+            <p>
+              Snapshot does <b>not</b> store full balances every time. It stores checkpoints only when balances change.
+              If an account doesn’t change between snapshot A and B, its balance is read from the latest checkpoint.
+            </p>
+            <p>
+              That’s why snapshots are efficient even with many holders.
+            </p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- STEP 5 PAUSABLE -->
+    <section id="pausable" class="section">
+      <div class="section-label">Step 5</div>
+      <h2 class="section-title">Add Pausable (emergency stop)</h2>
+
+      <div class="section-text">
+        <p>
+          Pausable is a safety switch. If something goes wrong (exploit, oracle bug, governance attack)
+          you want to stop transfers fast.
+        </p>
+
+        <p>We’ll add <span class="inline-code">ERC20Pausable</span> and expose:</p>
+        <ul>
+          <li><span class="inline-code">pause()</span></li>
+          <li><span class="inline-code">unpause()</span></li>
+        </ul>
+
+        <div class="code-toolbar">
+          <span>contracts/StudioToken.sol (add pausable)</span>
+          <button class="copy-btn" data-copy="#code-pause">Copy</button>
+        </div>
+<pre id="code-pause"><code>// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Snapshot.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Pausable.sol";
+
+contract StudioToken is ERC20, ERC20Snapshot, ERC20Pausable {
+
+    constructor(uint256 initialSupply)
+        ERC20("StudioToken", "STUDIO")
+    {
+        _mint(msg.sender, initialSupply);
+    }
+
+    function snapshot() external returns (uint256) {
+        return _snapshot();
+    }
+
+    // Simple pause controls for now (we'll secure them with roles next step)
+    function pause() external {
+        _pause();
+    }
+
+    function unpause() external {
+        _unpause();
+    }
+
+    function _update(address from, address to, uint256 value)
+        internal
+        override(ERC20, ERC20Snapshot, ERC20Pausable)
+    {
+        super._update(from, to, value);
+    }
+}</code></pre>
+
+        <div class="warning">
+          <div class="tip-title">This is insecure right now</div>
+          <p>
+            Anyone can pause/unpause. That’s intentional for the moment —
+            next step we lock it behind roles.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 6 ACL -->
+    <section id="acl" class="section">
+      <div class="section-label">Step 6</div>
+      <h2 class="section-title">Add AccessControl (roles)</h2>
+
+      <div class="section-text">
+        <p>
+          A single owner key is dangerous. If compromised, the whole token is done.
+          Instead, we use <b>role‑based access control</b>:
+          different keys for different operations.
+        </p>
+
+        <p>
+          We’ll add OZ <span class="inline-code">AccessControl</span> and define roles:
+        </p>
+
+        <ul>
+          <li><span class="inline-code">DEFAULT_ADMIN_ROLE</span> — can grant/revoke roles</li>
+          <li><span class="inline-code">PAUSER_ROLE</span> — can pause/unpause</li>
+          <li><span class="inline-code">SNAPSHOT_ROLE</span> — can call snapshot</li>
+          <li><span class="inline-code">MINTER_ROLE</span> — can mint more tokens</li>
+        </ul>
+
+        <div class="code-toolbar">
+          <span>contracts/StudioToken.sol (roles)</span>
+          <button class="copy-btn" data-copy="#code-acl">Copy</button>
+        </div>
+<pre id="code-acl"><code>// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Snapshot.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Pausable.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
+
+contract StudioToken is ERC20, ERC20Snapshot, ERC20Pausable, AccessControl {
+
+    bytes32 public constant PAUSER_ROLE   = keccak256("PAUSER_ROLE");
+    bytes32 public constant SNAPSHOT_ROLE = keccak256("SNAPSHOT_ROLE");
+    bytes32 public constant MINTER_ROLE   = keccak256("MINTER_ROLE");
+
+    constructor(uint256 initialSupply)
+        ERC20("StudioToken", "STUDIO")
+    {
+        address admin = msg.sender;
+
+        _mint(admin, initialSupply);
+
+        // grant all roles to deployer for now
+        _grantRole(DEFAULT_ADMIN_ROLE, admin);
+        _grantRole(PAUSER_ROLE, admin);
+        _grantRole(SNAPSHOT_ROLE, admin);
+        _grantRole(MINTER_ROLE, admin);
+    }
+
+    function snapshot() external onlyRole(SNAPSHOT_ROLE) returns (uint256) {
+        return _snapshot();
+    }
+
+    function pause() external onlyRole(PAUSER_ROLE) {
+        _pause();
+    }
+
+    function unpause() external onlyRole(PAUSER_ROLE) {
+        _unpause();
+    }
+
+    function mint(address to, uint256 amount) external onlyRole(MINTER_ROLE) {
+        _mint(to, amount);
+    }
+
+    function _update(address from, address to, uint256 value)
+        internal
+        override(ERC20, ERC20Snapshot, ERC20Pausable)
+    {
+        super._update(from, to, value);
+    }
+}</code></pre>
+
+        <details class="accordion">
+          <summary>Role design best‑practice <span>production notes</span></summary>
+          <div class="acc-body">
+            <p>
+              In real deployments you usually:
+            </p>
+            <ul>
+              <li>assign admin role to a multisig / timelock</li>
+              <li>separate minter from pauser</li>
+              <li>revoke deployer’s power after setup</li>
+            </ul>
+            <p>
+              We keep a single admin for clarity, but the contract supports splitting roles anytime.
+            </p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- STEP 7 TESTS -->
+    <section id="tests" class="section">
+      <div class="section-label">Step 7</div>
+      <h2 class="section-title">Write tests for each extension</h2>
+
+      <div class="section-text">
+        <p>
+          Tests are where extensions prove their value.
+          We’ll verify:
+        </p>
+        <ul>
+          <li>Snapshots freeze historical balances</li>
+          <li>Pausable blocks transfers</li>
+          <li>Roles gate sensitive functions</li>
+        </ul>
+
+        <p>Create <span class="inline-code">test/StudioToken.ts</span>:</p>
+
+        <div class="code-toolbar">
+          <span>test/StudioToken.ts</span>
+          <button class="copy-btn" data-copy="#code-tests">Copy</button>
+        </div>
+<pre id="code-tests"><code>import { expect } from "chai";
+import { ethers, loadFixture } from "hardhat";
+
+describe("StudioToken (extensions)", function () {
+  async function deployFixture() {
+    const [admin, user, pauser, snapshotter, minter] =
+      await ethers.getSigners();
+
+    const initialSupply = 1_000_000n * 10n ** 18n;
+
+    const Token = await ethers.getContractFactory("StudioToken");
+    const token = await Token.deploy(initialSupply);
+    await token.waitForDeployment();
+
+    // role ids from contract
+    const PAUSER_ROLE = await token.PAUSER_ROLE();
+    const SNAPSHOT_ROLE = await token.SNAPSHOT_ROLE();
+    const MINTER_ROLE = await token.MINTER_ROLE();
+
+    // grant separate roles to different accounts (simulate production)
+    await token.grantRole(PAUSER_ROLE, pauser.address);
+    await token.grantRole(SNAPSHOT_ROLE, snapshotter.address);
+    await token.grantRole(MINTER_ROLE, minter.address);
+
+    return {
+      token,
+      admin,
+      user,
+      pauser,
+      snapshotter,
+      minter,
+      initialSupply,
+      PAUSER_ROLE,
+      SNAPSHOT_ROLE,
+      MINTER_ROLE,
+    };
+  }
+
+  it("snapshots historical balances", async () => {
+    const { token, admin, user, snapshotter } =
+      await loadFixture(deployFixture);
+
+    // transfer before snapshot
+    await token.transfer(user.address, 1000n);
+
+    // snapshot (only snapshotter)
+    const tx = await token.connect(snapshotter).snapshot();
+    const receipt = await tx.wait();
+    const id = receipt?.logs[0]?.args?.id ?? 1n;
+
+    // balances after snapshot change
+    await token.transfer(user.address, 500n);
+
+    // historical balance is frozen
+    expect(await token.balanceOfAt(user.address, id)).to.equal(1000n);
+    expect(await token.balanceOf(user.address)).to.equal(1500n);
+  });
+
+  it("pausable blocks transfers", async () => {
+    const { token, user, pauser } =
+      await loadFixture(deployFixture);
+
+    await token.connect(pauser).pause();
+
+    await expect(
+      token.transfer(user.address, 1n)
+    ).to.be.revertedWithCustomError(token, "EnforcedPause");
+
+    await token.connect(pauser).unpause();
+    await expect(token.transfer(user.address, 1n)).to.not.be.reverted;
+  });
+
+  it("roles gate minting", async () => {
+    const { token, user, minter } =
+      await loadFixture(deployFixture);
+
+    // user can't mint
+    await expect(
+      token.connect(user).mint(user.address, 1n)
+    ).to.be.reverted;
+
+    // minter can
+    await expect(
+      token.connect(minter).mint(user.address, 100n)
+    ).to.not.be.reverted;
+
+    expect(await token.balanceOf(user.address)).to.equal(100n);
+  });
+});</code></pre>
+
+        <p>Run tests:</p>
+<pre><code>npx hardhat test</code></pre>
+
+        <div class="success tip">
+          <div class="tip-title">If tests pass — you're golden</div>
+          <p>
+            You now have strong proof that extensions don’t interfere with each other.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 8 DEPLOY -->
+    <section id="deploy" class="section">
+      <div class="section-label">Step 8</div>
+      <h2 class="section-title">Deploy and verify</h2>
+
+      <div class="section-text">
+        <p>
+          Deployment is identical to the previous Hardhat guide — but now your token has roles.
+          We'll deploy with an initial supply and keep admin roles for the deployer.
+        </p>
+
+        <p>Create <span class="inline-code">scripts/deploy-token.ts</span>:</p>
+
+        <div class="code-toolbar">
+          <span>scripts/deploy-token.ts</span>
+          <button class="copy-btn" data-copy="#code-deploy">Copy</button>
+        </div>
+<pre id="code-deploy"><code>import { network } from "hardhat";
+
+async function main() {
+  const { ethers, networkName } = await network.connect();
+
+  const initialSupply = 1_000_000n * 10n ** 18n;
+
+  console.log(`Deploying StudioToken to ${networkName}...`);
+
+  const Token = await ethers.getContractFactory("StudioToken");
+  const token = await Token.deploy(initialSupply);
+  await token.waitForDeployment();
+
+  console.log("StudioToken deployed at:", await token.getAddress());
+}
+
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});</code></pre>
+
+        <p>Local deploy:</p>
+<pre><code>npx hardhat run scripts/deploy-token.ts</code></pre>
+
+        <p>Sepolia deploy (after config env vars):</p>
+<pre><code>npx hardhat run scripts/deploy-token.ts --network sepolia</code></pre>
+
+        <details class="accordion">
+          <summary>Verification reminder <span>same as previous guide</span></summary>
+          <div class="acc-body">
+            <p>
+              Add Etherscan key to <span class="inline-code">.env</span> and config,
+              then:
+            </p>
+<pre><code>npx hardhat verify --network sepolia &lt;address&gt; &lt;initialSupply&gt;</code></pre>
+            <p>
+              Initial supply is the constructor arg used at deployment.
+            </p>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- STEP 9 WRAP -->
+    <section id="wrap" class="section">
+      <div class="section-label">Wrap up</div>
+      <h2 class="section-title">What you achieved</h2>
+
+      <div class="section-grid">
+        <div class="section-text">
+          <p>Nice. You now have a token that resembles real products:</p>
+          <ul>
+            <li>Snapshots for governance / airdrops</li>
+            <li>Pausable emergency stop</li>
+            <li>AccessControl to split power safely</li>
+            <li>Correct multi‑inheritance overrides</li>
+            <li>Tests proving the whole stack works</li>
+          </ul>
+
+          <p style="margin-top:0.9rem;">
+            You can extend further with:
+          </p>
+          <ul>
+            <li>Burnable tokens (<span class="inline-code">ERC20Burnable</span>)</li>
+            <li>Permit approvals (<span class="inline-code">ERC20Permit</span>)</li>
+            <li>Capped supply (<span class="inline-code">ERC20Capped</span>)</li>
+            <li>Votes module (<span class="inline-code">ERC20Votes</span>)</li>
+          </ul>
+
+          <div class="note">
+            <div class="tip-title">Production next step</div>
+            <p>
+              Move <span class="inline-code">DEFAULT_ADMIN_ROLE</span> to a multisig and revoke deployer roles.
+              This makes the token robust against key leaks.
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <div class="card-soft">
+            <div class="card-title">Suggested next guides</div>
+            <ul class="step-list">
+              <li><span class="checkmark">→</span> ERC‑721 extensions (Enumerable, Royalty)</li>
+              <li><span class="checkmark">→</span> OZ Votes + Governor setup</li>
+              <li><span class="checkmark">→</span> Token security deep dive</li>
+            </ul>
+
+            <p style="margin-top:0.9rem; font-size:0.86rem; color:var(--text-muted);">
+              You can link those to <span class="inline-code">security.html</span> and <span class="inline-code">oz.html</span>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- progress widget -->
+  <div class="progress-wrap">
+    <div class="progress" id="progressBtn" title="Scroll to top">
+      <div style="text-align:center; line-height:1.1;">
+        <b id="progressPct">0%</b><br>
+        <span style="font-size:0.7rem;">done</span>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div>© 2025 web3.studio — intermediate track: OpenZeppelin extensions.</div>
+    <div class="footer-links">
+      <a href="../index.html">Home</a><span>·</span>
+      <a href="../guides.html">All guides</a><span>·</span>
+      <a href="../docs.html">Docs</a><span>·</span>
+      <a href="../oz.html">OpenZeppelin</a>
+    
+    </div>
+  </footer>
+
+  <div class="guide-progress" id="guideProgress">
+  <div class="gp-label">
+    <span id="gpPercent">0%</span> · guide progress
+  </div>
+
+  <div class="gp-bar">
+    <div class="gp-bar-fill" id="gpBarFill"></div>
+  </div>
+
+  <div class="gp-actions">
+    <button id="gpTopBtn">Top</button>
+    <button id="gpNextBtn">Next</button>
+  </div>
+</div>
+
+<style>
+    .guide-progress {
+  position: fixed;
+  bottom: 22px;
+  right: 22px;
+  background: rgba(15, 23, 42, 0.82);
+  padding: 1rem 1.2rem 1.2rem;
+  border-radius: 18px;
+  border: 1px solid rgba(148,163,184,0.35);
+  backdrop-filter: blur(12px);
+  width: 180px;
+  z-index: 999;
+  box-shadow: 0 0 35px rgba(0,0,0,0.55);
+  font-size: 0.82rem;
+  color: #f3f4f6;
+}
+
+.gp-label {
+  margin-bottom: 0.6rem;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+}
+
+.gp-bar {
+  height: 8px;
+  background: #0f172a;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 0.9rem;
+  border: 1px solid rgba(148,163,184,0.35);
+}
+
+.gp-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #facc15, #f97316);
+  transition: width 0.2s ease-out;
+}
+
+.gp-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.4rem;
+}
+
+.gp-actions button {
+  flex: 1;
+  background: rgba(30,41,59,0.85);
+  border: 1px solid rgba(148,163,184,0.45);
+  color: #e5e7eb;
+  padding: 0.35rem 0.4rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.15s;
+  font-size: 0.78rem;
+}
+
+.gp-actions button:hover {
+  background: rgba(51,65,85,0.85);
+  border-color: rgba(248,250,252,0.6);
+}
+
+</style>
+
+<script>
+
+    const gpPercent = document.getElementById("gpPercent");
+const gpBarFill = document.getElementById("gpBarFill");
+const gpTopBtn = document.getElementById("gpTopBtn");
+const gpNextBtn = document.getElementById("gpNextBtn");
+
+// Собираем все секции, чтобы "Next" работал автоматически
+const guideSections = Array.from(document.querySelectorAll("section[id]"));
+
+function updateProgress() {
+  const scrollTop = window.scrollY;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+
+  let progress = Math.min(100, (scrollTop / docHeight) * 100);
+  progress = Math.floor(progress);
+
+  gpPercent.innerText = progress + "%";
+  gpBarFill.style.width = progress + "%";
+}
+
+// Обновление прогресса при прокрутке
+window.addEventListener("scroll", updateProgress);
+updateProgress();
+
+// Кнопка Top
+gpTopBtn.addEventListener("click", () => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+// Кнопка Next — ищет следующую секцию
+gpNextBtn.addEventListener("click", () => {
+  const scrollPos = window.scrollY + 40;
+
+  let next = null;
+  for (let section of guideSections) {
+    const top = section.offsetTop;
+    if (top > scrollPos) {
+      next = section;
+      break;
+    }
+  }
+
+  if (next) {
+    window.scrollTo({ top: next.offsetTop - 60, behavior: "smooth" });
+  }
+});
+
+</script>
+
+<script>
+  // Copy buttons
+  document.querySelectorAll(".copy-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const sel = btn.getAttribute("data-copy");
+      const el = document.querySelector(sel);
+      if (!el) return;
+      navigator.clipboard.writeText(el.innerText.trim());
+      const old = btn.textContent;
+      btn.textContent = "Copied";
+      btn.style.borderColor = "rgba(34,197,94,0.8)";
+      setTimeout(() => {
+        btn.textContent = old;
+        btn.style.borderColor = "";
+      }, 1200);
+    });
+  });
+
+  // Progress
+  const pctEl = document.getElementById("progressPct");
+  const progBtn = document.getElementById("progressBtn");
+  function updateProgress() {
+    const doc = document.documentElement;
+    const scrollTop = doc.scrollTop || document.body.scrollTop;
+    const scrollHeight = doc.scrollHeight - doc.clientHeight;
+    const pct = scrollHeight ? Math.round((scrollTop / scrollHeight) * 100) : 0;
+    pctEl.textContent = pct + "%";
+  }
+  window.addEventListener("scroll", updateProgress, { passive: true });
+  updateProgress();
+  progBtn.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+</script>
+
+</body>
+</html>

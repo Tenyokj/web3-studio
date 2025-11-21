@@ -1,0 +1,1816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Advanced Guide — Invariant Testing with Foundry (DeFi Lending)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg: #020617;
+      --bg-elevated: #020617;
+      --card: #020617;
+      --card-soft: #030712;
+      --accent: #facc15;
+      --accent-soft: rgba(250, 204, 21, 0.10);
+      --accent-strong: rgba(250, 204, 21, 0.18);
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --border-subtle: rgba(148, 163, 184, 0.30);
+      --border-soft: rgba(148, 163, 184, 0.20);
+      --radius-lg: 22px;
+      --radius-md: 14px;
+      --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.9);
+      --shadow-glow: 0 0 80px rgba(250, 204, 21, 0.18);
+      --green: #22c55e;
+      --red: #f87171;
+      --blue: #38bdf8;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: radial-gradient(circle at top left, #0f172a 0, #020617 45%, #000 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* Top nav */
+    .nav {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 1.2rem 1.4rem 0.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(22px);
+      background: linear-gradient(to bottom, rgba(2, 6, 23, 0.96), rgba(2, 6, 23, 0.75), transparent);
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    .nav-orb {
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 20%, #fde047 0, #facc15 26%, #a16207 70%, #0f172a 100%);
+      box-shadow: 0 0 30px rgba(250, 204, 21, 0.6);
+    }
+
+    .nav-title {
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      font-size: 1rem;
+    }
+
+    .nav-tagline {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.85rem;
+    }
+
+    .nav-link {
+      padding: 0.4rem 0.7rem;
+      border-radius: 999px;
+      color: var(--text-muted);
+      border: 1px solid transparent;
+      transition: 0.18s ease;
+    }
+
+    .nav-link:hover {
+      border-color: rgba(148, 163, 184, 0.5);
+      color: var(--text-main);
+      background: rgba(15, 23, 42, 0.8);
+    }
+
+    .nav-pill {
+      border-radius: 999px;
+      padding: 0.4rem 0.9rem;
+      border: 1px solid var(--border-subtle);
+      background: radial-gradient(circle at top left, rgba(250, 204, 21, 0.14), rgba(15, 23, 42, 0.8));
+      color: #fefce8;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+    }
+
+    .nav-pill-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #bbf7d0;
+      box-shadow: 0 0 11px rgba(74, 222, 128, 0.9);
+    }
+
+    /* Page shell */
+    .page {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 1.4rem 3.5rem;
+    }
+
+    /* Hero */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 3.4fr) minmax(0, 2.4fr);
+      gap: 2.6rem;
+      padding: 2.2rem 0 1.4rem;
+      align-items: center;
+    }
+
+    @media (max-width: 920px) {
+      .hero { grid-template-columns: minmax(0, 1fr); }
+    }
+
+    .hero-left-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.22rem 0.4rem;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 0.8rem;
+    }
+
+    .hero-left-label span {
+      padding: 0.16rem 0.5rem;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+    }
+
+    .hero-h1 {
+      font-size: clamp(2.25rem, 3vw, 2.9rem);
+      letter-spacing: -0.05em;
+      margin: 0.15rem 0 0.65rem;
+      line-height: 1.05;
+    }
+
+    .hero-h1 span {
+      background: linear-gradient(120deg, #facc15, #f97316, #22c55e);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .hero-lead {
+      color: var(--text-muted);
+      font-size: 0.98rem;
+      max-width: 34rem;
+      line-height: 1.8;
+      margin-bottom: 1.4rem;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-bottom: 1.8rem;
+    }
+
+    .hero-chip {
+      padding: 0.32rem 0.75rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      background: rgba(15, 23, 42, 0.85);
+    }
+
+    .hero-chip b { color: #e5e7eb; font-weight: 600; }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .btn-primary {
+      padding: 0.7rem 1.4rem;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      background: radial-gradient(circle at 0 0, #facc15, #f97316);
+      color: #030712;
+      font-weight: 600;
+      font-size: 0.9rem;
+      box-shadow: 0 14px 35px rgba(250, 204, 21, 0.45);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      cursor: pointer;
+      transition: 0.18s ease;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 20px 55px rgba(250, 204, 21, 0.65);
+    }
+
+    .btn-ghost {
+      padding: 0.65rem 1.1rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.55);
+      background: rgba(15, 23, 42, 0.9);
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      cursor: pointer;
+      transition: 0.18s ease;
+    }
+
+    .btn-ghost:hover {
+      border-color: rgba(249, 250, 251, 0.9);
+      color: #e5e7eb;
+      background: rgba(15, 23, 42, 1);
+    }
+
+    .hero-right { position: relative; }
+
+    .hero-card {
+      border-radius: var(--radius-lg);
+      background:
+        radial-gradient(circle at top left, rgba(250, 204, 21, 0.14), transparent 55%),
+        radial-gradient(circle at bottom right, rgba(56, 189, 248, 0.14), transparent 55%),
+        linear-gradient(to bottom right, #020617, #020617);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      box-shadow: var(--shadow-soft), var(--shadow-glow);
+      padding: 1rem 1.1rem 1.05rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.65rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .hero-card-badge {
+      padding: 0.16rem 0.55rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: rgba(15, 23, 42, 0.9);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #e5e7eb;
+    }
+
+    .hero-metric-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-bottom: 0.6rem;
+      font-size: 0.78rem;
+    }
+
+    .hero-metric-label { color: var(--text-muted); }
+
+    .hero-metric-value {
+      font-family: "JetBrains Mono", monospace;
+      color: #e5e7eb;
+    }
+
+    .hero-code-box {
+      margin-top: 0.7rem;
+      padding: 0.75rem 0.8rem;
+      border-radius: 16px;
+      background: rgba(15, 23, 42, 0.88);
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.78rem;
+      color: #e5e7eb;
+      overflow-x: auto;
+      line-height: 1.6;
+    }
+
+    .hero-code-box code { white-space: pre; }
+
+    .hero-code-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.4rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* Sections */
+    .section { margin-top: 2.6rem; }
+
+    .section-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .section-title {
+      font-size: 1.25rem;
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+    }
+
+    .section-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 3.2fr) minmax(0, 2.4fr);
+      gap: 1.8rem;
+    }
+
+    @media (max-width: 900px) {
+      .section-grid { grid-template-columns: minmax(0, 1fr); }
+    }
+
+    .section-text {
+      font-size: 0.96rem;
+      color: var(--text-muted);
+      line-height: 1.75;
+    }
+
+    .pill-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.7rem;
+      font-size: 0.8rem;
+    }
+
+    .pill {
+      padding: 0.3rem 0.65rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-muted);
+    }
+
+    .card {
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      background: radial-gradient(circle at top left, rgba(250, 204, 21, 0.16), transparent 60%), #020617;
+      padding: 1.2rem 1.25rem;
+      box-shadow: 0 14px 35px rgba(15, 23, 42, 0.9);
+    }
+
+    .card-soft {
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      background: rgba(15, 23, 42, 0.9);
+      padding: 1rem 1.05rem;
+      font-size: 0.9rem;
+    }
+
+    .card-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+    }
+
+    .card-meta {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .step-list {
+      list-style: none;
+      padding: 0;
+      margin: 0.4rem 0 0;
+      font-size: 0.9rem;
+    }
+
+    .step-list li {
+      margin-bottom: 0.45rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* Code blocks */
+    pre {
+      margin: 1rem 0 1.6rem;
+      padding: 0.9rem 1rem;
+      border-radius: 16px;
+      background: rgba(15, 23, 42, 0.94);
+      border: 1px solid var(--border-soft);
+      box-shadow: 0 16px 34px rgba(15, 23, 42, 0.85);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.82rem;
+      color: #e5e7eb;
+      overflow-x: auto;
+      line-height: 1.7;
+    }
+    pre code { white-space: pre; }
+
+    .inline-code {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.82rem;
+      padding: 0.1rem 0.35rem;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      color: #e5e7eb;
+    }
+
+    .tip, .note, .warning {
+      margin: 1rem 0 1.4rem;
+      padding: 0.85rem 0.95rem;
+      border-radius: 14px;
+      font-size: 0.90rem;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+    }
+
+    .note {
+      border-color: rgba(56, 189, 248, 0.8);
+      background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.18), rgba(15, 23, 42, 0.9));
+    }
+    .warning {
+      border-color: rgba(248, 113, 113, 0.9);
+      background: radial-gradient(circle at top left, rgba(248, 113, 113, 0.16), rgba(15, 23, 42, 0.96));
+    }
+
+    .tip-title {
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+      color: #e5e7eb;
+      letter-spacing: -0.01em;
+    }
+
+    .tip p, .note p, .warning p {
+      margin: 0.35rem 0 0;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: minmax(0, 1.5fr) minmax(0, 1.9fr);
+      gap: 1.2rem;
+    }
+    @media (max-width: 860px) {
+      .two-col { grid-template-columns: minmax(0, 1fr); }
+    }
+
+    .checklist {
+      list-style: none;
+      padding: 0;
+      margin: 0.4rem 0 0;
+      font-size: 0.9rem;
+    }
+    .checklist li {
+      margin-bottom: 0.35rem;
+      color: var(--text-muted);
+    }
+
+    .checkmark {
+      color: #bbf7d0;
+      margin-right: 0.4rem;
+    }
+
+    .muted { color: var(--text-muted); }
+
+    .hr {
+      height: 1px;
+      background: rgba(148, 163, 184, 0.2);
+      margin: 1.6rem 0;
+      border-radius: 999px;
+    }
+
+    footer {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 2rem 1.4rem 2.4rem;
+      border-top: 1px solid rgba(51, 65, 85, 0.8);
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.6rem;
+    }
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.7rem;
+      font-size: 0.84rem;
+    }
+    .footer-links a { color: var(--text-muted); }
+    .footer-links a:hover { color: #e5e7eb; }
+
+    section[id] { scroll-margin-top: 96px; }
+
+    /* Progress widget (bottom-right) */
+    .progress-widget {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      width: 220px;
+      padding: 12px;
+      border-radius: 18px;
+      border: 1px solid rgba(148,163,184,0.35);
+      background:
+        radial-gradient(circle at top left, rgba(250,204,21,0.12), transparent 70%),
+        rgba(2,6,23,0.9);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 12px 35px rgba(0,0,0,0.6);
+      z-index: 1000;
+      font-size: 14px;
+      color: #e5e7eb;
+      transition: transform .2s ease, opacity .2s ease;
+    }
+
+    .progress-widget.collapsed {
+      transform: translateY(8px);
+      opacity: 0.5;
+    }
+
+    .pw-top {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .pw-percent {
+      font-weight: 800;
+      font-size: 22px;
+      letter-spacing: -0.02em;
+    }
+
+    .pw-label {
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .pw-bar {
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(148,163,184,0.18);
+      overflow: hidden;
+      border: 1px solid rgba(148,163,184,0.25);
+    }
+
+    .pw-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #facc15, #f97316);
+      transition: width .15s ease;
+    }
+
+    .pw-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .pw-btn {
+      padding: 9px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(148,163,184,0.35);
+      background: rgba(15,23,42,0.9);
+      color: #e5e7eb;
+      font-weight: 600;
+      cursor: pointer;
+      transition: .15s ease;
+      text-align: center;
+      user-select: none;
+    }
+
+    .pw-btn:hover {
+      border-color: rgba(250,204,21,0.8);
+      box-shadow: 0 0 0 2px rgba(250,204,21,0.15) inset;
+      transform: translateY(-1px);
+    }
+
+    .pw-tiny {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .pw-toggle {
+      cursor: pointer;
+      opacity: .8;
+    }
+    .pw-toggle:hover { opacity: 1; }
+
+        .nav-donate-btn {
+      padding: 0.55rem 1.2rem;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      background: radial-gradient(circle at 0 0, #facc15, #f97316);
+      color: #030712;
+      border: 1px solid transparent;
+      box-shadow: 0 10px 24px rgba(250, 204, 21, 0.45);
+      transition: 0.18s ease;
+      line-height: 1;
+      height: 32px;
+    }
+
+    .nav-donate-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 35px rgba(250, 204, 21, 0.65);
+    }
+  </style>
+</head>
+
+<body>
+  <!-- TOP NAV -->
+  <header class="nav">
+    <div class="nav-left">
+      <div class="nav-orb"></div>
+      <div>
+        <div class="nav-title">web3.studio</div>
+        <div class="nav-tagline">Guides • Foundry • Security • DeFi</div>
+      </div>
+    </div>
+
+    <div class="nav-right">
+      <a href="../index.html" class="nav-link">Home</a>
+      <a href="../guides.html" class="nav-link">All guides</a>
+      <a href="../donate.html" class="nav-donate-btn">Donate</a>
+      <span class="nav-pill">
+        <span class="nav-pill-dot"></span>
+        Advanced track
+      </span>
+    </div>
+  </header>
+
+  <main class="page">
+    <!-- HERO -->
+    <section class="hero">
+      <div>
+        <div class="hero-left-label">
+          <span>Advanced • Foundry</span>
+          Invariant testing for DeFi-like flows
+        </div>
+
+        <h1 class="hero-h1">
+          Prove your protocol never <span>loses funds</span><br />with invariants.
+        </h1>
+
+        <p class="hero-lead">
+          In this 2-hour advanced guide you’ll model a small lending protocol,
+          then use Foundry’s invariant fuzzing to hunt for bugs you would never
+          think to write unit tests for. You’ll learn how to design handlers,
+          track ghost variables, and encode solvency guarantees.
+        </p>
+
+        <div class="hero-meta">
+          <div class="hero-chip"><b>Level</b> · Advanced</div>
+          <div class="hero-chip"><b>Stack</b> · Foundry, Solidity</div>
+          <div class="hero-chip"><b>Time</b> · ~2 hours</div>
+          <div class="hero-chip"><b>Theme</b> · DeFi invariants</div>
+        </div>
+
+        <div class="hero-actions">
+          <a href="#overview" class="btn-primary">
+            Start guide
+            <span>↓</span>
+          </a>
+          <a href="#invariants" class="btn-ghost">
+            Jump to invariants
+          </a>
+        </div>
+      </div>
+
+      <div class="hero-right">
+        <div class="hero-card">
+          <div class="hero-card-header">
+            <span>What you’ll build</span>
+            <span class="hero-card-badge">LENDING POOL</span>
+          </div>
+
+          <div class="hero-metric-row">
+            <span class="hero-metric-label">Collateral</span>
+            <span class="hero-metric-value">ETH (simulated)</span>
+          </div>
+          <div class="hero-metric-row">
+            <span class="hero-metric-label">Debt asset</span>
+            <span class="hero-metric-value">USDToken (ERC-20)</span>
+          </div>
+          <div class="hero-metric-row">
+            <span class="hero-metric-label">Key invariants</span>
+            <span class="hero-metric-value">solvency, health</span>
+          </div>
+
+          <div class="hero-code-box">
+            <div class="hero-code-label">
+              <span>src/LendingPool.sol</span>
+              <span>DeFi-like core</span>
+            </div>
+            <code>function borrow(uint256 amount) external {
+    _accrue(msg.sender);
+    require(health(msg.sender) &gt;= 1e18, "HF&lt;1");
+    debt[msg.sender] += amount;
+    usd.mint(msg.sender, amount);
+}</code>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- OVERVIEW -->
+    <section id="overview" class="section">
+      <div class="section-label">Overview</div>
+      <h2 class="section-title">What you’ll learn (no fluff)</h2>
+
+      <div class="section-grid">
+        <div class="section-text">
+          <p>
+            This guide is built like a real protocol testing workflow:
+            you implement a minimal DeFi component, then lock its safety properties
+            using Foundry invariant fuzzing.
+          </p>
+          <ul>
+            <li>Set up a clean Foundry workspace for invariants</li>
+            <li>Build a tiny lending pool with collateral + debt</li>
+            <li>Write <b>unit tests</b> for expected flows</li>
+            <li>Design a robust <b>Handler</b> that fuzzes user behavior</li>
+            <li>Track “ghost state” to reason about totals</li>
+            <li>Write invariants like solvency and no-loss guarantees</li>
+            <li>Debug invariant failures effectively</li>
+          </ul>
+
+          <div class="note">
+            <div class="tip-title">Why invariants?</div>
+            <p>
+              Unit tests check specific paths. Invariants let the fuzzer generate
+              hundreds of thousands of weird action sequences and check that some property
+              <i>always</i> holds, even in the crazy corners you didn’t predict.
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <div class="card-title">Prerequisites</div>
+            <div class="card-meta">You should be comfortable with:</div>
+            <ul class="checklist">
+              <li><span class="checkmark">✓</span> Solidity syntax & contracts</li>
+              <li><span class="checkmark">✓</span> Foundry basics (<span class="inline-code">forge test</span>)</li>
+              <li><span class="checkmark">✓</span> ERC-20 mental model</li>
+              <li><span class="checkmark">✓</span> DeFi primitives: collateral, debt, oracle, LTV</li>
+            </ul>
+            <div class="card-meta" style="margin-top:0.6rem;">
+              If not, skim:
+              <span class="inline-code">solidity.html</span> and
+              <span class="inline-code">foundry.html</span>.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 1: SETUP -->
+    <section id="setup" class="section">
+      <div class="section-label">Step 1</div>
+      <h2 class="section-title">Set up Foundry for invariant fuzzing</h2>
+
+      <div class="two-col">
+        <div class="section-text">
+          <p>1) Create a new Foundry project:</p>
+          <pre><code>mkdir invariant-lending
+cd invariant-lending
+forge init
+</code></pre>
+
+          <p>2) Open the folder. You should have:</p>
+          <pre><code>.
+├─ src/
+├─ test/
+├─ lib/
+└─ foundry.toml
+</code></pre>
+
+          <p>
+            We will use <span class="inline-code">forge test --match-test invariant_*</span>
+            later to isolate invariant suites.
+          </p>
+
+          <p>3) Add OpenZeppelin (for ERC-20 base):</p>
+          <pre><code>forge install OpenZeppelin/openzeppelin-contracts --no-commit
+</code></pre>
+
+          <p>4) Set fuzzing defaults in <span class="inline-code">foundry.toml</span>:</p>
+          <pre><code>[profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
+
+# Fuzzing / invariants
+fuzz_runs = 2048
+invariant_runs = 512
+invariant_depth = 64
+verbosity = 2
+</code></pre>
+
+          <div class="tip">
+            <div class="tip-title">Depth vs Runs</div>
+            <p>
+              <b>invariant_depth</b> controls how many actions per sequence.
+              <b>invariant_runs</b> controls how many sequences.
+              A common approach: deep sequences (32-128) + moderate runs (256-1024).
+            </p>
+          </div>
+
+        </div>
+
+        <div>
+          <div class="card-soft">
+            <div class="card-title">Why these numbers?</div>
+            <p>
+              Lending protocols often fail after long sequences:
+              deposit → borrow → price move → repay → withdraw → borrow again...
+              So we want deep sequences to catch state bugs.
+            </p>
+            <ul class="step-list">
+              <li><span class="checkmark">✓</span> That’s why depth = 64</li>
+              <li><span class="checkmark">✓</span> Runs = 512 gives decent coverage</li>
+              <li><span class="checkmark">✓</span> You can scale up later</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 2: MODEL -->
+    <section id="model" class="section">
+      <div class="section-label">Step 2</div>
+      <h2 class="section-title">Model a DeFi-like lending pool (minimal but real)</h2>
+
+      <div class="section-text">
+        <p>
+          We’ll implement a small protocol with:
+        </p>
+        <ul>
+          <li>Users deposit ETH as collateral</li>
+          <li>Users borrow a stable ERC-20 against collateral</li>
+          <li>An oracle provides ETH price</li>
+          <li>Health factor enforces solvency</li>
+          <li>Repay & withdraw flows</li>
+        </ul>
+
+        <div class="note">
+          <div class="tip-title">Minimalism on purpose</div>
+          <p>
+            The goal isn’t a full Aave clone.
+            It’s a compact state machine with enough complexity
+            to create meaningful invariants.
+          </p>
+        </div>
+
+        <h3>2.1 USDToken (mintable ERC-20)</h3>
+        <p>Create <span class="inline-code">src/USDToken.sol</span>:</p>
+
+        <pre><code>// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+
+contract USDToken is ERC20 {
+    address public minter;
+
+    constructor() ERC20("USDToken", "USDT") {}
+
+    function setMinter(address m) external {
+        require(minter == address(0), "minter already set");
+        minter = m;
+    }
+
+    modifier onlyMinter() {
+        require(msg.sender == minter, "not minter");
+        _;
+    }
+
+    function mint(address to, uint256 amt) external onlyMinter {
+        _mint(to, amt);
+    }
+
+    function burn(address from, uint256 amt) external onlyMinter {
+        _burn(from, amt);
+    }
+}</code></pre>
+
+        <h3>2.2 Price oracle (simplified)</h3>
+        <p>Create <span class="inline-code">src/Oracle.sol</span>:</p>
+
+        <pre><code>// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+contract Oracle {
+    // price in USD with 18 decimals
+    uint256 public price = 2000e18;
+
+    function setPrice(uint256 newPrice) external {
+        price = newPrice;
+    }
+}</code></pre>
+
+        <h3>2.3 LendingPool core</h3>
+        <p>Create <span class="inline-code">src/LendingPool.sol</span>:</p>
+
+        <pre><code>// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "./USDToken.sol";
+import "./Oracle.sol";
+
+contract LendingPool {
+    USDToken public immutable usd;
+    Oracle  public immutable oracle;
+
+    // user collateral in wei
+    mapping(address =&gt; uint256) public collateral;
+    // user debt in USDT (18d)
+    mapping(address =&gt; uint256) public debt;
+
+    // constants
+    uint256 public constant LTV = 75e16;  // 0.75 * 1e18
+    uint256 public constant LIQ_THRESHOLD = 80e16; // 0.8 * 1e18
+
+    constructor(USDToken _usd, Oracle _oracle) {
+        usd = _usd;
+        oracle = _oracle;
+    }
+
+    // --- Views ---
+
+    function ethPrice() public view returns (uint256) {
+        return oracle.price(); // USD per ETH, 18d
+    }
+
+    function collateralValueUsd(address user) public view returns (uint256) {
+        return collateral[user] * ethPrice() / 1e18;
+    }
+
+    function maxBorrowUsd(address user) public view returns (uint256) {
+        return collateralValueUsd(user) * LTV / 1e18;
+    }
+
+    function healthFactor(address user) public view returns (uint256) {
+        uint256 d = debt[user];
+        if (d == 0) return type(uint256).max;
+        // collateral * threshold / debt
+        return collateralValueUsd(user) * LIQ_THRESHOLD / d;
+    }
+
+    // --- Actions ---
+
+    function deposit() external payable {
+        collateral[msg.sender] += msg.value;
+    }
+
+    function withdraw(uint256 amountWei) external {
+        require(collateral[msg.sender] &gt;= amountWei, "not enough collateral");
+        collateral[msg.sender] -= amountWei;
+        require(healthFactor(msg.sender) &gt;= 1e18, "HF&lt;1 after withdraw");
+
+        (bool ok,) = msg.sender.call{value: amountWei}("");
+        require(ok, "eth transfer failed");
+    }
+
+    function borrow(uint256 amountUsd) external {
+        require(amountUsd &gt; 0, "zero borrow");
+        uint256 maxB = maxBorrowUsd(msg.sender);
+        require(debt[msg.sender] + amountUsd &lt;= maxB, "exceeds LTV");
+
+        debt[msg.sender] += amountUsd;
+        usd.mint(msg.sender, amountUsd);
+        require(healthFactor(msg.sender) &gt;= 1e18, "HF&lt;1 after borrow");
+    }
+
+    function repay(uint256 amountUsd) external {
+        require(amountUsd &gt; 0, "zero repay");
+        uint256 d = debt[msg.sender];
+        uint256 pay = amountUsd &gt; d ? d : amountUsd;
+
+        debt[msg.sender] -= pay;
+        usd.burn(msg.sender, pay);
+    }
+}</code></pre>
+
+        <div class="warning">
+          <div class="tip-title">We intentionally skip liquidations</div>
+          <p>
+            Liquidations add more state and invariants.
+            For a first invariant suite, solvency and HF guarantees are enough.
+            You can extend later (great exercise).
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- STEP 3: UNIT TESTS -->
+    <section id="unit" class="section">
+      <div class="section-label">Step 3</div>
+      <h2 class="section-title">Write unit tests for sanity</h2>
+
+      <div class="section-text">
+        <p>
+          We start with a few deterministic tests just to ensure the model works.
+        </p>
+
+        <p>Create <span class="inline-code">test/LendingPool.unit.t.sol</span>:</p>
+
+        <pre><code>// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "forge-std/Test.sol";
+import "../src/USDToken.sol";
+import "../src/Oracle.sol";
+import "../src/LendingPool.sol";
+
+contract LendingPoolUnitTest is Test {
+    USDToken usd;
+    Oracle oracle;
+    LendingPool pool;
+
+    address alice = address(0xA11CE);
+    address bob   = address(0xB0B);
+
+    function setUp() public {
+        usd = new USDToken();
+        oracle = new Oracle();
+        pool = new LendingPool(usd, oracle);
+        usd.setMinter(address(pool));
+
+        vm.deal(alice, 100 ether);
+        vm.deal(bob, 100 ether);
+    }
+
+    function test_depositAndBorrow() public {
+        vm.startPrank(alice);
+        pool.deposit{value: 10 ether}();
+
+        // ETH price 2000 => 10 ETH == 20k USD
+        // LTV 75% => max borrow 15k
+        pool.borrow(15_000e18);
+
+        assertEq(pool.debt(alice), 15_000e18);
+        assertEq(usd.balanceOf(alice), 15_000e18);
+        assertTrue(pool.healthFactor(alice) &gt;= 1e18);
+        vm.stopPrank();
+    }
+
+    function test_repayAndWithdraw() public {
+        vm.startPrank(alice);
+        pool.deposit{value: 10 ether}();
+        pool.borrow(10_000e18);
+
+        pool.repay(4_000e18);
+        assertEq(pool.debt(alice), 6_000e18);
+
+        pool.withdraw(2 ether);
+        assertEq(pool.collateral(alice), 8 ether);
+
+        vm.stopPrank();
+    }
+
+    function test_priceDropCanMakeHFBelow1() public {
+        vm.startPrank(alice);
+        pool.deposit{value: 10 ether}();
+        pool.borrow(14_000e18);
+        vm.stopPrank();
+
+        // ETH price drops to 1200
+        oracle.setPrice(1200e18);
+
+        // HF should dip below 1
+        assertTrue(pool.healthFactor(alice) &lt; 1e18);
+    }
+}</code></pre>
+
+        <p>Run:</p>
+        <pre><code>forge test --match-test test_ -vv
+</code></pre>
+
+        <div class="tip">
+          <div class="tip-title">Unit tests are not the goal</div>
+          <p>
+            We just validated basic flows. The real power comes next:
+            fuzzing arbitrary sequences.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 4: INVARIANTS THEORY -->
+    <section id="invariants" class="section">
+      <div class="section-label">Step 4</div>
+      <h2 class="section-title">Define safety invariants we care about</h2>
+
+      <div class="section-text">
+        <p>
+          Before coding, write down the properties you want to guarantee.
+          A good invariant is:
+        </p>
+        <ul>
+          <li>Simple to state</li>
+          <li>Hard to break accidentally</li>
+          <li>Meaningful for users / funds</li>
+        </ul>
+
+        <h3>Invariant #1 — protocol solvency</h3>
+        <p>
+          The pool should never “create” debt without enough collateral to justify it.
+          In our model, solvency means:
+        </p>
+        <pre><code>sum(collateralValueUsd(users)) * LIQ_THRESHOLD
+    &gt;= sum(debt(users))</code></pre>
+
+        <p>
+          If this ever fails, the protocol is underwater and someone can withdraw
+          more than is safe.
+        </p>
+
+        <h3>Invariant #2 — no negative balances</h3>
+        <p>
+          User collateral and debt mappings should never underflow.
+          Solidity 0.8 already reverts on underflow, but we still want to assert:
+        </p>
+        <pre><code>collateral[user] &gt;= 0
+debt[user] &gt;= 0</code></pre>
+
+        <h3>Invariant #3 — minted supply equals total debt</h3>
+        <p>
+          Since the pool is the only minter/burner of USDToken in this model,
+          total supply should always match sum of user debts:
+        </p>
+        <pre><code>usd.totalSupply() == sum(debt(users))</code></pre>
+
+        <div class="note">
+          <div class="tip-title">Why this invariant is gold</div>
+          <p>
+            It instantly catches bugs where debt updates, minting, or burning fall out of sync.
+            That’s a common and expensive class of DeFi bugs.
+          </p>
+        </div>
+
+        <h3>Invariant #4 — health factor can only be &lt; 1 due to price moves</h3>
+        <p>
+          Users should not be able to make themselves unhealthy via actions
+          (borrow/withdraw enforce HF ≥ 1). So:
+        </p>
+        <pre><code>after any user action:
+  healthFactor(user) &gt;= 1e18
+unless oracle price changed externally</code></pre>
+
+        <p>
+          We’ll encode this by modeling oracle moves as a separate handler action
+          and tracking whether price changed in the current sequence.
+        </p>
+      </div>
+    </section>
+
+    <!-- STEP 5: HANDLER -->
+    <section id="handler" class="section">
+      <div class="section-label">Step 5</div>
+      <h2 class="section-title">Write a Handler that fuzzes DeFi behavior</h2>
+
+      <div class="section-text">
+        <p>
+          Foundry invariants work like this:
+        </p>
+        <ol>
+          <li>You create a <b>Handler</b> contract with actions.</li>
+          <li>Foundry randomly calls these actions in sequences.</li>
+          <li>After each sequence, it checks invariant functions.</li>
+        </ol>
+
+        <p>Create <span class="inline-code">test/Handler.t.sol</span>:</p>
+
+        <pre><code>// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "forge-std/Test.sol";
+import "../src/USDToken.sol";
+import "../src/Oracle.sol";
+import "../src/LendingPool.sol";
+
+contract Handler is Test {
+    LendingPool public pool;
+    USDToken public usd;
+    Oracle public oracle;
+
+    address[] public users;
+    bool public priceMoved;
+
+    constructor(LendingPool _pool, USDToken _usd, Oracle _oracle, address[] memory _users) {
+        pool = _pool;
+        usd = _usd;
+        oracle = _oracle;
+        users = _users;
+    }
+
+    // Pick a user by fuzzed index
+    function _user(uint256 seed) internal view returns (address) {
+        return users[seed % users.length];
+    }
+
+    // --- Actions ---
+
+    function act_deposit(uint256 userSeed, uint256 amountWei) public {
+        address u = _user(userSeed);
+
+        // bound amount to realistic range
+        uint256 amt = bound(amountWei, 0.1 ether, 20 ether);
+
+        vm.deal(u, u.balance + amt);
+        vm.prank(u);
+        pool.deposit{value: amt}();
+    }
+
+    function act_withdraw(uint256 userSeed, uint256 amountWei) public {
+        address u = _user(userSeed);
+
+        uint256 col = pool.collateral(u);
+        if (col == 0) return;
+
+        uint256 amt = bound(amountWei, 0, col);
+
+        vm.prank(u);
+        // withdraw may revert if HF&lt;1, that's ok
+        try pool.withdraw(amt) {} catch {}
+    }
+
+    function act_borrow(uint256 userSeed, uint256 amountUsd) public {
+        address u = _user(userSeed);
+
+        uint256 maxB = pool.maxBorrowUsd(u);
+        uint256 d = pool.debt(u);
+        if (maxB &lt;= d) return;
+
+        uint256 room = maxB - d;
+        uint256 amt = bound(amountUsd, 1e18, room);
+
+        vm.prank(u);
+        try pool.borrow(amt) {} catch {}
+    }
+
+    function act_repay(uint256 userSeed, uint256 amountUsd) public {
+        address u = _user(userSeed);
+
+        uint256 d = pool.debt(u);
+        if (d == 0) return;
+
+        uint256 amt = bound(amountUsd, 1e18, d);
+
+        // ensure user has enough USD to repay
+        vm.startPrank(u);
+        if (usd.balanceOf(u) &lt; amt) {
+            // minting to user should only happen via borrow,
+            // but for testing we allow top-up to explore repay paths
+            usd.mint(u, amt - usd.balanceOf(u));
+        }
+
+        try pool.repay(amt) {} catch {}
+        vm.stopPrank();
+    }
+
+    function act_movePrice(uint256 newPrice) public {
+        // allow oracle moves in a broad range
+        uint256 p = bound(newPrice, 300e18, 5000e18);
+        oracle.setPrice(p);
+        priceMoved = true;
+    }
+
+    function resetPriceMoved() public {
+        priceMoved = false;
+    }
+}</code></pre>
+
+        <div class="warning">
+          <div class="tip-title">Note about “test-only mint”</div>
+          <p>
+            In <span class="inline-code">act_repay</span> we top-up USD balances if needed.
+            That’s a common trick in invariant tests to explore repay paths
+            even if the fuzzer didn’t borrow first.
+            If you want stricter realism, remove the mint and require borrow-first.
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- STEP 6: INVARIANT TEST SUITE -->
+    <section id="suite" class="section">
+      <div class="section-label">Step 6</div>
+      <h2 class="section-title">Write invariant tests (+ ghost state)</h2>
+
+      <div class="section-text">
+        <p>
+          Now we create Foundry’s invariant harness. This is the contract
+          where invariants live.
+        </p>
+
+        <p>Create <span class="inline-code">test/LendingPool.invariant.t.sol</span>:</p>
+
+        <pre><code>// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "forge-std/Test.sol";
+import "forge-std/StdInvariant.sol";
+import "../src/USDToken.sol";
+import "../src/Oracle.sol";
+import "../src/LendingPool.sol";
+import "./Handler.t.sol";
+
+contract LendingPoolInvariantTest is StdInvariant, Test {
+    USDToken usd;
+    Oracle oracle;
+    LendingPool pool;
+    Handler handler;
+
+    address[] users;
+
+    function setUp() public {
+        usd = new USDToken();
+        oracle = new Oracle();
+        pool = new LendingPool(usd, oracle);
+        usd.setMinter(address(pool));
+
+        // create a small user set
+        users.push(address(0xA11CE));
+        users.push(address(0xB0B));
+        users.push(address(0xCAFE));
+        users.push(address(0xD00D));
+
+        for (uint256 i = 0; i &lt; users.length; i++) {
+            vm.deal(users[i], 200 ether);
+        }
+
+        handler = new Handler(pool, usd, oracle, users);
+
+        // Tell Foundry to fuzz handler functions
+        targetContract(address(handler));
+
+        // optional: reduce or bias specific selectors
+        bytes4;
+        selectors[0] = Handler.act_deposit.selector;
+        selectors[1] = Handler.act_withdraw.selector;
+        selectors[2] = Handler.act_borrow.selector;
+        selectors[3] = Handler.act_repay.selector;
+        selectors[4] = Handler.act_movePrice.selector;
+
+        targetSelector(FuzzSelector({
+            addr: address(handler),
+            selectors: selectors
+        }));
+    }
+
+    // --- helper to sum debt & collateral ---
+
+    function _sumDebt() internal view returns (uint256 total) {
+        for (uint256 i = 0; i &lt; users.length; i++) {
+            total += pool.debt(users[i]);
+        }
+    }
+
+    function _sumCollUsd() internal view returns (uint256 total) {
+        for (uint256 i = 0; i &lt; users.length; i++) {
+            total += pool.collateralValueUsd(users[i]);
+        }
+    }
+
+    // --- Invariants ---
+
+    // Invariant #1: Solvency
+    function invariant_protocolSolvent() public {
+        uint256 totalDebt = _sumDebt();
+        uint256 totalColUsd = _sumCollUsd();
+
+        uint256 thresholdCol = totalColUsd * pool.LIQ_THRESHOLD() / 1e18;
+
+        assertGe(thresholdCol, totalDebt, "protocol insolvent");
+    }
+
+    // Invariant #2: totalSupply == sum(debt)
+    function invariant_supplyEqualsDebt() public {
+        assertEq(usd.totalSupply(), _sumDebt(), "supply != debt");
+    }
+
+    // Invariant #3: no action can make HF &lt; 1
+    function invariant_actionsDontBreakHF() public {
+        if (handler.priceMoved()) return;
+
+        for (uint256 i = 0; i &lt; users.length; i++) {
+            assertGe(
+                pool.healthFactor(users[i]),
+                1e18,
+                "HF&lt;1 without price move"
+            );
+        }
+    }
+
+    // reset flag between sequences
+    function afterInvariant() public {
+        handler.resetPriceMoved();
+    }
+}</code></pre>
+
+        <p>
+          You now have a full invariant system:
+          Foundry will call handler actions randomly, then validate invariants.
+        </p>
+
+        <p>Run invariants:</p>
+        <pre><code>forge test --match-test invariant_ -vv
+</code></pre>
+
+        <div class="tip">
+          <div class="tip-title">If nothing fails… that’s good</div>
+          <p>
+            A stable invariant suite means your model is robust under adversarial sequences.
+            Next we’ll learn how to intentionally break it to see the tooling.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 7: BREAK IT -->
+    <section id="break" class="section">
+      <div class="section-label">Step 7</div>
+      <h2 class="section-title">Intentionally break an invariant (learn to debug)</h2>
+
+      <div class="section-text">
+        <p>
+          Let’s create a bug by commenting out the HF check in <span class="inline-code">withdraw</span>:
+        </p>
+
+        <pre><code>// require(healthFactor(msg.sender) &gt;= 1e18, "HF&lt;1 after withdraw");</code></pre>
+
+        <p>Run invariants again.</p>
+
+        <p>You should see a failure similar to:</p>
+
+        <pre><code>Failing tests:
+invariant_protocolSolvent()
+  error: protocol insolvent
+  counterexample:
+    act_deposit(u=alice, 10 ETH)
+    act_borrow(u=alice, 15000 USD)
+    act_withdraw(u=alice, 9 ETH)
+</code></pre>
+
+        <h3>7.1 Read the counterexample</h3>
+        <p>
+          The fuzzer found a sequence where Alice withdraws too much collateral,
+          leaving total debt above solvency threshold.
+        </p>
+
+        <h3>7.2 Re-run with the replay</h3>
+        <p>Foundry provides a replay call in logs. Use:</p>
+
+        <pre><code>forge test --match-test invariant_protocolSolvent --replay-path &lt;path&gt; -vvvv
+</code></pre>
+
+        <p>
+          With high verbosity you’ll see the full trace and can insert logs.
+        </p>
+
+        <div class="note">
+          <div class="tip-title">Debugging invariants is half the craft</div>
+          <p>
+            In real audits you often spend more time debugging sequences
+            than writing invariants. This workflow is worth mastering.
+          </p>
+        </div>
+
+        <p>
+          Re-enable the HF check to fix the protocol.
+        </p>
+      </div>
+    </section>
+
+    <!-- STEP 8: REAL-WORLD TIPS -->
+    <section id="tips" class="section">
+      <div class="section-label">Step 8</div>
+      <h2 class="section-title">Hard-won real-world invariant tips</h2>
+
+      <div class="section-text">
+        <h3>Tip A — prefer small user sets</h3>
+        <p>
+          Invariants scale poorly with many accounts.
+          Start with 3-8 users. Add more only if needed.
+        </p>
+
+        <h3>Tip B — handlers should <u>not</u> revert often</h3>
+        <p>
+          If most fuzz calls revert, you lose exploration.
+          Use bounds, early returns, and try/catch to keep actions “soft”.
+        </p>
+
+        <h3>Tip C — track ghost state for totals</h3>
+        <p>
+          If your protocol tracks internal totals (like reserves),
+          store parallel “ghost” totals in Handler and assert equality.
+          That catches accounting drift fast.
+        </p>
+
+        <h3>Tip D — separate “environment moves”</h3>
+        <p>
+          Oracles, time, or L2 fees are environment actions.
+          Keep them as separate selectors so invariants can allow changes
+          only when the environment moved.
+        </p>
+
+        <div class="tip">
+          <div class="tip-title">Your next upgrade</div>
+          <p>
+            Add a liquidation function and write:
+            <span class="inline-code">invariant_liquidationNeverCreatesBadDebt()</span>.
+            That’s a realistic advanced-advanced exercise.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- WRAP UP -->
+    <section id="next" class="section">
+      <div class="section-label">Wrap up</div>
+      <h2 class="section-title">What you now know (and what to do next)</h2>
+
+      <div class="section-grid">
+        <div class="section-text">
+          <p>You’ve just:</p>
+          <ul>
+            <li>Modeled a minimal lending protocol</li>
+            <li>Validated it with unit tests</li>
+            <li>Built a Foundry Handler for adversarial sequences</li>
+            <li>Encoded solvency, accounting, and HF invariants</li>
+            <li>Learned invariant debugging from counterexamples</li>
+          </ul>
+
+          <p style="margin-top:0.9rem;">
+            In practice, this is how real DeFi teams and auditors find
+            “unknown unknowns”.
+          </p>
+
+          <div class="note">
+            <div class="tip-title">If you want a real protocol track</div>
+            <p>
+              Next guides could cover:
+              liquidations, interest accrual, multi-asset collateral,
+              and cross-protocol invariants.
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <div class="card-soft">
+            <div class="card-title">Suggested next guides</div>
+            <ul class="step-list">
+              <li><span class="checkmark">→</span> <b>Security: reentrancy deep dive</b></li>
+              <li><span class="checkmark">→</span> <b>Advanced fuzzing patterns</b></li>
+              <li><span class="checkmark">→</span> <b>Liquidations in Foundry</b> (exercise)</li>
+            </ul>
+
+            <p style="margin-top:0.9rem; font-size:0.86rem; color:var(--text-muted);">
+              Link these to your site pages like
+              <span class="inline-code">security.html</span>,
+              <span class="inline-code">foundry.html</span>,
+              or a future “DeFi track”.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div>© 2025 web3.studio — advanced track: Foundry • DeFi • Invariants.</div>
+    <div class="footer-links">
+      <a href="../index.html">Home</a>
+      <span>·</span>
+      <a href="../guides.html">All guides</a>
+      <span>·</span>
+      <a href="../docs.html">Docs</a>
+    </div>
+  </footer>
+
+  <div class="guide-progress" id="guideProgress">
+  <div class="gp-label">
+    <span id="gpPercent">0%</span> · guide progress
+  </div>
+
+  <div class="gp-bar">
+    <div class="gp-bar-fill" id="gpBarFill"></div>
+  </div>
+
+  <div class="gp-actions">
+    <button id="gpTopBtn">Top</button>
+    <button id="gpNextBtn">Next</button>
+  </div>
+</div>
+
+<style>
+    .guide-progress {
+  position: fixed;
+  bottom: 22px;
+  right: 22px;
+  background: rgba(15, 23, 42, 0.82);
+  padding: 1rem 1.2rem 1.2rem;
+  border-radius: 18px;
+  border: 1px solid rgba(148,163,184,0.35);
+  backdrop-filter: blur(12px);
+  width: 180px;
+  z-index: 999;
+  box-shadow: 0 0 35px rgba(0,0,0,0.55);
+  font-size: 0.82rem;
+  color: #f3f4f6;
+}
+
+.gp-label {
+  margin-bottom: 0.6rem;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+}
+
+.gp-bar {
+  height: 8px;
+  background: #0f172a;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 0.9rem;
+  border: 1px solid rgba(148,163,184,0.35);
+}
+
+.gp-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #facc15, #f97316);
+  transition: width 0.2s ease-out;
+}
+
+.gp-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.4rem;
+}
+
+.gp-actions button {
+  flex: 1;
+  background: rgba(30,41,59,0.85);
+  border: 1px solid rgba(148,163,184,0.45);
+  color: #e5e7eb;
+  padding: 0.35rem 0.4rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.15s;
+  font-size: 0.78rem;
+}
+
+.gp-actions button:hover {
+  background: rgba(51,65,85,0.85);
+  border-color: rgba(248,250,252,0.6);
+}
+
+</style>
+
+<script>
+
+    const gpPercent = document.getElementById("gpPercent");
+const gpBarFill = document.getElementById("gpBarFill");
+const gpTopBtn = document.getElementById("gpTopBtn");
+const gpNextBtn = document.getElementById("gpNextBtn");
+
+// Собираем все секции, чтобы "Next" работал автоматически
+const guideSections = Array.from(document.querySelectorAll("section[id]"));
+
+function updateProgress() {
+  const scrollTop = window.scrollY;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+
+  let progress = Math.min(100, (scrollTop / docHeight) * 100);
+  progress = Math.floor(progress);
+
+  gpPercent.innerText = progress + "%";
+  gpBarFill.style.width = progress + "%";
+}
+
+// Обновление прогресса при прокрутке
+window.addEventListener("scroll", updateProgress);
+updateProgress();
+
+// Кнопка Top
+gpTopBtn.addEventListener("click", () => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+// Кнопка Next — ищет следующую секцию
+gpNextBtn.addEventListener("click", () => {
+  const scrollPos = window.scrollY + 40;
+
+  let next = null;
+  for (let section of guideSections) {
+    const top = section.offsetTop;
+    if (top > scrollPos) {
+      next = section;
+      break;
+    }
+  }
+
+  if (next) {
+    window.scrollTo({ top: next.offsetTop - 60, behavior: "smooth" });
+  }
+});
+
+</script>
+
+  <script>
+    // Progress widget logic
+    const sections = [...document.querySelectorAll("main section[id]")];
+    const pw = document.getElementById("progressWidget");
+    const pwPercent = document.getElementById("pwPercent");
+    const pwFill = document.getElementById("pwFill");
+    const pwSection = document.getElementById("pwSection");
+    const pwTopBtn = document.getElementById("pwTopBtn");
+    const pwNextBtn = document.getElementById("pwNextBtn");
+    const pwToggle = document.getElementById("pwToggle");
+    let collapsed = false;
+
+    function clamp(n, min, max){ return Math.min(Math.max(n, min), max); }
+
+    function updateProgress() {
+      const doc = document.documentElement;
+      const scrollTop = doc.scrollTop || document.body.scrollTop;
+      const scrollHeight = doc.scrollHeight - doc.clientHeight;
+      const p = scrollHeight > 0 ? (scrollTop / scrollHeight) : 0;
+      const percent = Math.round(p * 100);
+
+      pwPercent.textContent = percent + "%";
+      pwFill.style.width = clamp(percent, 0, 100) + "%";
+
+      // active section label
+      let current = sections[0];
+      for (const s of sections) {
+        if (s.getBoundingClientRect().top <= 120) current = s;
+      }
+      pwSection.textContent = current.querySelector("h2")?.textContent || current.id;
+    }
+
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function scrollToNext() {
+      // find next section below viewport
+      const y = window.scrollY;
+      const next = sections.find(s => s.offsetTop > y + 140);
+      if (next) next.scrollIntoView({ behavior: "smooth", block: "start" });
+      else scrollToTop();
+    }
+
+    pwTopBtn.addEventListener("click", scrollToTop);
+    pwNextBtn.addEventListener("click", scrollToNext);
+
+    pwToggle.addEventListener("click", () => {
+      collapsed = !collapsed;
+      pw.classList.toggle("collapsed", collapsed);
+      pwToggle.textContent = collapsed ? "expand" : "collapse";
+    });
+
+    window.addEventListener("scroll", updateProgress, { passive: true });
+    window.addEventListener("resize", updateProgress);
+    updateProgress();
+  </script>
+</body>
+</html>

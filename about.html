@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>About — web3.studio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg: #020617;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --accent: #facc15;
+      --accent-soft: rgba(250, 204, 21, 0.15);
+      --border: rgba(148, 163, 184, 0.35);
+      --radius-lg: 22px;
+      --radius-md: 14px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Inter, sans-serif;
+      background: radial-gradient(circle at top left, #0f172a 0, #020617 45%, #000 100%);
+      color: var(--text-main);
+      overflow-x: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* NAV */
+    .nav {
+      max-width: 1120px;
+      padding: 1.2rem 1.4rem 0.5rem;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      backdrop-filter: blur(22px);
+      background: linear-gradient(to bottom, rgba(2,6,23,0.96), rgba(2,6,23,0.75), transparent);
+    }
+
+    .nav-left { display: flex; align-items: center; gap: 0.65rem; }
+    .nav-orb {
+      width: 26px; height: 26px; border-radius: 999px;
+      background: radial-gradient(circle at 30% 20%, #fde047, #facc15 35%, #a16207 70%, #0f172a);
+      box-shadow: 0 0 30px rgba(250, 204, 21, 0.5);
+    }
+    .nav-title { font-weight: 600; letter-spacing: -0.03em; }
+    .nav-tagline { font-size: 0.75rem; color: var(--text-muted); }
+
+    .nav-right { display: flex; gap: 0.7rem; }
+    .nav-link {
+      padding: 0.4rem 0.8rem;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      transition: .18s;
+    }
+    .nav-link:hover {
+      background: rgba(15,23,42,0.8);
+      color: var(--text-main);
+    }
+
+    /* GRID BACKGROUND */
+    .grid-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background-image: 
+        linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity: 0.08;
+      animation: gridMove 30s linear infinite;
+    }
+    @keyframes gridMove {
+      0% { transform: translate(0,0); }
+      100% { transform: translate(40px,40px); }
+    }
+
+    /* PAGE */
+    .page {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 1rem 1.4rem 3.5rem;
+    }
+
+    /* HERO */
+    .hero {
+      padding: 3.5rem 0 2rem;
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .hero h1 {
+      font-size: clamp(2.4rem, 3.4vw, 3rem);
+      font-weight: 700;
+      letter-spacing: -0.05em;
+      margin-bottom: 1rem;
+      background: linear-gradient(120deg, #facc15, #f97316, #22c55e);
+      background-clip: text;
+      color: transparent;
+    }
+    .hero p {
+      max-width: 46rem;
+      margin: 0.5rem auto;
+      line-height: 1.7;
+      color: var(--text-muted);
+    }
+
+    /* SECTION TITLES */
+    .section {
+      margin-top: 3.4rem;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: 0.8s ease;
+    }
+    .section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .section-title {
+      font-size: 1.4rem;
+      margin-bottom: 0.6rem;
+      letter-spacing: -0.03em;
+      font-weight: 600;
+    }
+    .section-sub {
+      color: var(--text-muted);
+      margin-bottom: 1.2rem;
+    }
+
+    /* Accordions */
+    .accordion {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      margin-bottom: 0.8rem;
+      overflow: hidden;
+      background: rgba(15,23,42,0.55);
+    }
+    .acc-header {
+      padding: 0.9rem 1rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: 0.2s;
+    }
+    .acc-header:hover { background: rgba(15,23,42,0.8); }
+    .acc-body {
+      max-height: 0;
+      overflow: hidden;
+      padding: 0 1rem;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.65;
+      transition: max-height 0.45s ease;
+    }
+    .acc-header span { font-size: 1.1rem; }
+
+    /* CREATOR CARD */
+    .creator-card {
+      margin-top: 2rem;
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      background: rgba(15,23,42,0.7);
+      border: 1px solid var(--border);
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: center;
+      transition: transform .3s ease, box-shadow .3s ease;
+      transform-style: preserve-3d;
+    }
+    .creator-card:hover {
+      transform: rotateX(6deg) rotateY(-6deg);
+      box-shadow: 0 25px 55px rgba(250,204,21,0.25);
+    }
+    .creator-photo {
+      width: 110px;
+      height: 110px;
+      border-radius: 999px;
+      object-fit: cover;
+      margin-bottom: 1rem;
+      border: 2px solid var(--accent);
+      box-shadow: 0 0 22px rgba(250,204,21,0.45);
+    }
+    .creator-name {
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin: 0.3rem 0;
+    }
+    .creator-role {
+      font-size: 0.87rem;
+      color: var(--text-muted);
+    }
+
+    /* FOOTER */
+    footer {
+      margin-top: 3rem;
+      padding: 2rem 1rem;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+        .nav-donate-btn {
+      padding: 0.55rem 1.2rem;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      background: radial-gradient(circle at 0 0, #facc15, #f97316);
+      color: #030712;
+      border: 1px solid transparent;
+      box-shadow: 0 10px 24px rgba(250, 204, 21, 0.45);
+      transition: 0.18s ease;
+      line-height: 1;
+      height: 32px;
+    }
+
+    .nav-donate-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 35px rgba(250, 204, 21, 0.65);
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="grid-bg"></div>
+
+<header class="nav">
+  <div class="nav-left">
+    <div class="nav-orb"></div>
+    <div>
+      <div class="nav-title">web3.studio</div>
+      <div class="nav-tagline">Guides • Docs • Web3</div>
+    </div>
+  </div>
+  <div class="nav-right">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="guides.html" class="nav-link">Guides</a>
+    <a href="docs.html" class="nav-link">Docs</a>
+    <a href="./donate.html" class="nav-donate-btn">Donate</a>
+  </div>
+</header>
+
+<main class="page">
+
+  <!-- HERO -->
+  <section class="hero">
+    <h1>About web3.studio</h1>
+    <p>
+      A clean, modern and practical learning space for Web3 developers.
+      Fast guides, minimalistic docs and real-world workflows — made for devs who
+      want to build, not read theory forever.
+    </p>
+  </section>
+
+  <!-- WHAT IS -->
+  <section class="section">
+    <div class="section-title">What is this website?</div>
+
+    <div class="accordion">
+      <div class="acc-header">
+        <div>Why this project exists</div>
+        <span>+</span>
+      </div>
+      <div class="acc-body">
+        web3.studio was created as a fast, developer-friendly place that explains
+        real blockchain workflows without unnecessary noise.  
+        Every guide is practical, short and immediately usable.
+      </div>
+    </div>
+
+    <div class="accordion">
+      <div class="acc-header">
+        <div>Philosophy</div>
+        <span>+</span>
+      </div>
+      <div class="acc-body">
+        Simplicity, depth and zero bullshit.  
+        You read → you build.  
+        No long essays, only real tools used by real developers.
+      </div>
+    </div>
+
+    <div class="accordion">
+      <div class="acc-header">
+        <div>What content you’ll find here</div>
+        <span>+</span>
+      </div>
+      <div class="acc-body">
+        • Step-by-step guides  
+        • Beginner → Intermediate → Advanced tracks  
+        • Hardhat, Foundry, Solidity, OpenZeppelin  
+        • Security patterns  
+        • Protocol-level invariant testing  
+        • Full documentation-style pages
+      </div>
+    </div>
+  </section>
+
+  <!-- CREATOR -->
+  <section class="section">
+    <div class="section-title">Creator</div>
+    <p class="section-sub">The mind behind web3.studio</p>
+
+    <div class="creator-card">
+      <img src="https://github.com/Tenyokj.png" alt="creator photo" class="creator-photo">
+      <div class="creator-name">Tenyokj</div>
+      <div class="creator-role">creator of web3.studio</div>
+    </div>
+  </section>
+
+  <!-- TECH STACK -->
+  <section class="section">
+    <div class="section-title">Tech behind the site</div>
+
+    <div class="accordion">
+      <div class="acc-header">
+        <div>Frontend stack</div>
+        <span>+</span>
+      </div>
+      <div class="acc-body">
+        Pure HTML/CSS/JS — intentionally minimal.  
+        No frameworks. No bundlers. Ultra-fast loading.
+      </div>
+    </div>
+
+    <div class="accordion">
+      <div class="acc-header">
+        <div>Design system</div>
+        <span>+</span>
+      </div>
+      <div class="acc-body">
+        Custom UI with gradients, soft-shadows, neon accents and hard edges.
+        Inspired by modern web3 dashboards and premium SaaS landing pages.
+      </div>
+    </div>
+  </section>
+
+  <!-- SUPPORT -->
+  <section class="section">
+    <div class="section-title">Support the project</div>
+    <p class="section-sub">Everything here is free — but donations help keep it alive.</p>
+    <a href="donate.html" class="nav-link" style="padding:0.65rem 1.1rem; border:1px solid var(--border); background:rgba(15,23,42,0.7); display:inline-block; margin-top:1rem;">
+      Donate with crypto →
+    </a>
+  </section>
+
+</main>
+
+<footer>
+  © 2025 web3.studio — Built by Tenyokj.
+</footer>
+
+<script>
+  /* Scroll fade-in */
+  const sections = document.querySelectorAll(".section");
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) e.target.classList.add("visible");
+    });
+  }, { threshold: 0.25 });
+  sections.forEach(s => observer.observe(s));
+
+  /* Accordions */
+  document.querySelectorAll(".accordion").forEach(acc => {
+    const header = acc.querySelector(".acc-header");
+    const body = acc.querySelector(".acc-body");
+    const icon = header.querySelector("span");
+
+    header.onclick = () => {
+      if (body.style.maxHeight) {
+        body.style.maxHeight = null;
+        icon.textContent = "+";
+      } else {
+        body.style.maxHeight = body.scrollHeight + "px";
+        icon.textContent = "−";
+      }
+    };
+  });
+</script>
+
+</body>
+</html>

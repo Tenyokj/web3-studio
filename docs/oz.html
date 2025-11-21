@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>OpenZeppelin — Web3 Studio Docs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Fonts (same as in docs / hardhat / foundry) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #05060a;
+      --sidebar: #0b0e17;
+      --content-bg: #0d101b;
+      --text-main: #f5f5f7;
+      --text-muted: #9ca3af;
+      --border: rgba(148, 163, 184, 0.2);
+      --accent: #facc15;
+      --radius: 14px;
+      --code-bg: #0b1120;
+      --code-border: rgba(148,163,184,0.15);
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text-main);
+      font-family: Inter, sans-serif;
+    }
+
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 280px;
+      background: var(--sidebar);
+      border-right: 1px solid var(--border);
+      padding: 1.4rem;
+      overflow-y: auto;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+
+    .sidebar h2 {
+      color: var(--accent);
+      font-size: 1.1rem;
+      margin: 0 0 0.4rem;
+      letter-spacing: -0.01em;
+    }
+
+    .sidebar-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 1.2rem;
+    }
+
+    .nav-category {
+      margin-bottom: 1.4rem;
+    }
+
+    .nav-category-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .sidebar a {
+      display: block;
+      padding: 0.3rem 0;
+      font-size: 0.9rem;
+      text-decoration: none;
+      color: var(--text-muted);
+      transition: 0.15s;
+    }
+
+    .sidebar a:hover {
+      color: var(--text-main);
+    }
+
+    .sidebar a.active {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* Content */
+    .content {
+      flex: 1;
+      padding: 2rem;
+      background: var(--content-bg);
+    }
+
+    .content-inner {
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    /* Mini TOC */
+    .toc {
+      padding: 1rem 1.2rem;
+      margin: 1.5rem 0 2rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,0.02);
+      font-size: 0.92rem;
+    }
+
+    .toc-title {
+      font-weight: 600;
+      margin-bottom: 0.6rem;
+      color: var(--accent);
+    }
+
+    .toc a {
+      display: inline-block;
+      margin-right: 1rem;
+      margin-bottom: 0.3rem;
+      color: var(--text-muted);
+      text-decoration: none;
+    }
+
+    .toc a:hover {
+      color: var(--accent);
+    }
+
+    /* Typography */
+    h1 {
+      font-size: 2.2rem;
+      margin-top: 0;
+      margin-bottom: 0.4rem;
+      letter-spacing: -0.02em;
+    }
+
+    .page-lead {
+      line-height: 1.7;
+      color: var(--text-muted);
+      margin-bottom: 0.8rem;
+    }
+
+    .page-meta {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      opacity: 0.9;
+      margin-bottom: 2rem;
+    }
+
+    h2 {
+      margin-top: 2.2rem;
+      font-size: 1.6rem;
+      color: var(--accent);
+      letter-spacing: -0.01em;
+    }
+
+    h3 {
+      margin-top: 1.4rem;
+      font-size: 1.15rem;
+    }
+
+    p {
+      line-height: 1.65;
+      color: var(--text-muted);
+    }
+
+    ul, ol {
+      padding-left: 1.2rem;
+    }
+
+    ul li, ol li {
+      margin: 0.4rem 0;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .tip, .note, .warning {
+      border-left: 3px solid var(--accent);
+      padding: 0.85rem 1rem;
+      margin: 1rem 0;
+      background: rgba(250,204,21,0.05);
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+
+    .note {
+      border-left-color: #38bdf8;
+      background: rgba(56,189,248,0.06);
+    }
+
+    .warning {
+      border-left-color: #f97316;
+      background: rgba(249,115,22,0.06);
+    }
+
+    .tip-title {
+      font-weight: 600;
+      margin-bottom: 0.2rem;
+      color: var(--text-main);
+    }
+
+    /* Code */
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--code-border);
+      padding: 1rem;
+      border-radius: var(--radius);
+      overflow-x: auto;
+      font-family: JetBrains Mono, monospace;
+      font-size: 0.85rem;
+      margin: 0.9rem 0 1.1rem;
+    }
+
+    code {
+      font-family: JetBrains Mono, monospace;
+      font-size: 0.85rem;
+    }
+
+    .inline-code {
+      padding: 0.1rem 0.3rem;
+      border-radius: 4px;
+      background: rgba(148,163,184,0.18);
+      border: 1px solid rgba(148,163,184,0.3);
+    }
+
+    section[id] {
+      scroll-margin-top: 80px;
+      padding-bottom: 2rem;
+    }
+
+    section[id]::before {
+      content: "";
+      display: block;
+      height: 80px;
+      margin-top: -80px;
+      visibility: hidden;
+    }
+
+    footer {
+      padding: 2rem 1.5rem 2.5rem;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      text-align: center;
+      background: #05060a;
+    }
+  </style>
+</head>
+<body>
+
+<div class="layout">
+  <!-- Sidebar -->
+  <nav class="sidebar">
+
+    <!-- Back to home -->
+    <a href="./docs.html" style="
+        display:block;
+        margin-bottom:1rem;
+        font-size:0.9rem;
+        color:var(--accent);
+        text-decoration:none;
+        font-weight:600;
+    ">← Back to main docs</a>
+
+    <h2>OpenZeppelin</h2>
+    <div class="sidebar-subtitle">Battle-tested smart contract library</div>
+
+        <input
+        id="searchInput"
+        type="text"
+        placeholder="Search..."
+        style="
+            width: 90%;
+            padding: 0.55rem 0.7rem;
+            margin: 0.6rem 0 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: #0f1320;
+            color: var(--text-main);
+            font-size: 0.9rem;
+        "
+    >
+    <div id="searchResults" style="margin-top:0.5rem; margin-bottom: 10px;"></div>
+
+    <script>
+  const searchInput = document.getElementById("searchInput");
+  const searchResults = document.getElementById("searchResults");
+
+  searchInput.addEventListener("input", () => {
+    const query = searchInput.value.toLowerCase();
+
+    if (query.length < 2) {
+      searchResults.innerHTML = "";
+      return;
+    }
+
+    let results = [];
+
+    document.querySelectorAll("section").forEach(section => {
+      const text = section.innerText.toLowerCase();
+
+      if (text.includes(query)) {
+        results.push({
+          id: section.id,
+          title: section.querySelector("h2")?.innerText || section.id
+        });
+      }
+    });
+
+    searchResults.innerHTML = results
+      .slice(0, 5)
+      .map(r => `<a href="#${r.id}" style="display:block; margin:4px 0; color:var(--accent);">${r.title}</a>`)
+      .join("");
+  });
+</script>
+
+    <div class="nav-category">
+      <div class="nav-category-title">Getting started</div>
+      <a href="#intro" class="active">What is OpenZeppelin</a>
+      <a href="#install">Installation</a>
+      <a href="#wizard">Contracts Wizard</a>
+      <a href="#project-setup">Project setup</a>
+    </div>
+
+    <div class="nav-category">
+      <div class="nav-category-title">Core contracts</div>
+      <a href="#erc20">ERC20 Tokens</a>
+      <a href="#erc721">ERC721 NFTs</a>
+      <a href="#erc1155">ERC1155 Multi-tokens</a>
+      <a href="#ownership">Ownable & roles</a>
+      <a href="#accesscontrol">AccessControl</a>
+      <a href="#modules">Pausable, ReentrancyGuard & more</a>
+    </div>
+
+    <div class="nav-category">
+      <div class="nav-category-title">Upgrades</div>
+      <a href="#upgrades-overview">Upgrade patterns</a>
+      <a href="#uups">UUPS proxies</a>
+      <a href="#transparent">Transparent proxies</a>
+      <a href="#initializers">Initializers & storage gaps</a>
+    </div>
+
+    <div class="nav-category">
+      <div class="nav-category-title">Security & testing</div>
+      <a href="#security">Security guidelines</a>
+      <a href="#testing-hardhat">Testing with Hardhat</a>
+      <a href="#testing-foundry">Testing with Foundry</a>
+      <a href="#pitfalls">Common pitfalls</a>
+    </div>
+
+    <div class="nav-category">
+      <div class="nav-category-title">Ecosystem</div>
+      <a href="#defender">OpenZeppelin Defender</a>
+      <a href="#integration">Integrating in a Web3 stack</a>
+      <a href="#resources">Resources</a>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="content">
+    <div class="content-inner">
+      <h1>OpenZeppelin Documentation</h1>
+      <p class="page-lead">
+        OpenZeppelin Contracts is the standard library for secure smart contracts.
+        It provides audited implementations of ERC standards, access control modules,
+        upgradeable patterns, and security primitives you can reuse instead of reinventing.
+      </p>
+      <div class="page-meta">
+        Target audience: developers building tokens, NFTs, protocols and upgradeable systems using Solidity ≥ 0.8.x.
+      </div>
+
+      <!-- Mini TOC -->
+      <div class="toc">
+        <div class="toc-title">On this page</div>
+        <a href="#intro">Overview</a>
+        <a href="#install">Installation</a>
+        <a href="#wizard">Contracts Wizard</a>
+        <a href="#project-setup">Project setup</a>
+        <a href="#erc20">ERC20</a>
+        <a href="#erc721">ERC721</a>
+        <a href="#erc1155">ERC1155</a>
+        <a href="#ownership">Ownable</a>
+        <a href="#accesscontrol">AccessControl</a>
+        <a href="#modules">Security modules</a>
+        <a href="#upgrades-overview">Upgrade patterns</a>
+        <a href="#uups">UUPS</a>
+        <a href="#transparent">Transparent</a>
+        <a href="#initializers">Initializers</a>
+        <a href="#security">Security</a>
+        <a href="#testing-hardhat">Hardhat tests</a>
+        <a href="#testing-foundry">Foundry tests</a>
+        <a href="#pitfalls">Pitfalls</a>
+        <a href="#defender">Defender</a>
+        <a href="#integration">Integration</a>
+        <a href="#resources">Resources</a>
+      </div>
+
+      <!-- CONTENT -->
+
+      <section id="intro">
+        <h2>What is OpenZeppelin</h2>
+        <p>
+          OpenZeppelin Contracts is a library of reusable, audited smart contracts for Ethereum and EVM-compatible chains.
+          Instead of writing low-level token, access control, or upgrade logic yourself, you inherit and configure
+          the provided contracts.
+        </p>
+        <ul>
+          <li>Standard implementations of ERC20, ERC721, ERC1155 and more.</li>
+          <li>Access control patterns: <span class="inline-code">Ownable</span>, <span class="inline-code">AccessControl</span>, role-based permissions.</li>
+          <li>Security primitives: <span class="inline-code">ReentrancyGuard</span>, <span class="inline-code">Pausable</span>, <span class="inline-code">SafeERC20</span>.</li>
+          <li>Upgradeable variants compatible with proxy patterns.</li>
+        </ul>
+
+        <div class="note">
+          <div class="tip-title">Don’t reimplement standards</div>
+          <p>
+            Writing your own ERC20 or ERC721 implementation from scratch is rarely a good idea.
+            Using OpenZeppelin reduces attack surface and makes your contracts more familiar to other developers.
+          </p>
+        </div>
+      </section>
+
+      <section id="install">
+        <h2>Installation</h2>
+        <p>
+          The contracts are distributed as an npm package. You install it once and import what you need in Solidity.
+        </p>
+
+        <h3>Hardhat / Node projects</h3>
+        <pre><code>npm install @openzeppelin/contracts
+# or
+pnpm add @openzeppelin/contracts</code></pre>
+
+        <h3>Foundry projects</h3>
+        <pre><code>forge install OpenZeppelin/openzeppelin-contracts</code></pre>
+
+        <p>
+          For upgradeable contracts, use the upgradeable package:
+        </p>
+        <pre><code>npm install @openzeppelin/contracts-upgradeable
+
+# Foundry:
+forge install OpenZeppelin/openzeppelin-contracts-upgradeable</code></pre>
+      </section>
+
+      <section id="wizard">
+        <h2>Contracts Wizard</h2>
+        <p>
+          The OpenZeppelin Contracts Wizard is an interactive web tool that lets you configure a token or access control
+          setup and generates Solidity code using the official library.
+        </p>
+
+        <ul>
+          <li>Choose ERC20 / ERC721 / ERC1155.</li>
+          <li>Select features: mintable, burnable, snapshots, permit, votes, etc.</li>
+          <li>Choose between regular or upgradeable variants.</li>
+          <li>Copy the generated contract into your project and adjust as needed.</li>
+        </ul>
+
+        <div class="tip">
+          <div class="tip-title">Use Wizard, then refactor</div>
+          <p>
+            A common workflow is: prototype with the Wizard, paste the contract into your repo,
+            rename it and gradually refactor to fit your protocol while keeping the inherited base classes.
+          </p>
+        </div>
+      </section>
+
+      <section id="project-setup">
+        <h2>Project setup</h2>
+        <p>
+          For a typical ERC20 or ERC721 project with Hardhat or Foundry, you:
+        </p>
+        <ol>
+          <li>Install <span class="inline-code">@openzeppelin/contracts</span> (and optionally <span class="inline-code">-upgradeable</span>).</li>
+          <li>Pick a base contract (e.g. <span class="inline-code">ERC20</span>, <span class="inline-code">ERC721</span>).</li>
+          <li>Inherit from it and implement constructor / initializer with your parameters.</li>
+          <li>Add access control (owner, roles, or both).</li>
+          <li>Write tests around minting, burning, role restrictions, and edge cases.</li>
+        </ol>
+      </section>
+
+      <section id="erc20">
+        <h2>ERC20 Tokens</h2>
+        <p>
+          OpenZeppelin’s ERC20 contract implements the ERC20 standard with hooks and extensions.
+          You almost never implement ERC20 directly yourself; you inherit <span class="inline-code">ERC20</span> and configure it.
+        </p>
+
+        <h3>Basic ERC20</h3>
+        <pre><code>// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+
+contract MyToken is ERC20, Ownable {
+    constructor() ERC20("MyToken", "MTK") Ownable(msg.sender) {
+        _mint(msg.sender, 1_000_000 ether);
+    }
+}</code></pre>
+
+        <p>Common extensions:</p>
+        <ul>
+          <li><span class="inline-code">ERC20Burnable</span> — token holders can burn their own tokens.</li>
+          <li><span class="inline-code">ERC20Pausable</span> — pausable transfers via <span class="inline-code">Pausable</span>.</li>
+          <li><span class="inline-code">ERC20Permit</span> — EIP-2612 approvals via signatures.</li>
+          <li><span class="inline-code">ERC20Votes</span> — voting power for governance.</li>
+        </ul>
+
+        <h3>ERC20 with permit + burnable</h3>
+        <pre><code>pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+
+contract GovernanceToken is ERC20Burnable, ERC20Permit, Ownable {
+    constructor()
+        ERC20("GovernanceToken", "GOV")
+        ERC20Permit("GovernanceToken")
+        Ownable(msg.sender)
+    {
+        _mint(msg.sender, 10_000_000 ether);
+    }
+}</code></pre>
+
+        <div class="tip">
+          <div class="tip-title">Use SafeERC20 in other contracts</div>
+          <p>
+            When your contracts interact with arbitrary ERC20 tokens, use
+            <span class="inline-code">SafeERC20</span> to handle non-standard return values and avoid stuck tokens.
+          </p>
+        </div>
+      </section>
+
+      <section id="erc721">
+        <h2>ERC721 NFTs</h2>
+        <p>
+          OpenZeppelin provides a modular ERC721 implementation with enumerable, URI storage, and safe minting.
+        </p>
+
+        <h3>Basic ERC721</h3>
+        <pre><code>// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+
+contract MyNFT is ERC721, Ownable {
+    uint256 public nextId;
+
+    constructor() ERC721("MyNFT", "MNFT") Ownable(msg.sender) {}
+
+    function mint(address to) external onlyOwner {
+        _safeMint(to, nextId);
+        nextId++;
+    }
+}</code></pre>
+
+        <p>Common extensions:</p>
+        <ul>
+          <li><span class="inline-code">ERC721URIStorage</span> — per-token metadata URI storage.</li>
+          <li><span class="inline-code">ERC721Enumerable</span> — on-chain enumeration (holders and token list).</li>
+          <li><span class="inline-code">ERC721Burnable</span> — burnable NFTs.</li>
+          <li><span class="inline-code">ERC721Votes</span> — governance voting power by NFT ownership.</li>
+        </ul>
+
+        <div class="warning">
+          <div class="tip-title">Enumerable trade-offs</div>
+          <p>
+            <span class="inline-code">ERC721Enumerable</span> keeps extra on-chain state for enumeration.
+            It increases gas costs of mint / transfer. For large collections, consider off-chain indexing instead.
+          </p>
+        </div>
+      </section>
+
+      <section id="erc1155">
+        <h2>ERC1155 Multi-tokens</h2>
+        <p>
+          ERC1155 is a multi-token standard that can represent fungible and non-fungible tokens within one contract.
+        </p>
+
+        <h3>Basic ERC1155</h3>
+        <pre><code>// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+
+contract GameItems is ERC1155, Ownable {
+    uint256 public constant GOLD = 0;
+    uint256 public constant SWORD = 1;
+
+    constructor() ERC1155("https://example.com/metadata/{id}.json") Ownable(msg.sender) {
+        _mint(msg.sender, GOLD, 1000, "");
+        _mint(msg.sender, SWORD, 10, "");
+    }
+}</code></pre>
+
+        <p>
+          ERC1155 is useful for gaming items, semi-fungible assets, and collections where you need batches and multiple IDs.
+        </p>
+      </section>
+
+      <section id="ownership">
+        <h2>Ownable & roles</h2>
+        <p>
+          The simplest access control pattern is <span class="inline-code">Ownable</span>.
+          It defines a single <span class="inline-code">owner</span> address with a modifier <span class="inline-code">onlyOwner</span>.
+        </p>
+
+        <h3>Basic Ownable usage</h3>
+        <pre><code>pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts/access/Ownable.sol";
+
+contract Example is Ownable {
+    constructor() Ownable(msg.sender) {}
+
+    function sensitiveAction() external onlyOwner {
+        // restricted logic
+    }
+}</code></pre>
+
+        <p>
+          For many simple tokens or apps with a single admin, <span class="inline-code">Ownable</span> is enough.
+          For more complex permissions, use <span class="inline-code">AccessControl</span>.
+        </p>
+      </section>
+
+      <section id="accesscontrol">
+        <h2>AccessControl</h2>
+        <p>
+          <span class="inline-code">AccessControl</span> provides role-based permissions.
+          Roles are identified by <span class="inline-code">bytes32</span> identifiers and can be granted and revoked.
+        </p>
+
+        <h3>Basic AccessControl setup</h3>
+        <pre><code>pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts/access/AccessControl.sol";
+
+contract RoleBasedExample is AccessControl {
+    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
+
+    constructor(address admin) {
+        _grantRole(DEFAULT_ADMIN_ROLE, admin);
+        _grantRole(MINTER_ROLE, admin);
+    }
+
+    function mint(address to, uint256 amount) external onlyRole(MINTER_ROLE) {
+        // mint logic
+    }
+}</code></pre>
+
+        <p>Best practices:</p>
+        <ul>
+          <li>Use <span class="inline-code">DEFAULT_ADMIN_ROLE</span> sparingly. It can grant and revoke other roles.</li>
+          <li>Create specific roles for each action (MINTER_ROLE, PAUSER_ROLE, etc.).</li>
+          <li>Consider using multisig or timelock as the admin for critical roles.</li>
+        </ul>
+      </section>
+
+      <section id="modules">
+        <h2>Pausable, ReentrancyGuard & security modules</h2>
+        <p>
+          OpenZeppelin provides a set of modules that help protect common patterns.
+        </p>
+
+        <h3>Pausable</h3>
+        <p>
+          <span class="inline-code">Pausable</span> lets you add an emergency stop to functions. Typically used on transfer,
+          mint, or critical operations.
+        </p>
+        <pre><code>import "@openzeppelin/contracts/security/Pausable.sol";
+
+contract MyContract is Pausable {
+    function pause() external /* onlyRole(PAUSER_ROLE) */ {
+        _pause();
+    }
+
+    function unpause() external /* onlyRole(PAUSER_ROLE) */ {
+        _unpause();
+    }
+
+    function doSomething() external whenNotPaused {
+        // ...
+    }
+}</code></pre>
+
+        <h3>ReentrancyGuard</h3>
+        <p>
+          Protects functions from reentrancy attacks by using a simple state lock.
+        </p>
+        <pre><code>import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+
+contract Vault is ReentrancyGuard {
+    function withdraw(uint256 amount) external nonReentrant {
+        // checks
+        // effects
+        // interactions
+    }
+}</code></pre>
+
+        <h3>SafeERC20</h3>
+        <p>
+          Use <span class="inline-code">SafeERC20</span> wrapper to safely call ERC20 tokens with inconsistent return values.
+        </p>
+        <pre><code>import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+
+contract Payment {
+    using SafeERC20 for IERC20;
+
+    function pay(IERC20 token, address to, uint256 amount) external {
+        token.safeTransfer(to, amount);
+    }
+}</code></pre>
+      </section>
+
+      <section id="upgrades-overview">
+        <h2>Upgrade patterns</h2>
+        <p>
+          OpenZeppelin supports upgradeable contracts via proxy patterns.
+          The two main approaches are:
+        </p>
+        <ul>
+          <li><b>Transparent proxies</b> — admin and user separation, classic pattern.</li>
+          <li><b>UUPS proxies</b> — upgrade logic in the implementation contract itself.</li>
+        </ul>
+
+        <div class="warning">
+          <div class="tip-title">Upgradeable contracts require discipline</div>
+          <p>
+            You cannot use regular constructors and must follow strict rules around storage layout.
+            Always use the upgradeable versions of OpenZeppelin contracts when working with proxies.
+          </p>
+        </div>
+      </section>
+
+      <section id="uups">
+        <h2>UUPS proxies</h2>
+        <p>
+          UUPS (Universal Upgradeable Proxy Standard) stores upgrade logic in the implementation contract
+          via the <span class="inline-code">upgradeTo</span> function.
+        </p>
+
+        <h3>UUPS ERC20 example</h3>
+        <pre><code>// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+
+contract UUPSToken is
+    ERC20Upgradeable,
+    OwnableUpgradeable,
+    UUPSUpgradeable
+{
+    function initialize(address initialOwner) public initializer {
+        __ERC20_init("UUPSToken", "UUP");
+        __Ownable_init(initialOwner);
+        __UUPSUpgradeable_init();
+
+        _mint(initialOwner, 1_000_000 ether);
+    }
+
+    function _authorizeUpgrade(address newImplementation)
+        internal
+        override
+        onlyOwner
+    {}
+}</code></pre>
+
+        <p>
+          Deployment is usually done with Hardhat Upgrades plugin or OpenZeppelin Defender, which deploys
+          the proxy and implementation and wires them together.
+        </p>
+      </section>
+
+      <section id="transparent">
+        <h2>Transparent proxies</h2>
+        <p>
+          Transparent proxies separate the admin (who can upgrade) from users (who interact with the implementation).
+          OpenZeppelin provides proxy contracts and helper tooling, especially in combination with Hardhat.
+        </p>
+
+        <p>
+          In code, you still write an upgradeable implementation (with initializers),
+          but the proxy admin logic is handled by the proxy contract and upgrade tooling.
+        </p>
+
+        <div class="note">
+          <div class="tip-title">Which pattern to choose?</div>
+          <p>
+            UUPS offers more flexibility and slightly lower gas on upgrades,
+            while Transparent proxies are conceptually simpler to reason about for some teams.
+            Both are widely used in production.
+          </p>
+        </div>
+      </section>
+
+      <section id="initializers">
+        <h2>Initializers & storage gaps</h2>
+        <p>
+          Upgradeable contracts cannot use Solidity constructors. Instead, they use initializer functions,
+          usually called <span class="inline-code">initialize</span>.
+        </p>
+
+        <h3>Initializers</h3>
+        <pre><code>function initialize(address owner) public initializer {
+    __ERC20_init("MyToken", "MTK");
+    __Ownable_init(owner);
+}</code></pre>
+
+        <p>
+          The <span class="inline-code">initializer</span> modifier ensures it can only be called once.
+        </p>
+
+        <h3>Storage gaps</h3>
+        <p>
+          Upgradeable base contracts in OpenZeppelin often include a reserved storage gap:
+        </p>
+        <pre><code>uint256[50] private __gap;</code></pre>
+
+        <p>
+          This is used to avoid storage layout collisions if new state variables are added in future versions.
+          In your own upgradeable contracts, avoid reordering fields and always append new variables at the end.
+        </p>
+      </section>
+
+      <section id="security">
+        <h2>Security guidelines</h2>
+        <p>
+          OpenZeppelin helps, but security is still your responsibility. Some basic guidelines:
+        </p>
+        <ul>
+          <li>Use audited base contracts (OpenZeppelin) instead of homegrown implementations.</li>
+          <li>Prefer <span class="inline-code">Ownable</span> or <span class="inline-code">AccessControl</span> instead of custom permission schemes.</li>
+          <li>Protect external calls with <span class="inline-code">ReentrancyGuard</span> where applicable.</li>
+          <li>Add <span class="inline-code">Pausable</span> to critical flows so you can react to incidents.</li>
+          <li>Use <span class="inline-code">SafeERC20</span> when interacting with tokens.</li>
+          <li>Write thorough tests for role restrictions and failure paths.</li>
+        </ul>
+      </section>
+
+      <section id="testing-hardhat">
+        <h2>Testing OpenZeppelin with Hardhat</h2>
+        <p>
+          Testing OZ-based contracts in Hardhat is just like testing any other contract,
+          but you can focus on your custom logic and role configuration instead of basic token behavior.
+        </p>
+
+        <h3>Example ERC20 test (TypeScript)</h3>
+        <pre><code>// test/MyToken.ts
+import { expect } from "chai";
+import { ethers } from "hardhat";
+
+describe("MyToken", () =&gt; {
+  it("mints initial supply to deployer", async () =&gt; {
+    const [deployer] = await ethers.getSigners();
+    const Token = await ethers.getContractFactory("MyToken");
+    const token = await Token.deploy();
+
+    const total = await token.totalSupply();
+    const balance = await token.balanceOf(deployer.address);
+    expect(balance).to.equal(total);
+  });
+
+  it("transfers tokens", async () =&gt; {
+    const [deployer, user] = await ethers.getSigners();
+    const Token = await ethers.getContractFactory("MyToken");
+    const token = await Token.deploy();
+
+    await token.transfer(user.address, 100n);
+    expect(await token.balanceOf(user.address)).to.equal(100n);
+  });
+});</code></pre>
+      </section>
+
+      <section id="testing-foundry">
+        <h2>Testing OpenZeppelin with Foundry</h2>
+        <p>
+          Foundry is great for testing OZ-based protocols using fuzzing, cheatcodes, and invariants.
+        </p>
+
+        <h3>Example test with forge-std</h3>
+        <pre><code>// test/MyToken.t.sol
+pragma solidity ^0.8.20;
+
+import "forge-std/Test.sol";
+import "../src/MyToken.sol";
+
+contract MyTokenTest is Test {
+    MyToken internal token;
+    address internal owner = address(0xABCD);
+    address internal user = address(0xBEEF);
+
+    function setUp() public {
+        vm.prank(owner);
+        token = new MyToken();
+    }
+
+    function testInitialSupplyAssignedToOwner() public {
+        assertEq(token.balanceOf(owner), token.totalSupply());
+    }
+
+    function testTransfer() public {
+        vm.prank(owner);
+        token.transfer(user, 100 ether);
+        assertEq(token.balanceOf(user), 100 ether);
+    }
+}</code></pre>
+      </section>
+
+      <section id="pitfalls">
+        <h2>Common pitfalls</h2>
+        <p>Some frequent mistakes when using OpenZeppelin:</p>
+        <ul>
+          <li>Modifying base contracts directly instead of inheriting and extending them.</li>
+          <li>Mixing regular and upgradeable contracts incorrectly (e.g. using non-upgradeable ERC20 in a proxy setup).</li>
+          <li>Forgetting to restrict sensitive functions with <span class="inline-code">onlyOwner</span> or <span class="inline-code">onlyRole</span>.</li>
+          <li>Not thinking about how ownership or roles will be transferred (to multisig / DAO / timelock).</li>
+          <li>Not adding a pause mechanism for highly critical protocols.</li>
+        </ul>
+      </section>
+
+      <section id="defender">
+        <h2>OpenZeppelin Defender</h2>
+        <p>
+          OpenZeppelin Defender is a hosted platform for managing smart contract operations securely.
+          It includes relayers, admin actions, scheduled tasks, upgrade flows, and more.
+        </p>
+
+        <ul>
+          <li>Use Defender Admin to manage upgrades and role changes via a secure UI.</li>
+          <li>Use Relayers to send transactions from backend services without exposing keys.</li>
+          <li>Connect Defender with multisig wallets for approvals.</li>
+        </ul>
+
+        <p>
+          While Defender is optional, it pairs well with OpenZeppelin Contracts and upgradeable patterns.
+        </p>
+      </section>
+
+      <section id="integration">
+        <h2>Integrating OpenZeppelin into a Web3 stack</h2>
+        <p>
+          In a modern stack, OpenZeppelin usually sits at the core of your Solidity code, with other tools around it:
+        </p>
+        <ul>
+          <li>Use <b>Hardhat</b> or <b>Foundry</b> for builds, tests, and scripts.</li>
+          <li>Use <b>OpenZeppelin Contracts</b> for ERC standards and access control.</li>
+          <li>Use <b>OpenZeppelin Upgrades</b> and/or <b>Defender</b> for proxy management.</li>
+          <li>Use frontends (React / Next.js / Viem / Wagmi) to talk to your OZ-based contracts.</li>
+        </ul>
+
+        <p>
+          Your Web3 Studio site can link all these together: Hardhat page for workflows, Foundry page for testing,
+          and this OpenZeppelin page for contract-level building blocks.
+        </p>
+      </section>
+
+      <section id="resources">
+        <h2>Resources</h2>
+        <ul>
+          <li>Official OpenZeppelin Contracts documentation.</li>
+          <li>Contracts Wizard for generating standard token and access control contracts.</li>
+          <li>OpenZeppelin Upgrades plugins for Hardhat and Foundry integration guides.</li>
+          <li>Security guidelines and best practices articles from OpenZeppelin.</li>
+          <li>Public audits that show real-world usage of OpenZeppelin Contracts.</li>
+        </ul>
+
+        <div style="height: 160px;"></div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<footer>
+  © 2025 web3.studio — OpenZeppelin handbook for modern Web3 developers.<br>
+  <span style="opacity:0.8;">Standards • Security • Upgrades • Governance</span>
+</footer>
+
+<script>
+  const sections = Array.from(document.querySelectorAll("section[id]"));
+  const navLinks = document.querySelectorAll(".sidebar a");
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        navLinks.forEach(link => {
+          const href = link.getAttribute("href");
+          if (!href || !href.startsWith("#")) return;
+          link.classList.toggle("active", href === "#" + id);
+        });
+      }
+    });
+  }, {
+    threshold: 0.35
+  });
+
+  sections.forEach(section => observer.observe(section));
+</script>
+
+</body>
+</html>

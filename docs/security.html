@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Security — Web3 Studio Docs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg:#05060a;
+      --sidebar:#0b0e17;
+      --content-bg:#0d101b;
+      --text-main:#f5f5f7;
+      --text-muted:#9ca3af;
+      --border:rgba(148,163,184,0.2);
+      --accent:#facc15;
+      --radius:14px;
+      --code-bg:#0b1120;
+      --code-border:rgba(148,163,184,0.15);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text-main);
+      font-family: Inter, sans-serif;
+    }
+
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 280px;
+      background: var(--sidebar);
+      border-right: 1px solid var(--border);
+      padding: 1.4rem;
+      overflow-y: auto;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+
+    .sidebar h2 {
+      color: var(--accent);
+      font-size: 1.1rem;
+      margin: 0 0 0.4rem;
+      letter-spacing: -0.01em;
+    }
+
+    .sidebar-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 1.2rem;
+    }
+
+    .nav-category {
+      margin-bottom: 1.4rem;
+    }
+
+    .nav-category-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .sidebar a {
+      display: block;
+      padding: 0.3rem 0;
+      font-size: 0.9rem;
+      text-decoration: none;
+      color: var(--text-muted);
+      transition: 0.15s;
+    }
+
+    .sidebar a:hover {
+      color: var(--text-main);
+    }
+
+    .sidebar a.active {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* Content */
+    .content {
+      flex: 1;
+      padding: 2rem;
+      background: var(--content-bg);
+    }
+
+    .content-inner {
+      max-width: 880px;
+      margin: 0 auto;
+    }
+
+    /* TOC */
+    .toc {
+      padding: 1rem 1.2rem;
+      margin: 1.5rem 0 2rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,0.02);
+      font-size: 0.92rem;
+    }
+
+    .toc-title {
+      font-weight: 600;
+      margin-bottom: 0.6rem;
+      color: var(--accent);
+    }
+
+    .toc a {
+      display: inline-block;
+      margin-right: 1rem;
+      margin-bottom: 0.3rem;
+      color: var(--text-muted);
+      text-decoration: none;
+    }
+
+    .toc a:hover {
+      color: var(--accent);
+    }
+
+    /* Typography */
+    h1 {
+      font-size: 2.2rem;
+      margin-top: 0;
+      margin-bottom: 0.4rem;
+      letter-spacing: -0.02em;
+    }
+
+    .page-lead {
+      line-height: 1.7;
+      color: var(--text-muted);
+      margin-bottom: 0.8rem;
+    }
+
+    .page-meta {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      opacity: 0.9;
+      margin-bottom: 2rem;
+    }
+
+    h2 {
+      margin-top: 2.2rem;
+      font-size: 1.6rem;
+      color: var(--accent);
+      letter-spacing: -0.01em;
+    }
+
+    h3 {
+      margin-top: 1.4rem;
+      font-size: 1.15rem;
+    }
+
+    p {
+      line-height: 1.65;
+      color: var(--text-muted);
+    }
+
+    ul, ol {
+      padding-left: 1.2rem;
+    }
+
+    ul li, ol li {
+      margin: 0.35rem 0;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .tip, .note, .warning {
+      border-left: 3px solid var(--accent);
+      padding: 0.85rem 1rem;
+      margin: 1rem 0;
+      background: rgba(250,204,21,0.05);
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+
+    .note {
+      border-left-color: #38bdf8;
+      background: rgba(56,189,248,0.06);
+    }
+
+    .warning {
+      border-left-color: #f97316;
+      background: rgba(249,115,22,0.06);
+    }
+
+    .tip-title {
+      font-weight: 600;
+      margin-bottom: 0.2rem;
+      color: var(--text-main);
+    }
+
+    /* Code */
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--code-border);
+      padding: 1rem;
+      border-radius: var(--radius);
+      overflow-x: auto;
+      font-family: JetBrains Mono, monospace;
+      font-size: 0.85rem;
+      margin: 0.9rem 0 1.1rem;
+    }
+
+    code {
+      font-family: JetBrains Mono, monospace;
+      font-size: 0.85rem;
+    }
+
+    .inline-code {
+      padding: 0.1rem 0.3rem;
+      border-radius: 4px;
+      background: rgba(148,163,184,0.18);
+      border: 1px solid rgba(148,163,184,0.3);
+    }
+
+    section[id] {
+      scroll-margin-top: 80px;
+      padding-bottom: 2rem;
+    }
+
+    section[id]::before {
+      content: "";
+      display: block;
+      height: 80px;
+      margin-top: -80px;
+      visibility: hidden;
+    }
+
+    footer {
+      padding: 2rem 1.5rem 2.5rem;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      text-align: center;
+      background: #05060a;
+    }
+  </style>
+</head>
+<body>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <a href="./docs.html" style="
+        display:block;
+        margin-bottom:1rem;
+        font-size:0.9rem;
+        color:var(--accent);
+        text-decoration:none;
+        font-weight:600;
+    ">← Back to main docs</a>
+
+    <h2>Security</h2>
+    <div class="sidebar-subtitle">Smart contract security handbook</div>
+
+            <input
+        id="searchInput"
+        type="text"
+        placeholder="Search..."
+        style="
+            width: 90%;
+            padding: 0.55rem 0.7rem;
+            margin: 0.6rem 0 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: #0f1320;
+            color: var(--text-main);
+            font-size: 0.9rem;
+        "
+    >
+    <div id="searchResults" style="margin-top:0.5rem; margin-bottom: 10px;"></div>
+
+    <script>
+  const searchInput = document.getElementById("searchInput");
+  const searchResults = document.getElementById("searchResults");
+
+  searchInput.addEventListener("input", () => {
+    const query = searchInput.value.toLowerCase();
+
+    if (query.length < 2) {
+      searchResults.innerHTML = "";
+      return;
+    }
+
+    let results = [];
+
+    document.querySelectorAll("section").forEach(section => {
+      const text = section.innerText.toLowerCase();
+
+      if (text.includes(query)) {
+        results.push({
+          id: section.id,
+          title: section.querySelector("h2")?.innerText || section.id
+        });
+      }
+    });
+
+    searchResults.innerHTML = results
+      .slice(0, 5)
+      .map(r => `<a href="#${r.id}" style="display:block; margin:4px 0; color:var(--accent);">${r.title}</a>`)
+      .join("");
+  });
+</script>
+
+    <div class="nav-category">
+      <div class="nav-category-title">Overview</div>
+      <a href="#intro" class="active">Intro</a>
+      <a href="#principles">Core principles</a>
+      <a href="#threats">Threat model</a>
+    </div>
+
+    <div class="nav-category">
+      <div class="nav-category-title">Common vulnerabilities</div>
+      <a href="#reentrancy">Reentrancy</a>
+      <a href="#overflow">Arithmetic & overflow</a>
+      <a href="#access">Access control bugs</a>
+      <a href="#dos">Denial of Service</a>
+      <a href="#txorigin">tx.origin misuse</a>
+      <a href="#delegatecall">delegatecall / proxies</a>
+      <a href="#frontrun">Front-running & MEV</a>
+      <a href="#oracle">Oracle manipulation</a>
+      <a href="#flashloans">Flashloan attacks</a>
+      <a href="#signatures">Signature issues</a>
+      <a href="#timestamp">Timestamp dependence</a>
+    </div>
+
+    <div class="nav-category">
+      <div class="nav-category-title">Secure patterns</div>
+      <a href="#cei">Checks-Effects-Interactions</a>
+      <a href="#pull">Pull payments</a>
+      <a href="#rate-limit">Rate limiting</a>
+      <a href="#pausable">Pausable flows</a>
+      <a href="#ownership">Ownership patterns</a>
+      <a href="#multisig">Multisig & timelocks</a>
+    </div>
+
+    <div class="nav-category">
+      <div class="nav-category-title">Upgrade & admin</div>
+      <a href="#upgradeable">Upgradeable contracts</a>
+      <a href="#proxy-pitfalls">Proxy pitfalls</a>
+      <a href="#admin-risk">Admin key risks</a>
+      <a href="#emergency">Emergency strategy</a>
+    </div>
+
+    <div class="nav-category">
+      <div class="nav-category-title">Testing & analysis</div>
+      <a href="#fuzzing">Fuzzing</a>
+      <a href="#invariants">Invariant testing</a>
+      <a href="#property-tests">Property-based tests</a>
+      <a href="#static">Static analysis</a>
+      <a href="#diff-testing">Differential testing</a>
+      <a href="#review-process">Code review workflow</a>
+    </div>
+
+    <div class="nav-category">
+      <div class="nav-category-title">Checklists & tools</div>
+      <a href="#checklist">Security checklist</a>
+      <a href="#tools">Tools & scanners</a>
+      <a href="#learning">Learning path</a>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main class="content">
+    <div class="content-inner">
+
+      <h1>Smart Contract Security</h1>
+      <p class="page-lead">
+        This page is a practical handbook for Ethereum smart contract security:
+        real-world vulnerabilities, secure patterns, testing strategies, and how to think like an attacker.
+      </p>
+      <div class="page-meta">
+        Focus: Solidity + EVM, Hardhat & Foundry workflows, production-ready protocols (ERC20, ERC721, vaults, DeFi).
+      </div>
+
+      <!-- TOC -->
+      <div class="toc">
+        <div class="toc-title">On this page</div>
+        <a href="#intro">Intro</a>
+        <a href="#principles">Principles</a>
+        <a href="#threats">Threat model</a>
+        <a href="#reentrancy">Reentrancy</a>
+        <a href="#overflow">Overflow</a>
+        <a href="#access">Access</a>
+        <a href="#dos">DoS</a>
+        <a href="#txorigin">tx.origin</a>
+        <a href="#delegatecall">delegatecall</a>
+        <a href="#frontrun">MEV</a>
+        <a href="#oracle">Oracles</a>
+        <a href="#flashloans">Flashloans</a>
+        <a href="#signatures">Signatures</a>
+        <a href="#timestamp">Timestamp</a>
+        <a href="#cei">CEI</a>
+        <a href="#pull">Pull payments</a>
+        <a href="#rate-limit">Rate limit</a>
+        <a href="#pausable">Pausable</a>
+        <a href="#ownership">Ownership</a>
+        <a href="#multisig">Multisig</a>
+        <a href="#upgradeable">Upgradeable</a>
+        <a href="#fuzzing">Fuzzing</a>
+        <a href="#invariants">Invariants</a>
+        <a href="#static">Static</a>
+        <a href="#checklist">Checklist</a>
+        <a href="#tools">Tools</a>
+        <a href="#learning">Learning</a>
+      </div>
+
+      <!-- OVERVIEW -->
+
+      <section id="intro">
+        <h2>Introduction</h2>
+        <p>
+          Smart contract security is not a “nice to have” – it is the core of Web3.
+          Once deployed, contracts are usually immutable and manage real value.
+          Every bug is public, permanent, and potentially catastrophic.
+        </p>
+        <p>
+          This document is written as if you already know Solidity and basic tools
+          (Hardhat, Foundry), and now want to build or audit contracts without
+          stepping on the same mines that destroyed many DeFi projects.
+        </p>
+
+        <div class="note">
+          <div class="tip-title">Security mindset</div>
+          <p>
+            When writing or reviewing contracts, you are not just “adding features”.
+            You are designing a system that must survive adversarial, creative, patient attackers
+            who may invest weeks into understanding how to break your code.
+          </p>
+        </div>
+      </section>
+
+      <section id="principles">
+        <h2>Core security principles</h2>
+        <ul>
+          <li><b>Least privilege</b> — give each contract and role the minimum power needed.</li>
+          <li><b>Simple beats clever</b> — attack surface scales with complexity.</li>
+          <li><b>Explicit over implicit</b> — make invariants obvious in code.</li>
+          <li><b>Defense in depth</b> — multiple layers: checks, limits, roles, monitoring.</li>
+          <li><b>Fail safe</b> — in doubt, revert; never silently continue in broken state.</li>
+        </ul>
+        <div class="tip">
+          <div class="tip-title">Design for review</div>
+          <p>
+            Write code in a way that is easy to review: small modules, clear naming, simple math,
+            well-documented invariants and assumptions. If you cannot explain a function clearly
+            in one or two sentences, it is probably too complex.
+          </p>
+        </div>
+      </section>
+
+      <section id="threats">
+        <h2>Threat model</h2>
+        <p>
+          Before you can “defend” anything, you must know what you are defending against.
+          A minimal threat model includes:
+        </p>
+        <ul>
+          <li><b>External attackers</b> calling functions with arbitrary calldata and ETH.</li>
+          <li><b>Malicious contracts</b> that can reenter, revert, manipulate callbacks.</li>
+          <li><b>Compromised privileged keys</b> (owner, admin, guardian, multisig signers).</li>
+          <li><b>Miners / validators</b> controlling transaction ordering and inclusion (MEV).</li>
+          <li><b>Users</b> making mistakes (approving wrong address, front-end phishing).</li>
+        </ul>
+      </section>
+
+      <!-- COMMON VULNERABILITIES -->
+
+      <section id="reentrancy">
+        <h2>Reentrancy</h2>
+        <p>
+          Reentrancy happens when a contract makes an external call before it has finished
+          updating its own state, and the callee calls back into the vulnerable contract.
+        </p>
+
+        <h3>Classic vulnerable pattern</h3>
+        <pre><code>mapping(address =&gt; uint256) public balances;
+
+function deposit() external payable {
+    balances[msg.sender] += msg.value;
+}
+
+function withdraw() external {
+    uint256 amount = balances[msg.sender];
+    require(amount &gt; 0, "Nothing to withdraw");
+
+    // ❌ External call before state update
+    (bool ok, ) = msg.sender.call{value: amount}("");
+    require(ok, "Transfer failed");
+
+    balances[msg.sender] = 0;
+}</code></pre>
+
+        <h3>Exploit idea</h3>
+        <p>
+          Attacker creates a contract with a <span class="inline-code">fallback</span> that calls
+          <span class="inline-code">withdraw()</span> again before
+          <span class="inline-code">balances[msg.sender]</span> is set to zero, draining funds.
+        </p>
+
+        <h3>Safe version (Checks-Effects-Interactions)</h3>
+        <pre><code>function withdraw() external {
+    uint256 amount = balances[msg.sender];
+    require(amount &gt; 0, "Nothing to withdraw");
+
+    // ✅ Effects first
+    balances[msg.sender] = 0;
+
+    // ✅ Interactions last
+    (bool ok, ) = msg.sender.call{value: amount}("");
+    require(ok, "Transfer failed");
+}</code></pre>
+
+        <div class="tip">
+          <div class="tip-title">Extra defenses</div>
+          <ul>
+            <li>Use <span class="inline-code">ReentrancyGuard</span> from OpenZeppelin.</li>
+            <li>Avoid writing complex logic after external calls.</li>
+            <li>Consider pull patterns instead of pushing ETH in loops.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="overflow">
+        <h2>Arithmetic & overflow</h2>
+        <p>
+          Since Solidity 0.8, arithmetic overflow and underflow revert by default. However:
+        </p>
+        <ul>
+          <li><span class="inline-code">unchecked { ... }</span> disables checks.</li>
+          <li>Inline assembly math has no checks.</li>
+          <li>Some gas-optimization tricks using smaller integer types can behave unexpectedly.</li>
+        </ul>
+
+        <h3>Unsafe pattern</h3>
+        <pre><code>function dec(uint256 x) external pure returns (uint256) {
+    unchecked {
+        return x - 1; // underflow won't revert if x == 0
+    }
+}</code></pre>
+
+        <div class="warning">
+          <div class="tip-title">Rule of thumb</div>
+          <p>
+            Only use <span class="inline-code">unchecked</span> when you have a proven invariant
+            that guarantees safety. Add comments explaining the reasoning.
+          </p>
+        </div>
+      </section>
+
+      <section id="access">
+        <h2>Access control bugs</h2>
+        <p>
+          Many high-profile hacks are just “anyone can call this function and drain funds”.
+          Access control must be explicit and simple.
+        </p>
+
+        <h3>Bad example</h3>
+        <pre><code>function emergencyWithdraw() external {
+    // supposed to be onlyOwner, but missing modifier
+    token.transfer(msg.sender, token.balanceOf(address(this)));
+}</code></pre>
+
+        <h3>Safer approach</h3>
+        <pre><code>import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+
+contract Vault is Ownable {
+    function emergencyWithdraw(address to) external onlyOwner {
+        uint256 bal = token.balanceOf(address(this));
+        token.transfer(to, bal);
+    }
+}</code></pre>
+
+        <p>
+          For bigger protocols, prefer <span class="inline-code">AccessControl</span> with roles instead
+          of a single owner.
+        </p>
+      </section>
+
+      <section id="dos">
+        <h2>Denial of Service</h2>
+        <p>
+          DoS in smart contracts is often about a function becoming unusable due to gas or
+          external dependency failures.
+        </p>
+
+        <h3>Gas-based DoS: unbounded loop</h3>
+        <pre><code>address[] public users;
+
+function airdrop(uint256 amount) external {
+    // ❌ will eventually run out of gas as users grows
+    for (uint256 i; i &lt; users.length; i++) {
+        token.transfer(users[i], amount);
+    }
+}</code></pre>
+
+        <p>Better: chunked processing, or pull model where users claim by themselves.</p>
+
+        <h3>DoS via reverting receiver</h3>
+        <pre><code>function pay(address to, uint256 amount) external {
+    // If `to` is a contract and reverts, entire tx fails
+    (bool ok, ) = to.call{value: amount}("");
+    require(ok, "Payment failed");
+}</code></pre>
+
+        <p>
+          Sometimes this is acceptable, sometimes you want to avoid relying on the success of
+          every external call, and instead track debts on-chain.
+        </p>
+      </section>
+
+      <section id="txorigin">
+        <h2>tx.origin misuse</h2>
+        <p>
+          <span class="inline-code">tx.origin</span> is the original EOA that started the transaction.
+          It is <b>not</b> safe for authorization, because contracts can trick users into calling them.
+        </p>
+        <pre><code>function auth() external {
+    require(tx.origin == owner, "Not owner"); // ❌ vulnerable
+}</code></pre>
+        <p>Always use <span class="inline-code">msg.sender</span> and proper access control instead.</p>
+      </section>
+
+      <section id="delegatecall">
+        <h2>delegatecall & proxy risks</h2>
+        <p>
+          <span class="inline-code">delegatecall</span> runs code of another contract in the context
+          (storage, balance, msg.sender) of the caller. It is the basis of many proxy patterns,
+          but also the source of numerous hacks.
+        </p>
+        <ul>
+          <li>Storage layout mismatch can corrupt state.</li>
+          <li>Uninitialized logic contracts can be taken over.</li>
+          <li>Any bug in implementation affects all proxies.</li>
+        </ul>
+      </section>
+
+      <section id="frontrun">
+        <h2>Front-running & MEV</h2>
+        <p>
+          Every transaction is public before it is finalized. Attackers (or MEV bots) can:
+        </p>
+        <ul>
+          <li>Sandwich trades by buying before and selling after your trade.</li>
+          <li>Race you to claim rewards, liquidations, or arbitrage.</li>
+          <li>Manipulate prices if your protocol relies on on-chain DEX spot prices.</li>
+        </ul>
+
+        <h3>Mitigations (high-level)</h3>
+        <ul>
+          <li>Avoid “first come, first served” rewards with predictable triggers.</li>
+          <li>Use commit-reveal schemes for sensitive actions when possible.</li>
+          <li>Use TWAP or oracle-based prices instead of raw pool spot price.</li>
+        </ul>
+      </section>
+
+      <section id="oracle">
+        <h2>Oracle manipulation</h2>
+        <p>
+          If your contract relies on a price or other external data, manipulating that data can
+          be equivalent to taking control over your protocol.
+        </p>
+        <ul>
+          <li>A single DEX pair as a price source can be manipulated via flashloans.</li>
+          <li>Thin liquidity pools are easy to move.</li>
+          <li>Using <span class="inline-code">block.timestamp</span> or <span class="inline-code">block.number</span>
+              as “randomness” is unsafe.</li>
+        </ul>
+      </section>
+
+      <section id="flashloans">
+        <h2>Flashloan attacks</h2>
+        <p>
+          Flashloans let attackers borrow huge amounts of capital for one transaction,
+          as long as they repay by the end of the tx. Any invariant that assumes
+          “no one can suddenly have X amount of capital” is probably wrong.
+        </p>
+
+        <p>
+          Typical pattern: manipulate price in a DEX, trigger under-collateralized loans,
+          drain pools, then repay the flashloan.
+        </p>
+      </section>
+
+      <section id="signatures">
+        <h2>Signature issues</h2>
+        <p>
+          Off-chain signatures (EIP-712, permits, meta-transactions) are powerful but come with risks:</p>
+        <ul>
+          <li>Replay on other chains (no chain id in domain).</li>
+          <li>Replay across contracts (missing contract-specific domain).</li>
+          <li>Using <span class="inline-code">ecrecover</span> incorrectly.</li>
+        </ul>
+        <p>Always bind signatures to:</p>
+        <ul>
+          <li>chain id</li>
+          <li>verifying contract address</li>
+          <li>unique nonce</li>
+          <li>clear, human-readable intent</li>
+        </ul>
+      </section>
+
+      <section id="timestamp">
+        <h2>Timestamp dependence</h2>
+        <p>
+          Miners can slightly manipulate timestamps. Do not use
+          <span class="inline-code">block.timestamp</span> for randomness, and be careful when logic
+          is extremely sensitive to exact time.
+        </p>
+      </section>
+
+      <!-- SECURE PATTERNS -->
+
+      <section id="cei">
+        <h2>Checks-Effects-Interactions</h2>
+        <p>
+          The CEI pattern is a core tool against reentrancy and inconsistent state:
+        </p>
+        <ol>
+          <li><b>Checks</b> — validate input and conditions.</li>
+          <li><b>Effects</b> — update internal state.</li>
+          <li><b>Interactions</b> — call external contracts, transfer ETH.</li>
+        </ol>
+
+        <pre><code>function safeWithdraw(uint256 amount) external {
+    // Checks
+    require(balance[msg.sender] &gt;= amount, "Too much");
+
+    // Effects
+    balance[msg.sender] -= amount;
+
+    // Interactions
+    (bool ok, ) = msg.sender.call{value: amount}("");
+    require(ok, "Transfer failed");
+}</code></pre>
+      </section>
+
+      <section id="pull">
+        <h2>Pull payments</h2>
+        <p>
+          Instead of sending ETH or tokens in a loop (push pattern), record how much each user
+          is owed and let them withdraw (pull pattern). This avoids DoS and reentrancy in loops.
+        </p>
+
+        <pre><code>mapping(address =&gt; uint256) public pending;
+
+function reward(address user, uint256 amount) internal {
+    pending[user] += amount;
+}
+
+function claim() external {
+    uint256 amount = pending[msg.sender];
+    require(amount &gt; 0, "Nothing to claim");
+
+    pending[msg.sender] = 0;
+    (bool ok, ) = msg.sender.call{value: amount}("");
+    require(ok, "Transfer failed");
+}</code></pre>
+      </section>
+
+      <section id="rate-limit">
+        <h2>Rate limiting</h2>
+        <p>
+          Rate limits reduce damage from compromised keys and griefing.
+          Examples include:
+        </p>
+        <ul>
+          <li>Max total withdrawals per block or per day.</li>
+          <li>Cooldowns between large actions (e.g. parameter changes).</li>
+          <li>Gradual parameter changes instead of instant ones.</li>
+        </ul>
+
+        <pre><code>mapping(address =&gt; uint256) public lastAction;
+
+function guardedAction() external {
+    require(block.timestamp &gt; lastAction[msg.sender] + 1 hours, "Too frequent");
+    lastAction[msg.sender] = block.timestamp;
+    // ...
+}</code></pre>
+      </section>
+
+      <section id="pausable">
+        <h2>Pausable flows</h2>
+        <p>
+          A pause mechanism lets you temporarily stop critical operations when something goes wrong
+          (suspicious activity, oracle failure, discovered bug).
+        </p>
+
+        <pre><code>import {Pausable} from "@openzeppelin/contracts/security/Pausable.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+
+contract Vault is Pausable, Ownable {
+    function pause() external onlyOwner {
+        _pause();
+    }
+
+    function unpause() external onlyOwner {
+        _unpause();
+    }
+
+    function deposit() external payable whenNotPaused {
+        // ...
+    }
+
+    function withdraw(uint256 amount) external whenNotPaused {
+        // ...
+    }
+}</code></pre>
+
+        <div class="tip">
+          <div class="tip-title">Design pause carefully</div>
+          <p>
+            Pausing should stop risky flows (like withdrawals or swaps), but ideally still allow
+            safe operations like viewing balances or performing admin recovery actions.
+          </p>
+        </div>
+      </section>
+
+      <section id="ownership">
+        <h2>Ownership patterns</h2>
+        <p>
+          Ownership determines who can change parameters, pause the system, upgrade contracts, etc.
+          Bad ownership setups are as dangerous as bugs.
+        </p>
+
+        <h3>Two-step ownership transfer</h3>
+        <pre><code>address public owner;
+address public pendingOwner;
+
+modifier onlyOwner() {
+    require(msg.sender == owner, "Not owner");
+    _;
+}
+
+function transferOwnership(address newOwner) external onlyOwner {
+    pendingOwner = newOwner;
+}
+
+function acceptOwnership() external {
+    require(msg.sender == pendingOwner, "Not pending owner");
+    owner = pendingOwner;
+    pendingOwner = address(0);
+}</code></pre>
+
+        <p>
+          This pattern prevents accidentally setting an invalid owner and gives the new owner a
+          chance to confirm control.
+        </p>
+      </section>
+
+      <section id="multisig">
+        <h2>Multisig & timelocks</h2>
+        <p>
+          For serious protocols, a single EOА owner is not acceptable. Use:
+        </p>
+        <ul>
+          <li><b>Multisig</b> as the admin/owner address of critical contracts.</li>
+          <li><b>Timelock</b> for upgrades and parameter changes, to give users time to react.</li>
+        </ul>
+
+        <p>
+          Typical pattern: core contracts are owned by a timelock, which is controlled by
+          a multisig. Timelock enforces a delay on sensitive operations.
+        </p>
+      </section>
+
+      <!-- UPGRADE & ADMIN -->
+
+      <section id="upgradeable">
+        <h2>Upgradeable contracts</h2>
+        <p>
+          Upgradeable designs let you fix bugs or add features, but massively increase complexity
+          and risk. You must handle:
+        </p>
+        <ul>
+          <li>Storage layout compatibility.</li>
+          <li>Upgrade admin security.</li>
+          <li>Initialization and reinitialization.</li>
+        </ul>
+
+        <p>
+          When using OpenZeppelin's proxy patterns, follow their guidelines strictly and
+          avoid changing the order or type of existing storage variables.
+        </p>
+      </section>
+
+      <section id="proxy-pitfalls">
+        <h2>Proxy pitfalls</h2>
+        <ul>
+          <li>Initializing logic contracts only once (otherwise anyone can take them over).</li>
+          <li>Leaving implementation contracts unprotected and upgradable.</li>
+          <li>Forgetting to disable <span class="inline-code">selfdestruct</span> in implementation.</li>
+        </ul>
+      </section>
+
+      <section id="admin-risk">
+        <h2>Admin key risks</h2>
+        <p>
+          Admins can:
+        </p>
+        <ul>
+          <li>Upgrade implementations.</li>
+          <li>Change parameters.</li>
+          <li>Pause or unpause systems.</li>
+        </ul>
+
+        <p>
+          Treat admin accounts as critical attack targets. Use:
+        </p>
+        <ul>
+          <li>Hardware wallets.</li>
+          <li>Multisigs.</li>
+          <li>Timelocks for upgrades.</li>
+          <li>Clear policies and on-chain transparency for admin actions.</li>
+        </ul>
+      </section>
+
+      <section id="emergency">
+        <h2>Emergency strategy</h2>
+        <p>
+          When something goes wrong, you need a plan:
+        </p>
+        <ul>
+          <li>How to pause / disable dangerous flows quickly.</li>
+          <li>How to communicate with users (website, socials, on-chain messages).</li>
+          <li>How to coordinate with other protocols that integrate you.</li>
+        </ul>
+      </section>
+
+      <!-- TESTING & ANALYSIS -->
+
+      <section id="fuzzing">
+        <h2>Fuzzing</h2>
+        <p>
+          Fuzzing means generating many random inputs to functions and checking properties
+          (no reverts, invariants hold, no funds lost).
+        </p>
+
+        <h3>Foundry fuzz example</h3>
+        <pre><code>function test_DepositWithdraw_fuzz(uint256 amount) public {
+    amount = bound(amount, 1, 1000 ether);
+    uint256 balBefore = address(this).balance;
+
+    vm.deal(address(this), amount);
+    vault.deposit{value: amount}();
+
+    vault.withdraw(amount);
+
+    assertEq(address(this).balance, balBefore);
+}</code></pre>
+      </section>
+
+      <section id="invariants">
+        <h2>Invariant testing</h2>
+        <p>
+          Invariants are properties that must always hold, no matter what sequence of calls an
+          attacker makes. Example: total supply of a token must never decrease, or a vault's
+          total assets must be &gt;= sum of user shares (modulo fees).
+        </p>
+
+        <h3>Foundry invariant example</h3>
+        <pre><code>contract Invariants is Test {
+    Vault vault;
+    Handler handler;
+
+    function setUp() public {
+        vault = new Vault();
+        handler = new Handler(vault);
+        targetContract(address(handler));
+    }
+
+    function invariant_totalAssetsNotNegative() public {
+        assertGe(vault.totalAssets(), 0);
+    }
+}</code></pre>
+      </section>
+
+      <section id="property-tests">
+        <h2>Property-based tests</h2>
+        <p>
+          Instead of testing specific values, define properties:
+        </p>
+        <ul>
+          <li>“Transfers conserve total supply.”</li>
+          <li>“Users cannot withdraw more than they deposited + yield.”</li>
+          <li>“Paused functions revert with specific error.”</li>
+        </ul>
+        <p>Then fuzz or randomly generate inputs to test those properties across many cases.</p>
+      </section>
+
+      <section id="static">
+        <h2>Static analysis</h2>
+        <p>
+          Static analyzers scan your code for common patterns and potential bugs without
+          executing it.
+        </p>
+        <ul>
+          <li>Detect reentrancy patterns.</li>
+          <li>Uninitialized variables.</li>
+          <li>Dangerous uses of <span class="inline-code">delegatecall</span> and <span class="inline-code">call</span>.</li>
+          <li>Shadowed variables, unused code, dead branches.</li>
+        </ul>
+      </section>
+
+      <section id="diff-testing">
+        <h2>Differential testing</h2>
+        <p>
+          Differential testing compares two implementations of the same idea:
+        </p>
+        <ul>
+          <li>New version vs old one.</li>
+          <li>Your implementation vs a reference implementation.</li>
+        </ul>
+        <p>
+          Feed them the same inputs and assert that outputs and state changes match (or differ only
+          in expected ways, like better gas usage).
+        </p>
+      </section>
+
+      <section id="review-process">
+        <h2>Code review workflow</h2>
+        <p>A simple, effective review flow:</p>
+        <ol>
+          <li>Read docs / README: understand protocol goals.</li>
+          <li>Draw a high-level architecture diagram (contracts, roles, flows).</li>
+          <li>List assets and critical invariants.</li>
+          <li>Review contract by contract:
+            <ul>
+              <li>State variables & storage layout.</li>
+              <li>Constructor & initialization.</li>
+              <li>Access control and modifiers.</li>
+              <li>External calls and transfers.</li>
+            </ul>
+          </li>
+          <li>Write or extend tests to cover discovered risks.</li>
+          <li>Run static analysis & fuzzing.</li>
+        </ol>
+      </section>
+
+      <!-- CHECKLIST & TOOLS -->
+
+      <section id="checklist">
+        <h2>Security checklist</h2>
+        <p>Use this quick checklist before mainnet:</p>
+        <ul>
+          <li>Compiler:
+            <ul>
+              <li>Using a recent Solidity version (0.8.x).</li>
+              <li>No accidental use of old pragma (&lt;0.8) in any file.</li>
+            </ul>
+          </li>
+          <li>Access control:
+            <ul>
+              <li>All sensitive functions have explicit access control.</li>
+              <li>No use of <span class="inline-code">tx.origin</span> for auth.</li>
+            </ul>
+          </li>
+          <li>External calls:
+            <ul>
+              <li>State updated before external calls (CEI).</li>
+              <li>ReentrancyGuard applied where needed.</li>
+            </ul>
+          </li>
+          <li>Math:
+            <ul>
+              <li>No unsafe <span class="inline-code">unchecked</span> sections without comments.</li>
+              <li>Division by zero and rounding behavior considered.</li>
+            </ul>
+          </li>
+          <li>Upgrades:
+            <ul>
+              <li>Proxy admin is multisig + timelock.</li>
+              <li>Storage layout audited for changes.</li>
+            </ul>
+          </li>
+          <li>Testing:
+            <ul>
+              <li>Unit tests cover happy & failure paths.</li>
+              <li>Fuzzing and invariants run on CI.</li>
+            </ul>
+          </li>
+        </ul>
+      </section>
+
+      <section id="tools">
+        <h2>Tools & scanners</h2>
+        <ul>
+          <li><b>Slither</b> — static analysis for Solidity.</li>
+          <li><b>Foundry</b> — testing, fuzzing, invariants.</li>
+          <li><b>Hardhat</b> — JS/TS tests, scripts, plugins.</li>
+          <li><b>Mythril / Echidna</b> — symbolic execution & fuzzing.</li>
+          <li><b>OpenZeppelin Contracts</b> — audited building blocks.</li>
+        </ul>
+      </section>
+
+      <section id="learning">
+        <h2>Learning path</h2>
+        <p>If you want to become “security native”:</p>
+        <ol>
+          <li>Master Solidity & EVM fundamentals.</li>
+          <li>Read public post-mortems of big hacks.</li>
+          <li>Reproduce simple exploits in local testnets.</li>
+          <li>Write your own vulnerable contracts and try to break them.</li>
+          <li>Practice writing fuzz and invariant tests for real protocols.</li>
+        </ol>
+
+        <div style="height: 160px;"></div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<footer>
+  © 2025 web3.studio — Smart contract security handbook.<br>
+  <span style="opacity:0.8;">Design • Defend • Test • Monitor</span>
+</footer>
+
+<script>
+  const sections = Array.from(document.querySelectorAll("section[id]"));
+  const navLinks = document.querySelectorAll(".sidebar a");
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        navLinks.forEach(link => {
+          const href = link.getAttribute("href");
+          if (!href || !href.startsWith("#")) return;
+          link.classList.toggle("active", href === "#" + id);
+        });
+      }
+    });
+  }, {
+    threshold: 0.3
+  });
+
+  sections.forEach(section => observer.observe(section));
+</script>
+
+</body>
+</html>

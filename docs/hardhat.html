@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Hardhat — Web3 Studio Docs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Fonts (same as in docs.html) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #05060a;
+      --sidebar: #0b0e17;
+      --content-bg: #0d101b;
+      --text-main: #f5f5f7;
+      --text-muted: #9ca3af;
+      --border: rgba(148, 163, 184, 0.2);
+      --accent: #facc15;
+      --radius: 14px;
+      --code-bg: #0b1120;
+      --code-border: rgba(148,163,184,0.15);
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text-main);
+      font-family: Inter, sans-serif;
+    }
+
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 280px;
+      background: var(--sidebar);
+      border-right: 1px solid var(--border);
+      padding: 1.4rem;
+      overflow-y: auto;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+
+    .sidebar h2 {
+      color: var(--accent);
+      font-size: 1.1rem;
+      margin: 0 0 0.4rem;
+      letter-spacing: -0.01em;
+    }
+
+    .sidebar-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 1.2rem;
+    }
+
+    .nav-category {
+      margin-bottom: 1.4rem;
+    }
+
+    .nav-category-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .sidebar a {
+      display: block;
+      padding: 0.3rem 0;
+      font-size: 0.9rem;
+      text-decoration: none;
+      color: var(--text-muted);
+      transition: 0.15s;
+    }
+
+    .sidebar a:hover {
+      color: var(--text-main);
+    }
+
+    .sidebar a.active {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* Content */
+    .content {
+      flex: 1;
+      padding: 2rem;
+      background: var(--content-bg);
+    }
+
+    .content-inner {
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    /* Mini TOC */
+    .toc {
+      padding: 1rem 1.2rem;
+      margin: 1.5rem 0 2rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,0.02);
+      font-size: 0.92rem;
+    }
+
+    .toc-title {
+      font-weight: 600;
+      margin-bottom: 0.6rem;
+      color: var(--accent);
+    }
+
+    .toc a {
+      display: inline-block;
+      margin-right: 1rem;
+      margin-bottom: 0.3rem;
+      color: var(--text-muted);
+      text-decoration: none;
+    }
+
+    .toc a:hover {
+      color: var(--accent);
+    }
+
+    /* Typography */
+    h1 {
+      font-size: 2.2rem;
+      margin-top: 0;
+      margin-bottom: 0.4rem;
+      letter-spacing: -0.02em;
+    }
+
+    .page-lead {
+      line-height: 1.7;
+      color: var(--text-muted);
+      margin-bottom: 0.8rem;
+    }
+
+    .page-meta {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      opacity: 0.9;
+      margin-bottom: 2rem;
+    }
+
+    h2 {
+      margin-top: 2.2rem;
+      font-size: 1.6rem;
+      color: var(--accent);
+      letter-spacing: -0.01em;
+    }
+
+    h3 {
+      margin-top: 1.4rem;
+      font-size: 1.15rem;
+    }
+
+    p {
+      line-height: 1.65;
+      color: var(--text-muted);
+    }
+
+    ul, ol {
+      padding-left: 1.2rem;
+    }
+
+    ul li, ol li {
+      margin: 0.4rem 0;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .tip, .note, .warning {
+      border-left: 3px solid var(--accent);
+      padding: 0.85rem 1rem;
+      margin: 1rem 0;
+      background: rgba(250,204,21,0.05);
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+
+    .note {
+      border-left-color: #38bdf8;
+      background: rgba(56,189,248,0.06);
+    }
+
+    .warning {
+      border-left-color: #f97316;
+      background: rgba(249,115,22,0.06);
+    }
+
+    .tip-title {
+      font-weight: 600;
+      margin-bottom: 0.2rem;
+      color: var(--text-main);
+    }
+
+    /* Code */
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--code-border);
+      padding: 1rem;
+      border-radius: var(--radius);
+      overflow-x: auto;
+      font-family: JetBrains Mono, monospace;
+      font-size: 0.85rem;
+      margin: 0.9rem 0 1.1rem;
+    }
+
+    code {
+      font-family: JetBrains Mono, monospace;
+      font-size: 0.85rem;
+    }
+
+    .inline-code {
+      padding: 0.1rem 0.3rem;
+      border-radius: 4px;
+      background: rgba(148,163,184,0.18);
+      border: 1px solid rgba(148,163,184,0.3);
+    }
+
+    section[id] {
+      scroll-margin-top: 80px;
+      padding-bottom: 2rem;
+    }
+
+    section[id]::before {
+      content: "";
+      display: block;
+      height: 80px;
+      margin-top: -80px;
+      visibility: hidden;
+    }
+
+    footer {
+      padding: 2rem 1.5rem 2.5rem;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      text-align: center;
+      background: #05060a;
+    }
+  </style>
+</head>
+<body>
+
+<div class="layout">
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    
+    <a href="./docs.html" style="
+        display:block;
+        margin-bottom:1rem;
+        font-size:0.9rem;
+        color:var(--accent);
+        text-decoration:none;
+        font-weight:600;
+    ">← Back to main docs</a>
+
+    <h2>Hardhat</h2>
+    <div class="sidebar-subtitle">Hardhat 3 + TypeScript workflow</div>
+    <input
+        id="searchInput"
+        type="text"
+        placeholder="Search..."
+        style="
+            width: 90%;
+            padding: 0.55rem 0.7rem;
+            margin: 0.6rem 0 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: #0f1320;
+            color: var(--text-main);
+            font-size: 0.9rem;
+        "
+    >
+    <div id="searchResults" style="margin-top:0.5rem; margin-bottom: 10px;"></div>
+
+    <script>
+  const searchInput = document.getElementById("searchInput");
+  const searchResults = document.getElementById("searchResults");
+
+  searchInput.addEventListener("input", () => {
+    const query = searchInput.value.toLowerCase();
+
+    if (query.length < 2) {
+      searchResults.innerHTML = "";
+      return;
+    }
+
+    let results = [];
+
+    document.querySelectorAll("section").forEach(section => {
+      const text = section.innerText.toLowerCase();
+
+      if (text.includes(query)) {
+        results.push({
+          id: section.id,
+          title: section.querySelector("h2")?.innerText || section.id
+        });
+      }
+    });
+
+    searchResults.innerHTML = results
+      .slice(0, 5)
+      .map(r => `<a href="#${r.id}" style="display:block; margin:4px 0; color:var(--accent);">${r.title}</a>`)
+      .join("");
+  });
+</script>
+
+
+    <div class="nav-category">
+      <div class="nav-category-title">Getting started</div>
+      <a href="#intro" class="active">What is Hardhat</a>
+      <a href="#why">Why Hardhat 3</a>
+      <a href="#install">Installation</a>
+      <a href="#init">Creating a project</a>
+    </div>
+
+    <div class="nav-category">
+      <div class="nav-category-title">Core concepts</div>
+      <a href="#structure">Project structure</a>
+      <a href="#config">hardhat.config.ts</a>
+      <a href="#solc">Solidity compiler</a>
+      <a href="#hre">Hardhat Runtime Env</a>
+      <a href="#network">Networks & forking</a>
+    </div>
+
+    <div class="nav-category">
+      <div class="nav-category-title">Build & deploy</div>
+      <a href="#tasks">Tasks</a>
+      <a href="#scripts">Scripts</a>
+      <a href="#deploy">Deployment</a>
+      <a href="#verify">Verification</a>
+    </div>
+
+    <div class="nav-category">
+      <div class="nav-category-title">Testing & plugins</div>
+      <a href="#testing">Testing (TypeScript)</a>
+      <a href="#plugins">Plugins</a>
+      <a href="#troubleshooting">Troubleshooting</a>
+      <a href="#resources">Resources</a>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="content">
+    <div class="content-inner">
+      <h1>Hardhat 3 Documentation</h1>
+      <p class="page-lead">
+        Hardhat 3 is a modern development environment for Ethereum: compilation, testing,
+        forking, deployment and verification. This page is a compact but dense guide for a TypeScript-based workflow.
+      </p>
+      <div class="page-meta">
+        Requires: Node.js ≥ 22.10.0 · Hardhat 3 · TypeScript + <code>@nomicfoundation/hardhat-toolbox-ethers</code>.
+      </div>
+
+      <!-- Mini TOC -->
+      <div class="toc">
+        <div class="toc-title">On this page</div>
+        <a href="#intro">What is Hardhat</a>
+        <a href="#why">Why Hardhat 3</a>
+        <a href="#install">Installation</a>
+        <a href="#init">Creating a project</a>
+        <a href="#structure">Project structure</a>
+        <a href="#config">Configuration</a>
+        <a href="#solc">Solidity compiler</a>
+        <a href="#hre">HRE</a>
+        <a href="#network">Networks</a>
+        <a href="#tasks">Tasks</a>
+        <a href="#scripts">Scripts</a>
+        <a href="#deploy">Deployment</a>
+        <a href="#verify">Verification</a>
+        <a href="#testing">Testing</a>
+        <a href="#plugins">Plugins</a>
+        <a href="#troubleshooting">Troubleshooting</a>
+        <a href="#resources">Resources</a>
+      </div>
+
+      <!-- CONTENT -->
+
+      <section id="intro">
+        <h2>What is Hardhat</h2>
+        <p>
+          Hardhat is a Node.js-based tool that manages the full lifecycle of smart contract development:
+          compilation, testing, local networks, mainnet forking, deployment, and integration with a rich plugin ecosystem.
+        </p>
+        <ul>
+          <li><span class="inline-code">npx hardhat &lt;task&gt;</span> — unified CLI for running tasks.</li>
+          <li>Built-in local network (simulated networks / <span class="inline-code">type: "edr-simulated"</span>).</li>
+          <li>Plugins: toolbox-ethers, gas reporter, coverage, verify, and more.</li>
+          <li>Runtime Environment (<span class="inline-code">HRE</span>) — access to <span class="inline-code">ethers</span>, networks, artifacts, config, etc.</li>
+        </ul>
+
+        <div class="note">
+          <div class="tip-title">Solidity ≠ workflow</div>
+          <p>
+            Solidity is just the language. Hardhat fills in everything around it: configuration, builds, tests, networks,
+            forking, deployment, and verification.
+          </p>
+        </div>
+      </section>
+
+      <section id="why">
+        <h2>Why Hardhat 3</h2>
+        <p>
+          Hardhat 3 introduces a new configuration model and network types, while keeping the familiar developer experience.
+        </p>
+        <ul>
+          <li><b>New configuration</b> via <span class="inline-code">defineConfig</span> and configuration variables.</li>
+          <li><b>TypeScript first</b>: the default config file is <span class="inline-code">hardhat.config.ts</span>.</li>
+          <li><b>Two network models</b>: <span class="inline-code">edr-simulated</span> (local) and <span class="inline-code">http</span> (RPC).</li>
+          <li><b>Toolbox plugins</b> for viem/ethers, coverage, gas reporting and more.</li>
+        </ul>
+      </section>
+
+      <section id="install">
+        <h2>Installation</h2>
+        <p>
+          We assume you already have Node.js ≥ 22.10 and a package manager like
+          <span class="inline-code">npm</span> or <span class="inline-code">pnpm</span> installed.
+        </p>
+
+        <h3>1. Create a project folder</h3>
+        <pre><code>mkdir web3-hardhat-demo
+cd web3-hardhat-demo
+npm init -y          # or pnpm init, yarn init
+</code></pre>
+
+        <h3>2. Install Hardhat 3</h3>
+        <pre><code>npm install --save-dev hardhat
+
+# or
+pnpm add -D hardhat
+</code></pre>
+
+        <h3>3. Initialize the project</h3>
+        <pre><code>npx hardhat</code></pre>
+
+        <p>
+          In Hardhat 3, the CLI can scaffold a TypeScript project by default, with
+          <span class="inline-code">hardhat.config.ts</span> and a basic project structure.
+        </p>
+
+        <div class="tip">
+          <div class="tip-title">Always use local Hardhat</div>
+          <p>
+            Use <span class="inline-code">npx hardhat</span> to run the locally installed version.
+            Global Hardhat installations are almost never needed and often cause version conflicts between projects.
+          </p>
+        </div>
+      </section>
+
+      <section id="init">
+        <h2>Creating a Hardhat project</h2>
+        <p>Typical flow after running <span class="inline-code">npx hardhat</span>:</p>
+        <ol>
+          <li>Select “Create a TypeScript project”.</li>
+          <li>Accept creating a <span class="inline-code">.gitignore</span>.</li>
+          <li>Accept installing recommended dependencies.</li>
+        </ol>
+
+        <p>The resulting structure looks like:</p>
+        <pre><code>.
+├─ contracts/
+│  └─ Lock.sol
+├─ scripts/
+│  └─ deploy-counter.ts
+├─ test/
+│  └─ Lock.ts
+├─ hardhat.config.ts
+└─ package.json
+</code></pre>
+
+        <div class="note">
+          <div class="tip-title">Good fit for a modern stack</div>
+          <p>
+            This template fits perfectly for a modern TypeScript stack: TS tests, ethers 6, forking,
+            integration with OpenZeppelin and more.
+          </p>
+        </div>
+      </section>
+
+      <section id="structure">
+        <h2>Project structure</h2>
+        <p>A typical Hardhat project contains:</p>
+        <ul>
+          <li><span class="inline-code">contracts/</span> — Solidity contracts.</li>
+          <li><span class="inline-code">scripts/</span> — deployment, migrations, and utility scripts.</li>
+          <li><span class="inline-code">test/</span> — tests (TypeScript / Node test runner or Mocha).</li>
+          <li><span class="inline-code">hardhat.config.ts</span> — configuration.</li>
+          <li><span class="inline-code">artifacts/</span> and <span class="inline-code">cache/</span> — build output and cache (usually in <span class="inline-code">.gitignore</span>).</li>
+        </ul>
+      </section>
+
+      <section id="config">
+        <h2>hardhat.config.ts</h2>
+        <p>
+          In Hardhat 3, configuration is defined via <span class="inline-code">defineConfig</span>, and secrets / RPC URLs
+          are loaded using configuration variables.
+        </p>
+
+        <h3>Minimal config with ethers toolbox</h3>
+        <pre><code>// hardhat.config.ts
+import { defineConfig, configVariable } from "hardhat/config";
+import "@nomicfoundation/hardhat-toolbox-ethers";
+
+export default defineConfig({
+  solidity: {
+    version: "0.8.28",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 200,
+      },
+    },
+  },
+
+  paths: {
+    sources: "./contracts",
+    tests: "./test",
+    cache: "./cache",
+    artifacts: "./artifacts",
+  },
+
+  networks: {
+    // Built-in simulated network that behaves like an L1 chain
+    hardhatMainnet: {
+      type: "edr-simulated",
+      chainType: "l1",
+    },
+
+    // RPC network (example: Sepolia)
+    sepolia: {
+      type: "http",
+      chainType: "l1",
+      url: configVariable("SEPOLIA_RPC_URL"),
+      accounts: [configVariable("SEPOLIA_PRIVATE_KEY")],
+    },
+  },
+
+  test: {
+    solidity: {
+      timeout: 40000,
+    },
+  },
+});
+</code></pre>
+
+        <div class="warning">
+          <div class="tip-title">Never commit private keys</div>
+          <p>
+            <span class="inline-code">SEPOLIA_PRIVATE_KEY</span>, <span class="inline-code">SEPOLIA_RPC_URL</span> and other
+            sensitive values should be stored outside the code — via configuration variables and, optionally,
+            <span class="inline-code">hardhat-keystore</span>.
+          </p>
+        </div>
+      </section>
+
+      <section id="solc">
+        <h2>Solidity compiler</h2>
+        <p>
+          The compiler configuration is defined in the <span class="inline-code">solidity</span> field of the config.
+        </p>
+
+        <h3>Single compiler</h3>
+        <pre><code>export default defineConfig({
+  solidity: {
+    version: "0.8.28",
+  },
+});
+</code></pre>
+
+        <h3>Multiple versions</h3>
+        <pre><code>export default defineConfig({
+  solidity: {
+    compilers: [
+      { version: "0.8.28" },
+      { version: "0.7.6" },
+    ],
+  },
+});
+</code></pre>
+
+        <p>
+          Hardhat will pick the smallest compatible version according to the
+          <span class="inline-code">pragma solidity</span> in the contract.
+        </p>
+      </section>
+
+      <section id="hre">
+        <h2>Hardhat Runtime Environment (HRE)</h2>
+        <p>
+          The Hardhat Runtime Environment gives you access to <span class="inline-code">ethers</span>, networks, artifacts,
+          config and more. In Hardhat 3, a common pattern is to use <span class="inline-code">network.connect()</span>.
+        </p>
+
+        <pre><code>// tasks/accounts.ts
+import { task } from "hardhat/config";
+
+task("accounts", "Prints accounts", async (_, hre) =&gt; {
+  const { ethers } = await hre.network.connect();
+  const signers = await ethers.getSigners();
+
+  for (const s of signers) {
+    console.log(s.address);
+  }
+});
+</code></pre>
+
+        <p>Common HRE properties:</p>
+        <ul>
+          <li><span class="inline-code">ethers</span> — integrated ethers v6 instance.</li>
+          <li><span class="inline-code">network</span> — network manager and <span class="inline-code">network.connect()</span>.</li>
+          <li><span class="inline-code">artifacts</span> — ABI/bytecode access.</li>
+          <li><span class="inline-code">config</span> — the active Hardhat configuration.</li>
+        </ul>
+      </section>
+
+      <section id="network">
+        <h2>Networks & forking</h2>
+        <p>
+          Hardhat 3 supports two main network types: simulated networks (<span class="inline-code">edr-simulated</span>) and
+          RPC networks (<span class="inline-code">http</span>).
+        </p>
+
+        <h3>Local simulated networks</h3>
+        <pre><code>export default defineConfig({
+  networks: {
+    hardhatMainnet: {
+      type: "edr-simulated",
+      chainType: "l1",
+      hardfork: "prague",
+    },
+  },
+});
+</code></pre>
+
+        <h3>Forking mainnet / L2</h3>
+        <pre><code>export default defineConfig({
+  networks: {
+    hardhatMainnet: {
+      type: "edr-simulated",
+      chainType: "l1",
+      forking: {
+        url: configVariable("MAINNET_RPC_URL"),
+        blockNumber: 19000000,
+      },
+    },
+  },
+});
+</code></pre>
+
+        <p>
+          In tests and scripts you can now work against a mainnet-like state locally:
+          impersonate accounts, interact with real protocols, and debug integrations without touching real funds.
+        </p>
+      </section>
+
+      <section id="tasks">
+        <h2>Tasks</h2>
+        <p>
+          A task is a named CLI command. Tasks are useful for repetitive operations: listing accounts, migrations,
+          generating snapshots, maintenance scripts, and more.
+        </p>
+
+        <pre><code>// tasks/accounts.ts
+import { task } from "hardhat/config";
+
+task("accounts", "Prints the list of accounts")
+  .setAction(async (_, hre) =&gt; {
+    const { ethers } = await hre.network.connect();
+    const signers = await ethers.getSigners();
+
+    for (const s of signers) {
+      console.log(s.address);
+    }
+  });
+</code></pre>
+
+        <p>Register the task in your config:</p>
+        <pre><code>// hardhat.config.ts
+import "./tasks/accounts";
+</code></pre>
+
+        <p>Run it:</p>
+        <pre><code>npx hardhat accounts</code></pre>
+      </section>
+
+      <section id="scripts">
+        <h2>Scripts</h2>
+        <p>
+          Scripts are plain TypeScript files that you run using
+          <span class="inline-code">npx hardhat run</span>. They’re most often used for deployments and maintenance.
+        </p>
+
+        <h3>Example deployment script with ethers</h3>
+        <pre><code>// scripts/deploy-counter.ts
+import { network } from "hardhat";
+
+const { ethers, networkName } = await network.connect();
+
+console.log(`Deploying Counter to ${networkName}...`);
+
+const counter = await ethers.deployContract("Counter");
+
+console.log("Waiting for the deployment tx to confirm...");
+await counter.waitForDeployment();
+
+console.log("Counter address:", await counter.getAddress());
+
+console.log("Calling counter.incBy(5)...");
+const tx = await counter.incBy(5n);
+await tx.wait();
+
+console.log("Deployment successful!");
+</code></pre>
+
+        <p>Run on Sepolia:</p>
+        <pre><code>npx hardhat run scripts/deploy-counter.ts --build-profile production --network sepolia</code></pre>
+      </section>
+
+      <section id="deploy">
+        <h2>Deployment</h2>
+        <p>
+          In Hardhat 3 there are two main approaches: Ignition (declarative deployment) and classic scripts.
+          Ignition is ideal for larger projects; scripts are simpler when you’re just starting out.
+        </p>
+
+        <ol>
+          <li>Configure the network in <span class="inline-code">hardhat.config.ts</span>.</li>
+          <li>Write a deployment script (like above) or an Ignition module.</li>
+          <li>Provide RPC URLs and keys via configuration variables.</li>
+          <li>Run <span class="inline-code">npx hardhat run ... --network ...</span>.</li>
+        </ol>
+
+        <div class="note">
+          <div class="tip-title">Deployment logs</div>
+          <p>
+            Log deployment information to the console and save deployed addresses into a JSON file, so you can reuse them
+            in your frontend, scripts, or tests.
+          </p>
+        </div>
+      </section>
+
+      <section id="verify">
+        <h2>Verification</h2>
+        <p>
+          Contract verification is handled via the Etherscan plugin (part of the toolbox) or other explorer plugins.
+        </p>
+
+        <h3>Etherscan configuration</h3>
+        <pre><code>// hardhat.config.ts
+import { defineConfig, configVariable } from "hardhat/config";
+import "@nomicfoundation/hardhat-toolbox-ethers";
+
+export default defineConfig({
+  solidity: { version: "0.8.28" },
+  networks: {
+    sepolia: {
+      type: "http",
+      chainType: "l1",
+      url: configVariable("SEPOLIA_RPC_URL"),
+      accounts: [configVariable("SEPOLIA_PRIVATE_KEY")],
+    },
+  },
+  etherscan: {
+    apiKey: configVariable("ETHERSCAN_API_KEY"),
+  },
+});
+</code></pre>
+
+        <h3>Verification command</h3>
+        <pre><code>npx hardhat verify --network sepolia &lt;deployed_address&gt; arg1 arg2 ...</code></pre>
+      </section>
+
+      <section id="testing">
+        <h2>Testing (TypeScript)</h2>
+        <p>
+          For TypeScript tests with ethers v6, a common setup is
+          <span class="inline-code">@nomicfoundation/hardhat-toolbox-ethers</span>, which provides utilities like
+          <span class="inline-code">expect(...).to.changeTokenBalances</span>, fixtures, and more.
+        </p>
+
+        <h3>Simple TypeScript test</h3>
+        <pre><code>// test/MyToken.ts
+import { expect } from "chai";
+import { ethers, loadFixture } from "hardhat";
+
+describe("MyToken", function () {
+  async function deployTokenFixture() {
+    const [owner, otherAccount] = await ethers.getSigners();
+
+    const token = await ethers.deployContract("MyToken");
+    await token.waitForDeployment();
+
+    return { token, owner, otherAccount };
+  }
+
+  it("assigns initial supply to owner", async function () {
+    const { token, owner } = await loadFixture(deployTokenFixture);
+
+    const ownerBalance = await token.balanceOf(owner.address);
+    expect(await token.totalSupply()).to.equal(ownerBalance);
+  });
+
+  it("transfers tokens", async function () {
+    const { token, owner, otherAccount } = await loadFixture(deployTokenFixture);
+
+    await expect(
+      token.transfer(otherAccount.address, 100n)
+    ).to.changeTokenBalances(token, [owner, otherAccount], [-100n, 100n]);
+  });
+});
+</code></pre>
+
+        <p>Run tests with:</p>
+        <pre><code>npx hardhat test</code></pre>
+
+        <div class="tip">
+          <div class="tip-title">Fixtures = faster tests</div>
+          <p>
+            <span class="inline-code">loadFixture</span> creates a snapshot of the network state and restores it before each test.
+            This is much faster than redeploying contracts every time.
+          </p>
+        </div>
+      </section>
+
+      <section id="plugins">
+        <h2>Plugins</h2>
+        <p>
+          Plugins are what turn Hardhat into a full-featured development stack. For a typical Web3 docs-style project,
+          you usually want at least:
+        </p>
+
+        <ul>
+          <li><span class="inline-code">@nomicfoundation/hardhat-toolbox-ethers</span> — tests, assertions, ethers integration.</li>
+          <li><span class="inline-code">hardhat-gas-reporter</span> — gas usage per test.</li>
+          <li><span class="inline-code">solidity-coverage</span> — test coverage reports.</li>
+        </ul>
+
+        <h3>Gas reporter example</h3>
+        <pre><code>npm install --save-dev hardhat-gas-reporter
+</code></pre>
+
+        <pre><code>// hardhat.config.ts
+import "hardhat-gas-reporter";
+
+export default defineConfig({
+  solidity: { version: "0.8.28" },
+  gasReporter: {
+    enabled: true,
+    currency: "USD",
+  },
+});
+</code></pre>
+      </section>
+
+      <section id="troubleshooting">
+        <h2>Troubleshooting</h2>
+        <p>Common issues:</p>
+
+        <h3>“No solc version compatible with pragma...”</h3>
+        <p>
+          Check that the <span class="inline-code">pragma solidity</span> in your contracts and the
+          <span class="inline-code">solidity</span> field in the config are compatible. If needed, add multiple compilers.
+        </p>
+
+        <h3>“Unknown network &lt;name&gt;”</h3>
+        <p>
+          You passed <span class="inline-code">--network name</span>, but there is no such entry in
+          <span class="inline-code">networks</span> in <span class="inline-code">hardhat.config.ts</span>.
+        </p>
+
+        <h3>“Insufficient funds for gas”</h3>
+        <p>
+          On testnets or mainnet your deployer address must have enough ETH to pay for gas. Use faucets or bridges to fund it.
+        </p>
+      </section>
+
+      <section id="resources">
+        <h2>Resources</h2>
+        <ul>
+          <li>Official Hardhat 3 documentation (tutorials and guides).</li>
+          <li>Guides on TypeScript testing, deployment scripts, and configuration variables.</li>
+          <li>OpenZeppelin Contracts for tokens, access control, and standards.</li>
+          <li>Combined Foundry + Hardhat workflows for advanced testing setups.</li>
+        </ul>
+
+        <div style="height: 160px;"></div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<footer>
+  © 2025 web3.studio — Hardhat 3 handbook for modern Web3 developers.<br>
+  <span style="opacity:0.8;">Build • Test • Fork • Deploy</span>
+</footer>
+
+<script>
+  const sections = Array.from(document.querySelectorAll("section[id]"));
+  const navLinks = document.querySelectorAll(".sidebar a");
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        navLinks.forEach(link => {
+          const href = link.getAttribute("href");
+          if (!href || !href.startsWith("#")) return;
+          link.classList.toggle("active", href === "#" + id);
+        });
+      }
+    });
+  }, {
+    threshold: 0.35
+  });
+
+  sections.forEach(section => observer.observe(section));
+</script>
+
+</body>
+</html>

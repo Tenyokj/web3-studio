@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Intermediate Guide — Foundry Testing Crash Course</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg: #020617;
+      --bg-elevated: #020617;
+      --card: #020617;
+      --card-soft: #030712;
+      --accent: #facc15;
+      --accent-soft: rgba(250, 204, 21, 0.1);
+      --accent-strong: rgba(250, 204, 21, 0.18);
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --border-subtle: rgba(148, 163, 184, 0.3);
+      --border-soft: rgba(148, 163, 184, 0.2);
+      --radius-lg: 22px;
+      --radius-md: 14px;
+      --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.9);
+      --shadow-glow: 0 0 80px rgba(250, 204, 21, 0.18);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: radial-gradient(circle at top left, #0f172a 0, #020617 45%, #000 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* Top nav */
+    .nav {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 1.2rem 1.4rem 0.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(22px);
+      background: linear-gradient(to bottom, rgba(2, 6, 23, 0.96), rgba(2, 6, 23, 0.75), transparent);
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    .nav-orb {
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 20%, #fde047 0, #facc15 26%, #a16207 70%, #0f172a 100%);
+      box-shadow: 0 0 30px rgba(250, 204, 21, 0.6);
+    }
+
+    .nav-title {
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      font-size: 1rem;
+    }
+
+    .nav-tagline {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.85rem;
+    }
+
+    .nav-link {
+      padding: 0.4rem 0.7rem;
+      border-radius: 999px;
+      color: var(--text-muted);
+      border: 1px solid transparent;
+      transition: 0.18s ease;
+    }
+
+    .nav-link:hover {
+      border-color: rgba(148, 163, 184, 0.5);
+      color: var(--text-main);
+      background: rgba(15, 23, 42, 0.8);
+    }
+
+    .nav-pill {
+      border-radius: 999px;
+      padding: 0.4rem 0.9rem;
+      border: 1px solid var(--border-subtle);
+      background: radial-gradient(circle at top left, rgba(250, 204, 21, 0.14), rgba(15, 23, 42, 0.8));
+      color: #fefce8;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+    }
+
+    .nav-pill-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #bbf7d0;
+      box-shadow: 0 0 11px rgba(74, 222, 128, 0.9);
+    }
+
+    /* Page shell */
+    .page {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 1.4rem 3.5rem;
+    }
+
+    /* Hero */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 3.5fr) minmax(0, 2.3fr);
+      gap: 2.6rem;
+      padding: 2.2rem 0 1.4rem;
+      align-items: center;
+    }
+
+    @media (max-width: 920px) {
+      .hero { grid-template-columns: minmax(0, 1fr); }
+    }
+
+    .hero-left-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.22rem 0.4rem;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 0.8rem;
+    }
+
+    .hero-left-label span {
+      padding: 0.16rem 0.5rem;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+    }
+
+    .hero-h1 {
+      font-size: clamp(2.35rem, 3vw, 2.9rem);
+      letter-spacing: -0.05em;
+      margin: 0.15rem 0 0.65rem;
+      line-height: 1.05;
+    }
+
+    .hero-h1 span {
+      background: linear-gradient(120deg, #facc15, #f97316, #22c55e);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .hero-lead {
+      color: var(--text-muted);
+      font-size: 0.98rem;
+      max-width: 34rem;
+      line-height: 1.8;
+      margin-bottom: 1.4rem;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-bottom: 1.8rem;
+    }
+
+    .hero-chip {
+      padding: 0.32rem 0.75rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      background: rgba(15, 23, 42, 0.85);
+    }
+
+    .hero-chip b {
+      color: #e5e7eb;
+      font-weight: 600;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .btn-primary {
+      padding: 0.7rem 1.4rem;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      background: radial-gradient(circle at 0 0, #facc15, #f97316);
+      color: #030712;
+      font-weight: 600;
+      font-size: 0.9rem;
+      box-shadow: 0 14px 35px rgba(250, 204, 21, 0.45);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      cursor: pointer;
+      transition: 0.18s ease;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 20px 55px rgba(250, 204, 21, 0.65);
+    }
+
+    .btn-ghost {
+      padding: 0.65rem 1.1rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.55);
+      background: rgba(15, 23, 42, 0.9);
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      cursor: pointer;
+      transition: 0.18s ease;
+    }
+
+    .btn-ghost:hover {
+      border-color: rgba(249, 250, 251, 0.9);
+      color: #e5e7eb;
+      background: rgba(15, 23, 42, 1);
+    }
+
+    .hero-right { position: relative; }
+
+    .hero-card {
+      border-radius: var(--radius-lg);
+      background:
+        radial-gradient(circle at top left, rgba(250, 204, 21, 0.14), transparent 55%),
+        radial-gradient(circle at bottom right, rgba(56, 189, 248, 0.14), transparent 55%),
+        linear-gradient(to bottom right, #020617, #020617);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      box-shadow: var(--shadow-soft), var(--shadow-glow);
+      padding: 1rem 1.1rem 1.05rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.65rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .hero-card-badge {
+      padding: 0.16rem 0.55rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: rgba(15, 23, 42, 0.9);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #e5e7eb;
+    }
+
+    .hero-metric-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-bottom: 0.6rem;
+      font-size: 0.78rem;
+    }
+
+    .hero-metric-label { color: var(--text-muted); }
+    .hero-metric-value { font-family: "JetBrains Mono", monospace; color: #e5e7eb; }
+
+    .hero-code-box {
+      margin-top: 0.7rem;
+      padding: 0.75rem 0.8rem;
+      border-radius: 16px;
+      background: rgba(15, 23, 42, 0.88);
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.78rem;
+      color: #e5e7eb;
+      overflow-x: auto;
+      line-height: 1.6;
+      position: relative;
+    }
+
+    .hero-code-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.4rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* Section wrappers */
+    .section { margin-top: 2.6rem; }
+
+    .section-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .section-title {
+      font-size: 1.25rem;
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+    }
+
+    .section-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 3.2fr) minmax(0, 2.4fr);
+      gap: 1.8rem;
+    }
+
+    @media (max-width: 900px) {
+      .section-grid { grid-template-columns: minmax(0, 1fr); }
+    }
+
+    .section-text {
+      font-size: 0.96rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+
+    .pill-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.7rem;
+      font-size: 0.8rem;
+    }
+
+    .pill {
+      padding: 0.3rem 0.65rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-muted);
+    }
+
+    .card {
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      background: radial-gradient(circle at top left, rgba(250, 204, 21, 0.16), transparent 60%), #020617;
+      padding: 1.2rem 1.25rem;
+      box-shadow: 0 14px 35px rgba(15, 23, 42, 0.9);
+    }
+
+    .card-soft {
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      background: rgba(15, 23, 42, 0.9);
+      padding: 1rem 1.05rem;
+      font-size: 0.9rem;
+    }
+
+    .card-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+      color: #e5e7eb;
+    }
+
+    .card-meta {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .step-list {
+      list-style: none;
+      padding: 0;
+      margin: 0.4rem 0 0;
+      font-size: 0.9rem;
+    }
+
+    .step-list li {
+      margin-bottom: 0.35rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    /* Code blocks */
+    pre {
+      margin: 1rem 0 1.2rem;
+      padding: 0.9rem 1rem;
+      border-radius: 16px;
+      background: rgba(15, 23, 42, 0.94);
+      border: 1px solid var(--border-soft);
+      box-shadow: 0 16px 34px rgba(15, 23, 42, 0.85);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.82rem;
+      color: #e5e7eb;
+      overflow-x: auto;
+      line-height: 1.7;
+      position: relative;
+    }
+
+    pre code { white-space: pre; }
+
+    .inline-code {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.82rem;
+      padding: 0.1rem 0.35rem;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      color: #e5e7eb;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 0.22rem 0.55rem;
+      font-size: 0.72rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: rgba(2, 6, 23, 0.9);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: 0.15s ease;
+      user-select: none;
+    }
+
+    .copy-btn:hover {
+      border-color: rgba(249, 250, 251, 0.9);
+      color: #e5e7eb;
+    }
+
+    .tip, .note, .warning {
+      margin: 1rem 0 1.2rem;
+      padding: 0.8rem 0.95rem;
+      border-radius: 14px;
+      font-size: 0.88rem;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+    }
+
+    .note {
+      border-color: rgba(56, 189, 248, 0.8);
+      background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.18), rgba(15, 23, 42, 0.9));
+    }
+
+    .warning {
+      border-color: rgba(248, 113, 113, 0.9);
+      background: radial-gradient(circle at top left, rgba(248, 113, 113, 0.16), rgba(15, 23, 42, 0.96));
+    }
+
+    .tip-title {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+      color: #e5e7eb;
+    }
+
+    .tip p, .note p, .warning p { margin: 0; color: var(--text-muted); }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.7fr);
+      gap: 1.2rem;
+    }
+
+    @media (max-width: 860px) {
+      .two-col { grid-template-columns: minmax(0, 1fr); }
+    }
+
+    .checklist {
+      list-style: none;
+      padding: 0;
+      margin: 0.4rem 0 0;
+      font-size: 0.9rem;
+    }
+
+    .checklist li {
+      margin-bottom: 0.35rem;
+      color: var(--text-muted);
+    }
+
+    .checkmark { color: #bbf7d0; margin-right: 0.4rem; }
+
+    details {
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 14px;
+      padding: 0.8rem 0.95rem;
+      margin: 0.7rem 0;
+      color: var(--text-muted);
+      font-size: 0.92rem;
+    }
+
+    details summary {
+      cursor: pointer;
+      font-weight: 600;
+      color: #e5e7eb;
+      list-style: none;
+    }
+
+    details p { margin: 0.6rem 0 0; }
+
+    footer {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 2rem 1.4rem 2.4rem;
+      border-top: 1px solid rgba(51, 65, 85, 0.8);
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.6rem;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.7rem;
+      font-size: 0.84rem;
+    }
+
+    .footer-links a { color: var(--text-muted); }
+    .footer-links a:hover { color: #e5e7eb; }
+
+    section[id] { scroll-margin-top: 90px; }
+
+        .nav-donate-btn {
+      padding: 0.55rem 1.2rem;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      background: radial-gradient(circle at 0 0, #facc15, #f97316);
+      color: #030712;
+      border: 1px solid transparent;
+      box-shadow: 0 10px 24px rgba(250, 204, 21, 0.45);
+      transition: 0.18s ease;
+      line-height: 1;
+      height: 32px;
+    }
+
+    .nav-donate-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 35px rgba(250, 204, 21, 0.65);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- TOP NAV -->
+  <header class="nav">
+    <div class="nav-left">
+      <div class="nav-orb"></div>
+      <div>
+        <div class="nav-title">web3.studio</div>
+        <div class="nav-tagline">Guides • Hardhat • Foundry • Security</div>
+      </div>
+    </div>
+
+    <div class="nav-right">
+      <a href="../index.html" class="nav-link">Home</a>
+      <a href="../guides.html" class="nav-link">All guides</a>
+    <a href="../donate.html" class="nav-donate-btn">Donate</a>
+      <span class="nav-pill">
+        <span class="nav-pill-dot"></span>
+        Intermediate track
+      </span>
+    </div>
+  </header>
+
+  <main class="page">
+
+    <!-- HERO -->
+    <section class="hero">
+      <div>
+        <div class="hero-left-label">
+          <span>Intermediate • Solidity</span>
+          Foundry testing crash course
+        </div>
+
+        <h1 class="hero-h1">
+          Test smart contracts<br />
+          you can <span>actually trust</span>.
+        </h1>
+
+        <p class="hero-lead">
+          In this guide you’ll learn Foundry testing step-by-step — from unit tests
+          to fuzzing and invariants. You’ll build a real tested contract and walk away
+          with a workflow used in production teams and audits.
+        </p>
+
+        <div class="hero-meta">
+          <div class="hero-chip"><b>Level</b> · Intermediate</div>
+          <div class="hero-chip"><b>Stack</b> · Foundry, Solidity</div>
+          <div class="hero-chip"><b>Time</b> · ~90 minutes</div>
+        </div>
+
+        <div class="hero-actions">
+          <a href="#overview" class="btn-primary">
+            Start guide
+            <span>↓</span>
+          </a>
+          <a href="#fuzzing" class="btn-ghost">
+            Jump to fuzzing
+          </a>
+        </div>
+      </div>
+
+      <div class="hero-right">
+        <div class="hero-card">
+          <div class="hero-card-header">
+            <span>What you’ll build</span>
+            <span class="hero-card-badge">TESTED VAULT</span>
+          </div>
+
+          <div class="hero-metric-row">
+            <span class="hero-metric-label">Contract</span>
+            <span class="hero-metric-value">MiniVault.sol</span>
+          </div>
+          <div class="hero-metric-row">
+            <span class="hero-metric-label">Testing types</span>
+            <span class="hero-metric-value">Unit • Fuzz • Invariants</span>
+          </div>
+          <div class="hero-metric-row">
+            <span class="hero-metric-label">Tooling</span>
+            <span class="hero-metric-value">forge • cast • anvil</span>
+          </div>
+
+          <div class="hero-code-box">
+            <div class="hero-code-label">
+              <span>test/MiniVault.t.sol</span>
+              <span>Foundry · forge-std</span>
+            </div>
+<code>
+function test_DepositIncreasesBalance() public {
+    vault.deposit{value: 1 ether}();
+    assertEq(vault.balanceOf(address(this)), 1 ether);
+}
+</code>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- OVERVIEW -->
+    <section id="overview" class="section">
+      <div class="section-label">Overview</div>
+      <h2 class="section-title">What you’ll learn</h2>
+
+      <div class="section-grid">
+        <div class="section-text">
+          <p>
+            This is a practical crash course. No random theory dumps —
+            everything is anchored to real code you’ll run.
+          </p>
+
+          <ul>
+            <li>Setting up a clean Foundry project</li>
+            <li>Writing unit tests with <span class="inline-code">forge-std/Test.sol</span></li>
+            <li>Using cheatcodes: prank, deal, warp, expectRevert</li>
+            <li>Fuzz testing with randomized inputs</li>
+            <li>Invariant testing to catch “impossible states”</li>
+            <li>Debugging failing tests like an adult</li>
+          </ul>
+
+          <div class="note">
+            <div class="tip-title">Who is this for?</div>
+            <p>
+              If you already shipped at least one Solidity project and want
+              faster & more powerful tests than Hardhat gives — Foundry is your next step.
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <div class="card-title">Prerequisites</div>
+            <div class="card-meta">You should be comfortable with:</div>
+            <ul class="checklist">
+              <li><span class="checkmark">✓</span> Writing basic Solidity contracts</li>
+              <li><span class="checkmark">✓</span> Using CLI tools / terminal</li>
+              <li><span class="checkmark">✓</span> Understanding msg.sender / msg.value / reverts</li>
+            </ul>
+            <div class="card-meta" style="margin-top:0.6rem;">
+              Nice-to-have:
+            </div>
+            <ul class="checklist">
+              <li><span class="checkmark">•</span> Some unit testing experience (any framework)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SETUP -->
+    <section id="setup" class="section">
+      <div class="section-label">Step 1</div>
+      <h2 class="section-title">Install Foundry and initialize a project</h2>
+
+      <div class="two-col">
+        <div class="section-text">
+          <p>1. Install Foundry (macOS / Linux / WSL):</p>
+          <pre><button class="copy-btn">Copy</button><code>curl -L https://foundry.paradigm.xyz | bash
+foundryup</code></pre>
+
+          <p>2. Create a new project:</p>
+          <pre><button class="copy-btn">Copy</button><code>mkdir foundry-testing-crash-course
+cd foundry-testing-crash-course
+forge init</code></pre>
+
+          <p>
+            You now have a skeleton project with:
+            <span class="inline-code">src/</span>, <span class="inline-code">test/</span>, and <span class="inline-code">lib/</span>.
+          </p>
+
+          <div class="tip">
+            <div class="tip-title">Update Foundry often</div>
+            <p>
+              Foundry evolves fast. If something feels broken, run:
+              <span class="inline-code">foundryup</span>.
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <div class="card-soft">
+            <div class="card-title">Your tools</div>
+            <ul class="step-list">
+              <li><span class="checkmark">✓</span> <span class="inline-code">forge</span> — compile & test</li>
+              <li><span class="checkmark">✓</span> <span class="inline-code">cast</span> — interact with chains</li>
+              <li><span class="checkmark">✓</span> <span class="inline-code">anvil</span> — local node</li>
+              <li><span class="checkmark">✓</span> <span class="inline-code">chisel</span> — Solidity REPL</li>
+            </ul>
+            <p style="margin-top:0.8rem;">
+              In this guide we’ll mainly use <span class="inline-code">forge test</span>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTRACT -->
+    <section id="contract" class="section">
+      <div class="section-label">Step 2</div>
+      <h2 class="section-title">Build a tiny contract worth testing</h2>
+
+      <div class="section-text">
+        <p>
+          Delete the sample contract in <span class="inline-code">src/Counter.sol</span> (if any),
+          and create <span class="inline-code">src/MiniVault.sol</span>:
+        </p>
+
+        <pre><button class="copy-btn">Copy</button><code>// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+/// @notice A minimal ETH vault with deposits & withdrawals.
+contract MiniVault {
+    mapping(address => uint256) public balanceOf;
+
+    error InsufficientBalance();
+
+    event Deposit(address indexed user, uint256 amount);
+    event Withdraw(address indexed user, uint256 amount);
+
+    function deposit() external payable {
+        balanceOf[msg.sender] += msg.value;
+        emit Deposit(msg.sender, msg.value);
+    }
+
+    function withdraw(uint256 amount) external {
+        if (balanceOf[msg.sender] < amount) revert InsufficientBalance();
+        balanceOf[msg.sender] -= amount;
+
+        (bool ok,) = msg.sender.call{value: amount}("");
+        require(ok, "TRANSFER_FAILED");
+
+        emit Withdraw(msg.sender, amount);
+    }
+}</code></pre>
+
+        <p>
+          This contract is simple, but it already has meaningful invariant rules:
+        </p>
+
+        <ul>
+          <li>User balances must never go negative</li>
+          <li>Vault shouldn’t lose ETH unless someone withdraws</li>
+          <li>Reverts should trigger correctly on bad withdrawals</li>
+        </ul>
+
+        <p>Compile once:</p>
+        <pre><button class="copy-btn">Copy</button><code>forge build</code></pre>
+      </div>
+    </section>
+
+    <!-- UNIT TESTS -->
+    <section id="unit" class="section">
+      <div class="section-label">Step 3</div>
+      <h2 class="section-title">Write unit tests</h2>
+
+      <div class="section-text">
+        <p>
+          Foundry tests are Solidity contracts stored in <span class="inline-code">test/</span>.
+          They inherit from <span class="inline-code">forge-std/Test.sol</span>.
+        </p>
+
+        <p>Create <span class="inline-code">test/MiniVault.t.sol</span>:</p>
+
+        <pre><button class="copy-btn">Copy</button><code>// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "forge-std/Test.sol";
+import "../src/MiniVault.sol";
+
+contract MiniVaultTest is Test {
+    MiniVault vault;
+    address alice = address(0xA11CE);
+    address bob   = address(0xB0B);
+
+    function setUp() public {
+        vault = new MiniVault();
+
+        // Give accounts ETH for testing
+        vm.deal(alice, 10 ether);
+        vm.deal(bob, 10 ether);
+    }
+
+    function test_DepositIncreasesBalance() public {
+        vm.prank(alice);
+        vault.deposit{value: 2 ether}();
+
+        assertEq(vault.balanceOf(alice), 2 ether);
+    }
+
+    function test_WithdrawDecreasesBalance() public {
+        vm.startPrank(alice);
+        vault.deposit{value: 3 ether}();
+        vault.withdraw(1 ether);
+        vm.stopPrank();
+
+        assertEq(vault.balanceOf(alice), 2 ether);
+    }
+
+    function test_RevertOnTooLargeWithdraw() public {
+        vm.prank(alice);
+        vault.deposit{value: 1 ether}();
+
+        vm.prank(alice);
+        vm.expectRevert(MiniVault.InsufficientBalance.selector);
+        vault.withdraw(2 ether);
+    }
+}</code></pre>
+
+        <p>Run tests:</p>
+        <pre><button class="copy-btn">Copy</button><code>forge test -vv</code></pre>
+
+        <div class="tip">
+          <div class="tip-title">Flags you’ll use daily</div>
+          <p>
+            <span class="inline-code">-v</span> = verbose,
+            <span class="inline-code">-vv</span> = logs + traces,
+            <span class="inline-code">-vvv</span> = deepest traces.
+          </p>
+        </div>
+
+        <details>
+          <summary>How do cheatcodes work?</summary>
+          <p>
+            Cheatcodes are special “testing syscalls” exposed through the <span class="inline-code">vm</span> object.
+            They only exist in tests, never on-chain. That’s why Foundry tests are so powerful.
+          </p>
+        </details>
+
+        <details>
+          <summary>What is prank / startPrank?</summary>
+          <p>
+            <span class="inline-code">vm.prank(x)</span> makes the next call execute as x.
+            <span class="inline-code">vm.startPrank(x)</span> keeps msg.sender = x until stopPrank().
+          </p>
+        </details>
+      </div>
+    </section>
+
+    <!-- FUZZ TESTS -->
+    <section id="fuzzing" class="section">
+      <div class="section-label">Step 4</div>
+      <h2 class="section-title">Fuzz testing: find edge cases automatically</h2>
+
+      <div class="section-text">
+        <p>
+          Fuzzing means Foundry generates random inputs for your test function.
+          If any input breaks the test, Foundry prints the minimal failing case.
+        </p>
+
+        <p>Add this to <span class="inline-code">MiniVaultTest</span>:</p>
+
+        <pre><button class="copy-btn">Copy</button><code>function testFuzz_DepositAndWithdraw(uint96 amount) public {
+    // bound converts random amount into safe range
+    uint256 a = bound(uint256(amount), 1 wei, 5 ether);
+
+    vm.prank(alice);
+    vault.deposit{value: a}();
+
+    vm.prank(alice);
+    vault.withdraw(a);
+
+    assertEq(vault.balanceOf(alice), 0);
+}</code></pre>
+
+        <p>Run fuzz tests:</p>
+        <pre><button class="copy-btn">Copy</button><code>forge test --match-test testFuzz -vv</code></pre>
+
+        <div class="note">
+          <div class="tip-title">Why uint96?</div>
+          <p>
+            Smaller types fuzz faster and avoid weird overflow paths.
+            For ETH-based fuzzing, uint96 is a sweet spot.
+          </p>
+        </div>
+
+        <details>
+          <summary>What does bound() do?</summary>
+          <p>
+            Foundry gives you a fully random value. <span class="inline-code">bound(x, min, max)</span>
+            clamps it into a range so the fuzzing stays meaningful.
+          </p>
+        </details>
+      </div>
+    </section>
+
+    <!-- INVARIANTS -->
+    <section id="invariants" class="section">
+      <div class="section-label">Step 5</div>
+      <h2 class="section-title">Invariants: test the rules, not a single path</h2>
+
+      <div class="section-text">
+        <p>
+          Invariant tests repeatedly call random actions on a contract
+          and verify some property always holds.
+        </p>
+
+        <p>
+          Create a handler contract in <span class="inline-code">test/handlers/MiniVaultHandler.sol</span>:
+        </p>
+
+        <pre><button class="copy-btn">Copy</button><code>// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "forge-std/Test.sol";
+import "../../src/MiniVault.sol";
+
+contract MiniVaultHandler is Test {
+    MiniVault public vault;
+
+    address[] public users;
+
+    constructor(MiniVault _vault) {
+        vault = _vault;
+        users.push(address(0xA11CE));
+        users.push(address(0xB0B));
+
+        vm.deal(users[0], 100 ether);
+        vm.deal(users[1], 100 ether);
+    }
+
+    function deposit(uint256 amount, uint256 userIndex) public {
+        address user = users[userIndex % users.length];
+        uint256 a = bound(amount, 1 wei, 5 ether);
+
+        vm.prank(user);
+        vault.deposit{value: a}();
+    }
+
+    function withdraw(uint256 amount, uint256 userIndex) public {
+        address user = users[userIndex % users.length];
+        uint256 bal = vault.balanceOf(user);
+
+        uint256 a = bound(amount, 0, bal);
+
+        vm.prank(user);
+        vault.withdraw(a);
+    }
+}</code></pre>
+
+        <p>Now create an invariant test file <span class="inline-code">test/MiniVault.invariant.t.sol</span>:</p>
+
+        <pre><button class="copy-btn">Copy</button><code>// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "forge-std/Test.sol";
+import "../src/MiniVault.sol";
+import "./handlers/MiniVaultHandler.sol";
+
+contract MiniVaultInvariantTest is Test {
+    MiniVault vault;
+    MiniVaultHandler handler;
+
+    function setUp() public {
+        vault = new MiniVault();
+        handler = new MiniVaultHandler(vault);
+
+        targetContract(address(handler));
+    }
+
+    /// Invariant: vault ETH == sum of user balances tracked in contract
+    function invariant_VaultSolvency() public {
+        uint256 sum;
+        sum += vault.balanceOf(address(0xA11CE));
+        sum += vault.balanceOf(address(0xB0B));
+
+        assertEq(address(vault).balance, sum);
+    }
+}</code></pre>
+
+        <p>Run invariants:</p>
+        <pre><button class="copy-btn">Copy</button><code>forge test --match-test invariant -vv</code></pre>
+
+        <div class="warning">
+          <div class="tip-title">Invariants are brutal (in a good way)</div>
+          <p>
+            If your state accounting has even a tiny bug, invariants usually catch it.
+            That’s why auditors love them.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- DEBUGGING -->
+    <section id="debugging" class="section">
+      <div class="section-label">Extra</div>
+      <h2 class="section-title">Debugging failing tests fast</h2>
+
+      <div class="section-text">
+        <p>
+          Foundry gives you great tools to understand why something failed.
+          Here are the important ones:
+        </p>
+
+        <ul>
+          <li><span class="inline-code">forge test -vvv</span> — full call traces</li>
+          <li><span class="inline-code">console2.log()</span> — logs from Solidity tests</li>
+          <li><span class="inline-code">--match-test</span> — run only specific tests</li>
+          <li><span class="inline-code">--gas-report</span> — see gas costs per function</li>
+        </ul>
+
+        <p>Try adding a log:</p>
+        <pre><button class="copy-btn">Copy</button><code>import "forge-std/console2.sol";
+
+console2.log("alice balance", vault.balanceOf(alice));</code></pre>
+
+        <details>
+          <summary>Foundry tests don’t see my new file</summary>
+          <p>
+            Run <span class="inline-code">forge clean</span> then <span class="inline-code">forge test</span>.
+            If it’s still weird, check import paths and file naming (<span class="inline-code">.t.sol</span>).
+          </p>
+        </details>
+      </div>
+    </section>
+
+    <!-- NEXT STEPS -->
+    <section id="next" class="section">
+      <div class="section-label">Wrap up</div>
+      <h2 class="section-title">Where to go from here</h2>
+
+      <div class="section-grid">
+        <div class="section-text">
+          <p>Nice! You’ve just:</p>
+          <ul>
+            <li>Installed Foundry and initialized a project</li>
+            <li>Wrote unit tests with cheatcodes</li>
+            <li>Added fuzz tests to auto-discover edge cases</li>
+            <li>Built invariant tests for solvency rules</li>
+            <li>Learned how to debug failures quickly</li>
+          </ul>
+
+          <p style="margin-top:0.9rem;">
+            This is already enough to test most real-world contracts.
+            Next, level up by testing DeFi patterns and security properties.
+          </p>
+
+          <ul>
+            <li>Test ERC-20/721 integrations</li>
+            <li>Fuzz + invariants for AMMs / vaults / staking</li>
+            <li>Property-based security testing</li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="card-soft">
+            <div class="card-title">Suggested next guides</div>
+            <ul class="step-list">
+              <li>
+                <span class="checkmark">→</span>
+                <b>Foundry deployment</b> · scripts, broadcasting, verify
+              </li>
+              <li>
+                <span class="checkmark">→</span>
+                <b>Security invariants</b> · reentrancy, access control, solvency
+              </li>
+              <li>
+                <span class="checkmark">→</span>
+                <b>Hardhat vs Foundry</b> · when to use which stack
+              </li>
+            </ul>
+
+            <p style="margin-top:0.9rem; font-size:0.86rem; color:var(--text-muted);">
+              Link these to your docs like
+              <span class="inline-code">foundry.html</span>,
+              <span class="inline-code">security.html</span>,
+              or a comparison page.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div>© 2025 web3.studio — intermediate track: Foundry • Solidity • Testing.</div>
+    <div class="footer-links">
+      <a href="../index.html">Home</a>
+      <span>·</span>
+      <a href="../guides.html">All guides</a>
+      <span>·</span>
+      <a href="../docs.html">Docs</a>
+    </div>
+  </footer>
+
+    <div class="guide-progress" id="guideProgress">
+  <div class="gp-label">
+    <span id="gpPercent">0%</span> · guide progress
+  </div>
+
+  <div class="gp-bar">
+    <div class="gp-bar-fill" id="gpBarFill"></div>
+  </div>
+
+  <div class="gp-actions">
+    <button id="gpTopBtn">Top</button>
+    <button id="gpNextBtn">Next</button>
+  </div>
+</div>
+
+<style>
+    .guide-progress {
+  position: fixed;
+  bottom: 22px;
+  right: 22px;
+  background: rgba(15, 23, 42, 0.82);
+  padding: 1rem 1.2rem 1.2rem;
+  border-radius: 18px;
+  border: 1px solid rgba(148,163,184,0.35);
+  backdrop-filter: blur(12px);
+  width: 180px;
+  z-index: 999;
+  box-shadow: 0 0 35px rgba(0,0,0,0.55);
+  font-size: 0.82rem;
+  color: #f3f4f6;
+}
+
+.gp-label {
+  margin-bottom: 0.6rem;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+}
+
+.gp-bar {
+  height: 8px;
+  background: #0f172a;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 0.9rem;
+  border: 1px solid rgba(148,163,184,0.35);
+}
+
+.gp-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #facc15, #f97316);
+  transition: width 0.2s ease-out;
+}
+
+.gp-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.4rem;
+}
+
+.gp-actions button {
+  flex: 1;
+  background: rgba(30,41,59,0.85);
+  border: 1px solid rgba(148,163,184,0.45);
+  color: #e5e7eb;
+  padding: 0.35rem 0.4rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.15s;
+  font-size: 0.78rem;
+}
+
+.gp-actions button:hover {
+  background: rgba(51,65,85,0.85);
+  border-color: rgba(248,250,252,0.6);
+}
+
+</style>
+
+<script>
+
+    const gpPercent = document.getElementById("gpPercent");
+const gpBarFill = document.getElementById("gpBarFill");
+const gpTopBtn = document.getElementById("gpTopBtn");
+const gpNextBtn = document.getElementById("gpNextBtn");
+
+// Собираем все секции, чтобы "Next" работал автоматически
+const guideSections = Array.from(document.querySelectorAll("section[id]"));
+
+function updateProgress() {
+  const scrollTop = window.scrollY;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+
+  let progress = Math.min(100, (scrollTop / docHeight) * 100);
+  progress = Math.floor(progress);
+
+  gpPercent.innerText = progress + "%";
+  gpBarFill.style.width = progress + "%";
+}
+
+// Обновление прогресса при прокрутке
+window.addEventListener("scroll", updateProgress);
+updateProgress();
+
+// Кнопка Top
+gpTopBtn.addEventListener("click", () => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+// Кнопка Next — ищет следующую секцию
+gpNextBtn.addEventListener("click", () => {
+  const scrollPos = window.scrollY + 40;
+
+  let next = null;
+  for (let section of guideSections) {
+    const top = section.offsetTop;
+    if (top > scrollPos) {
+      next = section;
+      break;
+    }
+  }
+
+  if (next) {
+    window.scrollTo({ top: next.offsetTop - 60, behavior: "smooth" });
+  }
+});
+
+</script>
+
+<script>
+  // Copy buttons for code blocks
+  document.querySelectorAll("pre").forEach(pre => {
+    const btn = pre.querySelector(".copy-btn");
+    if (!btn) return;
+
+    btn.addEventListener("click", () => {
+      const code = pre.querySelector("code")?.innerText || "";
+      navigator.clipboard.writeText(code);
+      btn.textContent = "Copied!";
+      setTimeout(() => btn.textContent = "Copy", 1200);
+    });
+  });
+</script>
+
+</body>
+</html>

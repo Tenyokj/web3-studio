@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Beginner Guide — ERC-20 with Hardhat & OpenZeppelin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg: #020617;
+      --bg-elevated: #020617;
+      --card: #020617;
+      --card-soft: #030712;
+      --accent: #facc15;
+      --accent-soft: rgba(250, 204, 21, 0.1);
+      --accent-strong: rgba(250, 204, 21, 0.18);
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --border-subtle: rgba(148, 163, 184, 0.3);
+      --border-soft: rgba(148, 163, 184, 0.2);
+      --radius-lg: 22px;
+      --radius-md: 14px;
+      --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.9);
+      --shadow-glow: 0 0 80px rgba(250, 204, 21, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: radial-gradient(circle at top left, #0f172a 0, #020617 45%, #000 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* Top nav */
+    .nav {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 1.2rem 1.4rem 0.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(22px);
+      background: linear-gradient(to bottom, rgba(2, 6, 23, 0.96), rgba(2, 6, 23, 0.75), transparent);
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    .nav-orb {
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 20%, #fde047 0, #facc15 26%, #a16207 70%, #0f172a 100%);
+      box-shadow: 0 0 30px rgba(250, 204, 21, 0.6);
+    }
+
+    .nav-title {
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      font-size: 1rem;
+    }
+
+    .nav-tagline {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.85rem;
+    }
+
+    .nav-link {
+      padding: 0.4rem 0.7rem;
+      border-radius: 999px;
+      color: var(--text-muted);
+      border: 1px solid transparent;
+      transition: 0.18s ease;
+    }
+
+    .nav-link:hover {
+      border-color: rgba(148, 163, 184, 0.5);
+      color: var(--text-main);
+      background: rgba(15, 23, 42, 0.8);
+    }
+
+    .nav-pill {
+      border-radius: 999px;
+      padding: 0.4rem 0.9rem;
+      border: 1px solid var(--border-subtle);
+      background: radial-gradient(circle at top left, rgba(250, 204, 21, 0.14), rgba(15, 23, 42, 0.8));
+      color: #fefce8;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+    }
+
+    .nav-pill-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #bbf7d0;
+      box-shadow: 0 0 11px rgba(74, 222, 128, 0.9);
+    }
+
+    /* Page shell */
+    .page {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 1.4rem 3.5rem;
+    }
+
+    /* Hero */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 3.5fr) minmax(0, 2.3fr);
+      gap: 2.6rem;
+      padding: 2.2rem 0 1.4rem;
+      align-items: center;
+    }
+
+    @media (max-width: 920px) {
+      .hero {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .hero-left-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.22rem 0.4rem;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 0.8rem;
+    }
+
+    .hero-left-label span {
+      padding: 0.16rem 0.5rem;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+    }
+
+    .hero-h1 {
+      font-size: clamp(2.35rem, 3vw, 2.9rem);
+      letter-spacing: -0.05em;
+      margin: 0.15rem 0 0.65rem;
+      line-height: 1.05;
+    }
+
+    .hero-h1 span {
+      background: linear-gradient(120deg, #facc15, #f97316, #22c55e);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .hero-lead {
+      color: var(--text-muted);
+      font-size: 0.98rem;
+      max-width: 32rem;
+      line-height: 1.8;
+      margin-bottom: 1.4rem;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-bottom: 1.8rem;
+    }
+
+    .hero-chip {
+      padding: 0.32rem 0.75rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      background: rgba(15, 23, 42, 0.85);
+    }
+
+    .hero-chip b {
+      color: #e5e7eb;
+      font-weight: 600;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .btn-primary {
+      padding: 0.7rem 1.4rem;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      background: radial-gradient(circle at 0 0, #facc15, #f97316);
+      color: #030712;
+      font-weight: 600;
+      font-size: 0.9rem;
+      box-shadow: 0 14px 35px rgba(250, 204, 21, 0.45);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      cursor: pointer;
+      transition: 0.18s ease;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 20px 55px rgba(250, 204, 21, 0.65);
+    }
+
+    .btn-ghost {
+      padding: 0.65rem 1.1rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.55);
+      background: rgba(15, 23, 42, 0.9);
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      cursor: pointer;
+      transition: 0.18s ease;
+    }
+
+    .btn-ghost:hover {
+      border-color: rgba(249, 250, 251, 0.9);
+      color: #e5e7eb;
+      background: rgba(15, 23, 42, 1);
+    }
+
+    .hero-right {
+      position: relative;
+    }
+
+    .hero-card {
+      border-radius: var(--radius-lg);
+      background:
+        radial-gradient(circle at top left, rgba(250, 204, 21, 0.14), transparent 55%),
+        radial-gradient(circle at bottom right, rgba(56, 189, 248, 0.14), transparent 55%),
+        linear-gradient(to bottom right, #020617, #020617);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      box-shadow: var(--shadow-soft), var(--shadow-glow);
+      padding: 1rem 1.1rem 1.05rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.65rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .hero-card-badge {
+      padding: 0.16rem 0.55rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: rgba(15, 23, 42, 0.9);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #e5e7eb;
+    }
+
+    .hero-metric-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-bottom: 0.6rem;
+      font-size: 0.78rem;
+    }
+
+    .hero-metric-label {
+      color: var(--text-muted);
+    }
+
+    .hero-metric-value {
+      font-family: "JetBrains Mono", monospace;
+      color: #e5e7eb;
+    }
+
+    .hero-code-box {
+      margin-top: 0.7rem;
+      padding: 0.75rem 0.8rem;
+      border-radius: 16px;
+      background: rgba(15, 23, 42, 0.88);
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.78rem;
+      color: #e5e7eb;
+      overflow-x: auto;
+      line-height: 1.6;
+    }
+
+    .hero-code-box code {
+      white-space: pre;
+    }
+
+    .hero-code-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.4rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* Section wrappers */
+    .section {
+      margin-top: 2.6rem;
+    }
+
+    .section-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .section-title {
+      font-size: 1.25rem;
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+    }
+
+    .section-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 3.2fr) minmax(0, 2.4fr);
+      gap: 1.8rem;
+    }
+
+    @media (max-width: 900px) {
+      .section-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .section-text {
+      font-size: 0.96rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+
+    .pill-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.7rem;
+      font-size: 0.8rem;
+    }
+
+    .pill {
+      padding: 0.3rem 0.65rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-muted);
+    }
+
+    .card {
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      background: radial-gradient(circle at top left, rgba(250, 204, 21, 0.16), transparent 60%), #020617;
+      padding: 1.2rem 1.25rem;
+      box-shadow: 0 14px 35px rgba(15, 23, 42, 0.9);
+    }
+
+    .card-soft {
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      background: rgba(15, 23, 42, 0.9);
+      padding: 1rem 1.05rem;
+      font-size: 0.9rem;
+    }
+
+    .card-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+    }
+
+    .card-meta {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .step-list {
+      list-style: none;
+      padding: 0;
+      margin: 0.4rem 0 0;
+      font-size: 0.9rem;
+    }
+
+    .step-list li {
+      margin-bottom: 0.35rem;
+      color: var(--text-muted);
+    }
+
+    /* Code blocks */
+    pre {
+      margin: 1rem 0 1.6rem;
+      padding: 0.9rem 1rem;
+      border-radius: 16px;
+      background: rgba(15, 23, 42, 0.94);
+      border: 1px solid var(--border-soft);
+      box-shadow: 0 16px 34px rgba(15, 23, 42, 0.85);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.82rem;
+      color: #e5e7eb;
+      overflow-x: auto;
+      line-height: 1.7;
+    }
+
+    pre code {
+      white-space: pre;
+    }
+
+    .inline-code {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.82rem;
+      padding: 0.1rem 0.35rem;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      color: #e5e7eb;
+    }
+
+    .tip, .note, .warning {
+      margin: 1rem 0 1.4rem;
+      padding: 0.8rem 0.95rem;
+      border-radius: 14px;
+      font-size: 0.88rem;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+    }
+
+    .note {
+      border-color: rgba(56, 189, 248, 0.8);
+      background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.18), rgba(15, 23, 42, 0.9));
+    }
+
+    .warning {
+      border-color: rgba(248, 113, 113, 0.9);
+      background: radial-gradient(circle at top left, rgba(248, 113, 113, 0.16), rgba(15, 23, 42, 0.96));
+    }
+
+    .tip-title {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+      color: #e5e7eb;
+    }
+
+    .tip p, .note p, .warning p {
+      margin: 0;
+      color: var(--text-muted);
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.7fr);
+      gap: 1.2rem;
+    }
+
+    @media (max-width: 860px) {
+      .two-col {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .checklist {
+      list-style: none;
+      padding: 0;
+      margin: 0.4rem 0 0;
+      font-size: 0.9rem;
+    }
+
+    .checklist li {
+      margin-bottom: 0.35rem;
+      color: var(--text-muted);
+    }
+
+    .checkmark {
+      color: #bbf7d0;
+      margin-right: 0.4rem;
+    }
+
+    footer {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 2rem 1.4rem 2.4rem;
+      border-top: 1px solid rgba(51, 65, 85, 0.8);
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.6rem;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.7rem;
+      font-size: 0.84rem;
+    }
+
+    .footer-links a {
+      color: var(--text-muted);
+    }
+
+    .footer-links a:hover {
+      color: #e5e7eb;
+    }
+
+    /* Anchor spacing */
+    section[id] {
+      scroll-margin-top: 90px;
+    }
+
+        .nav-donate-btn {
+      padding: 0.55rem 1.2rem;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      background: radial-gradient(circle at 0 0, #facc15, #f97316);
+      color: #030712;
+      border: 1px solid transparent;
+      box-shadow: 0 10px 24px rgba(250, 204, 21, 0.45);
+      transition: 0.18s ease;
+      line-height: 1;
+      height: 32px;
+    }
+
+    .nav-donate-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 35px rgba(250, 204, 21, 0.65);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- TOP NAV -->
+  <header class="nav">
+    <div class="nav-left">
+      <div class="nav-orb"></div>
+      <div>
+        <div class="nav-title">web3.studio</div>
+        <div class="nav-tagline">Guides • Hardhat • Solidity • OZ</div>
+      </div>
+    </div>
+
+    <div class="nav-right">
+      <a href="../index.html" class="nav-link">Home</a>
+      <a href="../guides.html" class="nav-link">All guides</a>
+      <a href="../donate.html" class="nav-donate-btn">Donate</a>
+      <span class="nav-pill">
+        <span class="nav-pill-dot"></span>
+        Beginner track
+      </span>
+    </div>
+  </header>
+
+  <main class="page">
+    <!-- HERO -->
+    <section class="hero">
+      <div>
+        <div class="hero-left-label">
+          <span>Beginner • Solidity</span>
+          ERC-20 with Hardhat &amp; OpenZeppelin
+        </div>
+
+        <h1 class="hero-h1">
+          Ship your first <span>ERC-20 token</span><br />in ~60 minutes.
+        </h1>
+
+        <p class="hero-lead">
+          In this guide you’ll create, test and deploy a real ERC-20 token
+          using Hardhat 3, TypeScript and OpenZeppelin Contracts. No magic, just
+          a clean step-by-step workflow used in real projects.
+        </p>
+
+        <div class="hero-meta">
+          <div class="hero-chip"><b>Level</b> · Beginner</div>
+          <div class="hero-chip"><b>Stack</b> · Hardhat 3, TS, OZ</div>
+          <div class="hero-chip"><b>Time</b> · ~60 minutes</div>
+        </div>
+
+        <div class="hero-actions">
+          <a href="#overview" class="btn-primary">
+            Start guide
+            <span>↓</span>
+          </a>
+          <a href="#deploy" class="btn-ghost">
+            Jump to deploy
+          </a>
+        </div>
+      </div>
+
+      <div class="hero-right">
+        <div class="hero-card">
+          <div class="hero-card-header">
+            <span>What you’ll build</span>
+            <span class="hero-card-badge">ERC-20 TOKEN</span>
+          </div>
+
+          <div class="hero-metric-row">
+            <span class="hero-metric-label">Name / Symbol</span>
+            <span class="hero-metric-value">MyToken · MTK</span>
+          </div>
+          <div class="hero-metric-row">
+            <span class="hero-metric-label">Initial supply</span>
+            <span class="hero-metric-value">1,000,000 MTK</span>
+          </div>
+          <div class="hero-metric-row">
+            <span class="hero-metric-label">Networks</span>
+            <span class="hero-metric-value">Hardhat • Sepolia</span>
+          </div>
+
+          <div class="hero-code-box">
+            <div class="hero-code-label">
+              <span>contracts/MyToken.sol</span>
+              <span>OpenZeppelin · ERC20</span>
+            </div>
+            <code>contract MyToken is ERC20 {
+    constructor(uint256 initialSupply)
+        ERC20("MyToken", "MTK")
+    {
+        _mint(msg.sender, initialSupply);
+    }
+}</code>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- OVERVIEW -->
+    <section id="overview" class="section">
+      <div class="section-label">Overview</div>
+      <h2 class="section-title">What you’ll learn</h2>
+
+      <div class="section-grid">
+        <div class="section-text">
+          <p>
+            This is a practical beginner-friendly guide. You won’t just copy/paste
+            code — you’ll understand the full flow of shipping a token:
+          </p>
+
+          <ul>
+            <li>Setting up a clean Hardhat 3 + TypeScript project</li>
+            <li>Creating an ERC-20 token with OpenZeppelin Contracts</li>
+            <li>Writing a couple of focused tests with <span class="inline-code">ethers</span></li>
+            <li>Deploying to a local network and to Sepolia testnet</li>
+            <li>Checking your token on a block explorer</li>
+          </ul>
+
+          <div class="note">
+            <div class="tip-title">Who is this for?</div>
+            <p>
+              If you already know a bit of JavaScript or TypeScript and want
+              to touch real smart contracts without drowning in theory — this
+              is exactly your level.
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <div class="card-title">Prerequisites</div>
+            <div class="card-meta">You should be comfortable with:</div>
+            <ul class="checklist">
+              <li><span class="checkmark">✓</span> Basic JS / TS syntax</li>
+              <li><span class="checkmark">✓</span> Using a terminal</li>
+              <li><span class="checkmark">✓</span> Installing npm packages</li>
+            </ul>
+            <div class="card-meta" style="margin-top:0.6rem;">
+              Nice-to-have (optional):
+            </div>
+            <ul class="checklist">
+              <li><span class="checkmark">•</span> MetaMask installed</li>
+              <li><span class="checkmark">•</span> A Sepolia RPC URL (Alchemy / Infura)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SETUP -->
+    <section id="setup" class="section">
+      <div class="section-label">Step 1</div>
+      <h2 class="section-title">Set up your project</h2>
+
+      <div class="two-col">
+        <div class="section-text">
+          <p>1. Create a folder for this guide:</p>
+          <pre><code>mkdir erc20-guide
+cd erc20-guide
+npm init -y          # or pnpm init</code></pre>
+
+          <p>2. Install Hardhat 3 as a dev dependency:</p>
+          <pre><code>npm install --save-dev hardhat
+
+# or
+pnpm add -D hardhat</code></pre>
+
+          <p>3. Initialize a new Hardhat TypeScript project:</p>
+          <pre><code>npx hardhat</code></pre>
+
+          <p>Choose:</p>
+          <ul>
+            <li><b>“Create a TypeScript project”</b></li>
+            <li>Yes — add <span class="inline-code">.gitignore</span></li>
+            <li>Yes — install recommended dependencies</li>
+          </ul>
+
+          <div class="tip" style="margin-top:0.9rem;">
+            <div class="tip-title">Always use npx hardhat</div>
+            <p>
+              Keep Hardhat installed locally per project and run it through
+              <span class="inline-code">npx hardhat</span>. Global installs create version hell.
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <div class="card-soft">
+            <div class="card-title">You should now have:</div>
+            <ul class="step-list">
+              <li><span class="checkmark">✓</span> <span class="inline-code">hardhat.config.ts</span></li>
+              <li><span class="checkmark">✓</span> <span class="inline-code">contracts/Lock.sol</span> sample</li>
+              <li><span class="checkmark">✓</span> <span class="inline-code">test/Lock.ts</span> sample test</li>
+              <li><span class="checkmark">✓</span> <span class="inline-code">tsconfig.json</span></li>
+            </ul>
+            <p style="margin-top:0.8rem;">
+              We’ll now remove the Lock example and build our own
+              ERC-20 implementation using OpenZeppelin.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TOKEN -->
+    <section id="token" class="section">
+      <div class="section-label">Step 2</div>
+      <h2 class="section-title">Create the ERC-20 token</h2>
+
+      <div class="section-text">
+        <p>Install OpenZeppelin Contracts:</p>
+        <pre><code>npm install @openzeppelin/contracts</code></pre>
+
+        <p>Inside <span class="inline-code">contracts/</span>, create <b>MyToken.sol</b>:</p>
+
+        <pre><code>// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+
+contract MyToken is ERC20 {
+    constructor(uint256 initialSupply) ERC20("MyToken", "MTK") {
+        _mint(msg.sender, initialSupply);
+    }
+}</code></pre>
+
+        <p>
+          This contract:
+        </p>
+        <ul>
+          <li>Uses the battle-tested <span class="inline-code">ERC20</span> implementation from OpenZeppelin</li>
+          <li>Sets the name to <b>MyToken</b> and symbol to <b>MTK</b></li>
+          <li>Mints the whole <span class="inline-code">initialSupply</span> to the deployer address</li>
+        </ul>
+
+        <div class="note">
+          <div class="tip-title">Why not write ERC-20 from scratch?</div>
+          <p>
+            Implementing ERC-20 manually is easy to mess up and unsafe.
+            In production, teams always use OpenZeppelin or similar audited libraries.
+          </p>
+        </div>
+
+        <p>Compile the project to make sure everything works:</p>
+        <pre><code>npx hardhat compile</code></pre>
+      </div>
+    </section>
+
+    <!-- TESTING -->
+    <section id="tests" class="section">
+      <div class="section-label">Step 3</div>
+      <h2 class="section-title">Write a couple of tests</h2>
+
+      <div class="section-text">
+        <p>
+          We’ll write two simple tests:
+        </p>
+        <ul>
+          <li>Initial supply is minted to the deployer</li>
+          <li>Transfers work and balances change as expected</li>
+        </ul>
+
+        <p>
+          Create <span class="inline-code">test/MyToken.ts</span>:
+        </p>
+
+        <pre><code>import { expect } from "chai";
+import { ethers, loadFixture } from "hardhat";
+
+describe("MyToken", function () {
+
+  async function deployTokenFixture() {
+    const [owner, user] = await ethers.getSigners();
+
+    // 1,000,000 MTK with 18 decimals
+    const initialSupply = 1_000_000n * 10n ** 18n;
+
+    const Token = await ethers.getContractFactory("MyToken");
+    const token = await Token.deploy(initialSupply);
+    await token.waitForDeployment();
+
+    return { token, owner, user, initialSupply };
+  }
+
+  it("mints initial supply to the deployer", async () =&gt; {
+    const { token, owner, initialSupply } =
+      await loadFixture(deployTokenFixture);
+
+    expect(await token.totalSupply()).to.equal(initialSupply);
+    expect(await token.balanceOf(owner.address)).to.equal(initialSupply);
+  });
+
+  it("transfers tokens between accounts", async () =&gt; {
+    const { token, owner, user } =
+      await loadFixture(deployTokenFixture);
+
+    await expect(
+      token.transfer(user.address, 1000n)
+    ).to.changeTokenBalances(
+      token,
+      [owner, user],
+      [-1000n, 1000n]
+    );
+  });
+
+});</code></pre>
+
+        <p>Run the tests:</p>
+        <pre><code>npx hardhat test</code></pre>
+
+        <p>You should see:</p>
+        <pre><code>MyToken
+  ✓ mints initial supply to the deployer
+  ✓ transfers tokens between accounts
+
+2 passing</code></pre>
+
+        <div class="tip">
+          <div class="tip-title">Helper for token amounts</div>
+          <p>
+            You can define a small helper to avoid manually writing 10<sup>18</sup>:
+          </p>
+          <pre><code>function tokens(n: number) {
+  return BigInt(n) * 10n ** 18n;
+}</code></pre>
+          <p>Then call: <span class="inline-code">token.transfer(user.address, tokens(1000));</span></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- DEPLOY -->
+    <section id="deploy" class="section">
+      <div class="section-label">Step 4</div>
+      <h2 class="section-title">Deploy to a testnet</h2>
+
+      <div class="section-text">
+        <p>
+          We’ll deploy first to the built-in Hardhat network, then to Sepolia.
+        </p>
+
+        <h3>1. Create a deploy script</h3>
+        <p>
+          In <span class="inline-code">scripts/</span>, create
+          <span class="inline-code">deploy-token.ts</span>:
+        </p>
+
+        <pre><code>import { network } from "hardhat";
+
+async function main() {
+  const { ethers, networkName } = await network.connect();
+
+  console.log(`Deploying MyToken to ${networkName}...`);
+
+  const initialSupply = 1_000_000n * 10n ** 18n;
+
+  const Token = await ethers.getContractFactory("MyToken");
+  const token = await Token.deploy(initialSupply);
+  await token.waitForDeployment();
+
+  const address = await token.getAddress();
+  console.log("MyToken deployed at:", address);
+}
+
+main().catch((error) =&gt; {
+  console.error(error);
+  process.exit(1);
+});</code></pre>
+
+        <h3>2. Deploy to the local Hardhat network</h3>
+        <p>Simply run:</p>
+        <pre><code>npx hardhat run scripts/deploy-token.ts</code></pre>
+
+        <p>
+          This uses the default simulated network from Hardhat and prints the address.
+          Good for quick sanity checks.
+        </p>
+
+        <h3>3. Configure Sepolia network</h3>
+        <p>
+          Open <span class="inline-code">hardhat.config.ts</span> and add a basic Sepolia config.
+          For a beginner-friendly version you can use environment variables via
+          <span class="inline-code">process.env</span>:
+        </p>
+
+        <pre><code>import { config as loadEnv } from "dotenv";
+import { HardhatUserConfig } from "hardhat/config";
+import "@nomicfoundation/hardhat-toolbox-ethers";
+
+loadEnv();
+
+const config: HardhatUserConfig = {
+  solidity: {
+    version: "0.8.20",
+    settings: {
+      optimizer: { enabled: true, runs: 200 },
+    },
+  },
+  networks: {
+    sepolia: {
+      url: process.env.SEPOLIA_RPC_URL,
+      accounts: process.env.DEPLOYER_PRIVATE_KEY
+        ? [process.env.DEPLOYER_PRIVATE_KEY]
+        : [],
+    },
+  },
+};
+
+export default config;</code></pre>
+
+        <p>
+          In your project root create a <span class="inline-code">.env</span>:
+        </p>
+        <pre><code>SEPOLIA_RPC_URL=&lt;your-sepolia-rpc-url&gt;
+DEPLOYER_PRIVATE_KEY=&lt;private-key-with-test-eth&gt;</code></pre>
+
+        <div class="warning">
+          <div class="tip-title">Never commit private keys</div>
+          <p>
+            Make sure <span class="inline-code">.env</span> is in
+            <span class="inline-code">.gitignore</span>. Use this guide only with testnets,
+            never paste your real mainnet private key here.
+          </p>
+        </div>
+
+        <h3>4. Deploy to Sepolia</h3>
+        <p>
+          Now run the same script, but specifying the network:
+        </p>
+        <pre><code>npx hardhat run scripts/deploy-token.ts --network sepolia</code></pre>
+
+        <p>
+          You’ll see logs and the deployed token address. Save this address —
+          we’ll need it for Etherscan and for interacting with the token later.
+        </p>
+      </div>
+    </section>
+
+    <!-- VERIFY -->
+    <section id="verify" class="section">
+      <div class="section-label">Step 5</div>
+      <h2 class="section-title">Verify the contract (optional)</h2>
+
+      <div class="section-text">
+        <p>
+          Verifying your contract on Etherscan makes the source code publicly
+          readable and enables the “Write / Read” tabs in the explorer.
+        </p>
+
+        <h3>1. Install Etherscan plugin (Toolbox)</h3>
+        <p>
+          If you started from Hardhat’s TypeScript template with toolbox, you
+          likely already have it. If not:
+        </p>
+        <pre><code>npm install --save-dev @nomicfoundation/hardhat-toolbox-ethers</code></pre>
+
+        <p>
+          Make sure it’s imported in <span class="inline-code">hardhat.config.ts</span>:
+        </p>
+        <pre><code>import "@nomicfoundation/hardhat-toolbox-ethers";</code></pre>
+
+        <h3>2. Add Etherscan API key</h3>
+        <p>Extend your <span class="inline-code">.env</span>:</p>
+        <pre><code>ETHERSCAN_API_KEY=&lt;your-etherscan-api-key&gt;</code></pre>
+
+        <p>And the config:</p>
+        <pre><code>etherscan: {
+  apiKey: process.env.ETHERSCAN_API_KEY,
+}</code></pre>
+
+        <h3>3. Verify the token</h3>
+        <p>
+          Use the deployed address printed by your deploy script and run:
+        </p>
+        <pre><code>npx hardhat verify --network sepolia &lt;deployed_address&gt; 10000000000000000000000000</code></pre>
+
+        <p>
+          The last argument is the <span class="inline-code">initialSupply</span> you passed
+          to the constructor (1,000,000 tokens with 18 decimals).
+        </p>
+      </div>
+    </section>
+
+    <!-- NEXT STEPS -->
+    <section id="next" class="section">
+      <div class="section-label">Wrap up</div>
+      <h2 class="section-title">Where to go from here</h2>
+
+      <div class="section-grid">
+        <div class="section-text">
+          <p>Nice! You’ve just:</p>
+          <ul>
+            <li>Initialized a Hardhat 3 + TypeScript project</li>
+            <li>Created an ERC-20 token with OpenZeppelin</li>
+            <li>Wrote tests using <span class="inline-code">ethers</span> & matchers</li>
+            <li>Deployed to a local network and to Sepolia</li>
+            <li>(Optionally) Verified the contract on Etherscan</li>
+          </ul>
+
+          <p style="margin-top:0.9rem;">
+            This is a solid starting point for real-world Web3 development.
+            In the next guides you can:
+          </p>
+          <ul>
+            <li>Build an ERC-721 NFT collection</li>
+            <li>Add access control and pausable features</li>
+            <li>Connect your contracts to a frontend dApp</li>
+            <li>Learn basic security patterns and common pitfalls</li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="card-soft">
+            <div class="card-title">Suggested next guides</div>
+            <ul class="step-list">
+              <li>
+                <span class="checkmark">→</span>
+                <b>Hardhat 3 deep dive</b> · networks, forking, plugins
+              </li>
+              <li>
+                <span class="checkmark">→</span>
+                <b>OpenZeppelin extensions</b> · burnable, pausable, ownable
+              </li>
+              <li>
+                <span class="checkmark">→</span>
+                <b>Security basics</b> · reentrancy, checks-effects-interactions
+              </li>
+            </ul>
+
+            <p style="margin-top:0.9rem; font-size:0.86rem; color:var(--text-muted);">
+              You can link these to other pages on your site like
+              <span class="inline-code">hardhat.html</span>,
+              <span class="inline-code">oz.html</span> or
+              <span class="inline-code">security.html</span>
+              to create a complete learning path.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div>© 2025 web3.studio — beginner track: Hardhat • Solidity • OpenZeppelin.</div>
+    <div class="footer-links">
+      <a href="../index.html">Home</a>
+      <span>·</span>
+      <a href="../guides.html">All guides</a>
+      <span>·</span>
+      <a href="../docs.html">Docs</a>
+    </div>
+  </footer>
+
+    <div class="guide-progress" id="guideProgress">
+  <div class="gp-label">
+    <span id="gpPercent">0%</span> · guide progress
+  </div>
+
+  <div class="gp-bar">
+    <div class="gp-bar-fill" id="gpBarFill"></div>
+  </div>
+
+  <div class="gp-actions">
+    <button id="gpTopBtn">Top</button>
+    <button id="gpNextBtn">Next</button>
+  </div>
+</div>
+
+<style>
+    .guide-progress {
+  position: fixed;
+  bottom: 22px;
+  right: 22px;
+  background: rgba(15, 23, 42, 0.82);
+  padding: 1rem 1.2rem 1.2rem;
+  border-radius: 18px;
+  border: 1px solid rgba(148,163,184,0.35);
+  backdrop-filter: blur(12px);
+  width: 180px;
+  z-index: 999;
+  box-shadow: 0 0 35px rgba(0,0,0,0.55);
+  font-size: 0.82rem;
+  color: #f3f4f6;
+}
+
+.gp-label {
+  margin-bottom: 0.6rem;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+}
+
+.gp-bar {
+  height: 8px;
+  background: #0f172a;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 0.9rem;
+  border: 1px solid rgba(148,163,184,0.35);
+}
+
+.gp-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #facc15, #f97316);
+  transition: width 0.2s ease-out;
+}
+
+.gp-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.4rem;
+}
+
+.gp-actions button {
+  flex: 1;
+  background: rgba(30,41,59,0.85);
+  border: 1px solid rgba(148,163,184,0.45);
+  color: #e5e7eb;
+  padding: 0.35rem 0.4rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.15s;
+  font-size: 0.78rem;
+}
+
+.gp-actions button:hover {
+  background: rgba(51,65,85,0.85);
+  border-color: rgba(248,250,252,0.6);
+}
+
+</style>
+
+<script>
+
+    const gpPercent = document.getElementById("gpPercent");
+const gpBarFill = document.getElementById("gpBarFill");
+const gpTopBtn = document.getElementById("gpTopBtn");
+const gpNextBtn = document.getElementById("gpNextBtn");
+
+// Собираем все секции, чтобы "Next" работал автоматически
+const guideSections = Array.from(document.querySelectorAll("section[id]"));
+
+function updateProgress() {
+  const scrollTop = window.scrollY;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+
+  let progress = Math.min(100, (scrollTop / docHeight) * 100);
+  progress = Math.floor(progress);
+
+  gpPercent.innerText = progress + "%";
+  gpBarFill.style.width = progress + "%";
+}
+
+// Обновление прогресса при прокрутке
+window.addEventListener("scroll", updateProgress);
+updateProgress();
+
+// Кнопка Top
+gpTopBtn.addEventListener("click", () => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+// Кнопка Next — ищет следующую секцию
+gpNextBtn.addEventListener("click", () => {
+  const scrollPos = window.scrollY + 40;
+
+  let next = null;
+  for (let section of guideSections) {
+    const top = section.offsetTop;
+    if (top > scrollPos) {
+      next = section;
+      break;
+    }
+  }
+
+  if (next) {
+    window.scrollTo({ top: next.offsetTop - 60, behavior: "smooth" });
+  }
+});
+
+</script>
+
+</body>
+</html>
+

@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Solidity — Web3 Studio Docs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Fonts (same as other docs pages) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #05060a;
+      --sidebar: #0b0e17;
+      --content-bg: #0d101b;
+      --text-main: #f5f5f7;
+      --text-muted: #9ca3af;
+      --border: rgba(148, 163, 184, 0.2);
+      --accent: #facc15;
+      --radius: 14px;
+      --code-bg: #0b1120;
+      --code-border: rgba(148,163,184,0.15);
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text-main);
+      font-family: Inter, sans-serif;
+    }
+
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 280px;
+      background: var(--sidebar);
+      border-right: 1px solid var(--border);
+      padding: 1.4rem;
+      overflow-y: auto;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+
+    .sidebar h2 {
+      color: var(--accent);
+      font-size: 1.1rem;
+      margin: 0 0 0.4rem;
+      letter-spacing: -0.01em;
+    }
+
+    .sidebar-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 1.2rem;
+    }
+
+    .nav-category {
+      margin-bottom: 1.4rem;
+    }
+
+    .nav-category-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .sidebar a {
+      display: block;
+      padding: 0.3rem 0;
+      font-size: 0.9rem;
+      text-decoration: none;
+      color: var(--text-muted);
+      transition: 0.15s;
+    }
+
+    .sidebar a:hover {
+      color: var(--text-main);
+    }
+
+    .sidebar a.active {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* Content */
+    .content {
+      flex: 1;
+      padding: 2rem;
+      background: var(--content-bg);
+    }
+
+    .content-inner {
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    /* Mini TOC */
+    .toc {
+      padding: 1rem 1.2rem;
+      margin: 1.5rem 0 2rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,0.02);
+      font-size: 0.92rem;
+    }
+
+    .toc-title {
+      font-weight: 600;
+      margin-bottom: 0.6rem;
+      color: var(--accent);
+    }
+
+    .toc a {
+      display: inline-block;
+      margin-right: 1rem;
+      margin-bottom: 0.3rem;
+      color: var(--text-muted);
+      text-decoration: none;
+    }
+
+    .toc a:hover {
+      color: var(--accent);
+    }
+
+    /* Typography */
+    h1 {
+      font-size: 2.2rem;
+      margin-top: 0;
+      margin-bottom: 0.4rem;
+      letter-spacing: -0.02em;
+    }
+
+    .page-lead {
+      line-height: 1.7;
+      color: var(--text-muted);
+      margin-bottom: 0.8rem;
+    }
+
+    .page-meta {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      opacity: 0.9;
+      margin-bottom: 2rem;
+    }
+
+    h2 {
+      margin-top: 2.2rem;
+      font-size: 1.6rem;
+      color: var(--accent);
+      letter-spacing: -0.01em;
+    }
+
+    h3 {
+      margin-top: 1.4rem;
+      font-size: 1.15rem;
+    }
+
+    p {
+      line-height: 1.65;
+      color: var(--text-muted);
+    }
+
+    ul, ol {
+      padding-left: 1.2rem;
+    }
+
+    ul li, ol li {
+      margin: 0.4rem 0;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .tip, .note, .warning {
+      border-left: 3px solid var(--accent);
+      padding: 0.85rem 1rem;
+      margin: 1rem 0;
+      background: rgba(250,204,21,0.05);
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+
+    .note {
+      border-left-color: #38bdf8;
+      background: rgba(56,189,248,0.06);
+    }
+
+    .warning {
+      border-left-color: #f97316;
+      background: rgba(249,115,22,0.06);
+    }
+
+    .tip-title {
+      font-weight: 600;
+      margin-bottom: 0.2rem;
+      color: var(--text-main);
+    }
+
+    /* Code */
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--code-border);
+      padding: 1rem;
+      border-radius: var(--radius);
+      overflow-x: auto;
+      font-family: JetBrains Mono, monospace;
+      font-size: 0.85rem;
+      margin: 0.9rem 0 1.1rem;
+    }
+
+    code {
+      font-family: JetBrains Mono, monospace;
+      font-size: 0.85rem;
+    }
+
+    .inline-code {
+      padding: 0.1rem 0.3rem;
+      border-radius: 4px;
+      background: rgba(148,163,184,0.18);
+      border: 1px solid rgba(148,163,184,0.3);
+    }
+
+    section[id] {
+      scroll-margin-top: 80px;
+      padding-bottom: 2rem;
+    }
+
+    section[id]::before {
+      content: "";
+      display: block;
+      height: 80px;
+      margin-top: -80px;
+      visibility: hidden;
+    }
+
+    footer {
+      padding: 2rem 1.5rem 2.5rem;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      text-align: center;
+      background: #05060a;
+    }
+  </style>
+</head>
+<body>
+
+<div class="layout">
+  <!-- Sidebar -->
+  <nav class="sidebar">
+
+    <!-- Back to home -->
+    <a href="./docs.html" style="
+        display:block;
+        margin-bottom:1rem;
+        font-size:0.9rem;
+        color:var(--accent);
+        text-decoration:none;
+        font-weight:600;
+    ">← Back to main docs</a>
+
+    <h2>Solidity</h2>
+    <div class="sidebar-subtitle">The language of the EVM</div>
+
+      <input
+        id="searchInput"
+        type="text"
+        placeholder="Search..."
+        style="
+            width: 90%;
+            padding: 0.55rem 0.7rem;
+            margin: 0.6rem 0 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: #0f1320;
+            color: var(--text-main);
+            font-size: 0.9rem;
+        "
+    >
+    <div id="searchResults" style="margin-top:0.5rem; margin-bottom: 10px;"></div>
+
+    <script>
+  const searchInput = document.getElementById("searchInput");
+  const searchResults = document.getElementById("searchResults");
+
+  searchInput.addEventListener("input", () => {
+    const query = searchInput.value.toLowerCase();
+
+    if (query.length < 2) {
+      searchResults.innerHTML = "";
+      return;
+    }
+
+    let results = [];
+
+    document.querySelectorAll("section").forEach(section => {
+      const text = section.innerText.toLowerCase();
+
+      if (text.includes(query)) {
+        results.push({
+          id: section.id,
+          title: section.querySelector("h2")?.innerText || section.id
+        });
+      }
+    });
+
+    searchResults.innerHTML = results
+      .slice(0, 5)
+      .map(r => `<a href="#${r.id}" style="display:block; margin:4px 0; color:var(--accent);">${r.title}</a>`)
+      .join("");
+  });
+</script>
+
+    <div class="nav-category">
+      <div class="nav-category-title">Getting started</div>
+      <a href="#intro" class="active">What is Solidity</a>
+      <a href="#versioning">Versioning & pragma</a>
+      <a href="#syntax">Basic syntax</a>
+    </div>
+
+    <div class="nav-category">
+      <div class="nav-category-title">Data & storage</div>
+      <a href="#types">Value & reference types</a>
+      <a href="#variables">State & local variables</a>
+      <a href="#storage-locations">Storage / memory / calldata</a>
+      <a href="#mappings">Mappings</a>
+      <a href="#structs">Structs</a>
+      <a href="#arrays">Arrays</a>
+    </div>
+
+    <div class="nav-category">
+      <div class="nav-category-title">Functions & control</div>
+      <a href="#functions">Functions</a>
+      <a href="#visibility">Visibility & state mutability</a>
+      <a href="#modifiers">Modifiers</a>
+      <a href="#errors">Errors, require & revert</a>
+      <a href="#events">Events & logging</a>
+    </div>
+
+    <div class="nav-category">
+      <div class="nav-category-title">Advanced language</div>
+      <a href="#inheritance">Inheritance</a>
+      <a href="#interfaces">Interfaces</a>
+      <a href="#libraries">Libraries</a>
+      <a href="#fallback">Fallback & receive</a>
+      <a href="#constructor-immutables">Constructors & immutables</a>
+      <a href="#payable">Payable & value transfers</a>
+      <a href="#gas">Gas & optimization basics</a>
+    </div>
+
+    <div class="nav-category">
+      <div class="nav-category-title">Patterns & security</div>
+      <a href="#patterns">Common patterns</a>
+      <a href="#security">Security checklist</a>
+      <a href="#testing">Testing Solidity</a>
+      <a href="#resources">Resources</a>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="content">
+    <div class="content-inner">
+      <h1>Solidity Documentation</h1>
+      <p class="page-lead">
+        Solidity is a statically typed, contract-oriented language designed for the Ethereum Virtual Machine.
+        This page is a practical handbook: from syntax and storage to patterns and security.
+      </p>
+      <div class="page-meta">
+        Target audience: developers who already understand basic Web3 concepts (accounts, transactions, gas) and want to write secure contracts.
+      </div>
+
+      <!-- Mini TOC -->
+      <div class="toc">
+        <div class="toc-title">On this page</div>
+        <a href="#intro">Overview</a>
+        <a href="#versioning">Versioning</a>
+        <a href="#syntax">Syntax</a>
+        <a href="#types">Types</a>
+        <a href="#variables">Variables</a>
+        <a href="#storage-locations">Storage</a>
+        <a href="#mappings">Mappings</a>
+        <a href="#structs">Structs</a>
+        <a href="#arrays">Arrays</a>
+        <a href="#functions">Functions</a>
+        <a href="#visibility">Visibility</a>
+        <a href="#modifiers">Modifiers</a>
+        <a href="#errors">Errors</a>
+        <a href="#events">Events</a>
+        <a href="#inheritance">Inheritance</a>
+        <a href="#interfaces">Interfaces</a>
+        <a href="#libraries">Libraries</a>
+        <a href="#fallback">Fallback</a>
+        <a href="#constructor-immutables">Constructors</a>
+        <a href="#payable">Payable</a>
+        <a href="#gas">Gas</a>
+        <a href="#patterns">Patterns</a>
+        <a href="#security">Security</a>
+        <a href="#testing">Testing</a>
+        <a href="#resources">Resources</a>
+      </div>
+
+      <!-- CONTENT -->
+
+      <section id="intro">
+        <h2>What is Solidity</h2>
+        <p>
+          Solidity is the main language used to write smart contracts on Ethereum and EVM-compatible chains.
+          It looks a bit like JavaScript mixed with TypeScript and C++, but it’s compiled to EVM bytecode
+          and runs in a deterministic, gas-metered environment.
+        </p>
+        <ul>
+          <li><b>Statically typed</b> — every variable has a type known at compile time.</li>
+          <li><b>Contract-oriented</b> — the top-level structure is a contract, not a class.</li>
+          <li><b>EVM-focused</b> — the language is designed around EVM limitations and gas costs.</li>
+        </ul>
+
+        <div class="note">
+          <div class="tip-title">Solidity vs JavaScript</div>
+          <p>
+            Solidity is not dynamic: no <span class="inline-code">eval</span>, no dynamic types,
+            no unbounded recursion, and every operation costs gas. Think more like a small, strict
+            language for financial logic, not a general-purpose scripting language.
+          </p>
+        </div>
+      </section>
+
+      <section id="versioning">
+        <h2>Versioning & pragma</h2>
+        <p>
+          Each Solidity file starts with a pragma that defines which compiler versions are allowed:
+        </p>
+        <pre><code>// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;</code></pre>
+        <p>
+          The caret (<span class="inline-code">^</span>) means “compatible with 0.8.20 up to (but not including) 0.9.0”.
+          In production, you usually:
+        </p>
+        <ul>
+          <li>Pick a specific minor version, like <span class="inline-code">^0.8.20</span>.</li>
+          <li>Configure your tooling (Hardhat / Foundry) to use that version.</li>
+          <li>Avoid very old versions (<span class="inline-code">&lt;0.8.0</span>) due to missing built-in overflow checks.</li>
+        </ul>
+      </section>
+
+      <section id="syntax">
+        <h2>Basic syntax</h2>
+        <p>
+          A minimal contract looks like this:
+        </p>
+        <pre><code>// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+contract Counter {
+    uint256 public count;
+
+    function inc() external {
+        count += 1;
+    }
+
+    function dec() external {
+        count -= 1;
+    }
+}</code></pre>
+        <p>Key points:</p>
+        <ul>
+          <li><span class="inline-code">contract</span> defines a new contract type.</li>
+          <li><span class="inline-code">uint256 public count;</span> creates a state variable and an auto-generated getter.</li>
+          <li><span class="inline-code">external</span> means callable from outside the contract via transactions or calls.</li>
+        </ul>
+      </section>
+
+      <section id="types">
+        <h2>Value & reference types</h2>
+        <p>Solidity has two main categories of types:</p>
+        <ul>
+          <li><b>Value types</b> — copied on assignment:
+            <ul>
+              <li><span class="inline-code">bool</span>, <span class="inline-code">uint256</span>, <span class="inline-code">int256</span></li>
+              <li><span class="inline-code">address</span>, <span class="inline-code">bytes32</span>, <span class="inline-code">enum</span></li>
+            </ul>
+          </li>
+          <li><b>Reference types</b> — reference storage locations:
+            <ul>
+              <li><span class="inline-code">array</span> (fixed / dynamic)</li>
+              <li><span class="inline-code">struct</span></li>
+              <li><span class="inline-code">mapping</span></li>
+            </ul>
+          </li>
+        </ul>
+
+        <p>Examples:</p>
+        <pre><code>bool public isActive;
+uint256 public totalSupply;
+address public owner;
+bytes32 public id;</code></pre>
+      </section>
+
+      <section id="variables">
+        <h2>State & local variables</h2>
+        <p>
+          Solidity variables live either in contract storage or in function scope.
+        </p>
+        <ul>
+          <li><b>State variables</b> — declared at contract level, stored permanently on-chain.</li>
+          <li><b>Local variables</b> — declared inside functions, live only during call execution.</li>
+        </ul>
+
+        <pre><code>contract Example {
+    uint256 public x; // state
+
+    function set(uint256 _x) external {
+        uint256 old = x; // local
+        x = _x;
+        // old disappears after the function returns
+    }
+}</code></pre>
+      </section>
+
+      <section id="storage-locations">
+        <h2>Storage, memory & calldata</h2>
+        <p>
+          Reference types (<span class="inline-code">arrays</span>, <span class="inline-code">structs</span>, <span class="inline-code">mappings</span>)
+          must specify where data lives:
+        </p>
+        <ul>
+          <li><span class="inline-code">storage</span> — persistent, on-chain, expensive to write.</li>
+          <li><span class="inline-code">memory</span> — temporary, in-memory during function execution.</li>
+          <li><span class="inline-code">calldata</span> — read-only view into function arguments (for external functions).</li>
+        </ul>
+
+        <h3>Example</h3>
+        <pre><code>contract Users {
+    struct User {
+        string name;
+        uint256 age;
+    }
+
+    mapping(address =&gt; User) public users;
+
+    // Reads from storage (no location keyword at call site)
+    function getUser(address account) external view returns (User memory) {
+        return users[account]; // copied from storage to memory
+    }
+
+    // Accepts calldata array
+    function sum(uint256[] calldata values) external pure returns (uint256) {
+        uint256 s;
+        for (uint256 i; i &lt; values.length; i++) {
+            s += values[i];
+        }
+        return s;
+    }
+}</code></pre>
+
+        <div class="tip">
+          <div class="tip-title">Use calldata for external params</div>
+          <p>
+            For external functions receiving arrays or strings, prefer <span class="inline-code">calldata</span>
+            to avoid unnecessary copies and gas costs.
+          </p>
+        </div>
+      </section>
+
+      <section id="mappings">
+        <h2>Mappings</h2>
+        <p>
+          Mappings are key-value stores in contract storage, similar to hash maps, but without iteration.
+        </p>
+        <pre><code>mapping(address =&gt; uint256) public balances;</code></pre>
+
+        <p>Usage:</p>
+        <pre><code>function deposit() external payable {
+    balances[msg.sender] += msg.value;
+}
+
+function withdraw(uint256 amount) external {
+    require(balances[msg.sender] &gt;= amount, "Not enough");
+    balances[msg.sender] -= amount;
+    payable(msg.sender).transfer(amount);
+}</code></pre>
+
+        <div class="warning">
+          <div class="tip-title">No built-in length or iteration</div>
+          <p>
+            Mappings do not track keys. If you need to iterate or know how many entries you have,
+            keep a separate array of keys or a counter.
+          </p>
+        </div>
+      </section>
+
+      <section id="structs">
+        <h2>Structs</h2>
+        <p>
+          Structs allow you to group related fields into a custom type.
+        </p>
+        <pre><code>struct Position {
+    uint256 size;
+    uint256 collateral;
+    bool isLong;
+}
+
+mapping(address =&gt; Position) public positions;</code></pre>
+
+        <p>Usage:</p>
+        <pre><code>function openLong(uint256 size, uint256 collateral) external {
+    positions[msg.sender] = Position({
+        size: size,
+        collateral: collateral,
+        isLong: true
+    });
+}</code></pre>
+      </section>
+
+      <section id="arrays">
+        <h2>Arrays</h2>
+        <p>Solidity supports fixed-size and dynamic arrays.</p>
+
+        <pre><code>uint256[] public values;       // dynamic
+address[3] public topHolders;  // fixed-size</code></pre>
+
+        <h3>Working with dynamic arrays</h3>
+        <pre><code>function pushValue(uint256 v) external {
+    values.push(v);
+}
+
+function getValues() external view returns (uint256[] memory) {
+    return values;
+}</code></pre>
+
+        <div class="warning">
+          <div class="tip-title">Be careful with unbounded loops</div>
+          <p>
+            Iterating over large arrays in a single transaction can run out of gas.
+            Design your storage so that loops over unbounded arrays are avoided or broken into smaller steps.
+          </p>
+        </div>
+      </section>
+
+      <section id="functions">
+        <h2>Functions</h2>
+        <p>
+          Functions define behavior. They can be external, public, internal, or private, and can be
+          <span class="inline-code">view</span>, <span class="inline-code">pure</span>, or state-changing.
+        </p>
+
+        <pre><code>function setValue(uint256 _value) external {
+    value = _value;
+}
+
+function getValue() external view returns (uint256) {
+    return value;
+}
+
+function double(uint256 x) public pure returns (uint256) {
+    return x * 2;
+}</code></pre>
+      </section>
+
+      <section id="visibility">
+        <h2>Visibility & state mutability</h2>
+        <p>Visibility keywords:</p>
+        <ul>
+          <li><span class="inline-code">external</span> — callable from outside the contract, not from internal code by default.</li>
+          <li><span class="inline-code">public</span> — callable from everywhere, auto-generates getter for state variables.</li>
+          <li><span class="inline-code">internal</span> — only from within the contract or derived contracts.</li>
+          <li><span class="inline-code">private</span> — only from the current contract.</li>
+        </ul>
+
+        <p>State mutability:</p>
+        <ul>
+          <li><span class="inline-code">view</span> — reads state, does not modify.</li>
+          <li><span class="inline-code">pure</span> — does not read or modify state.</li>
+          <li><span class="inline-code">payable</span> — can receive ETH along with the call.</li>
+        </ul>
+      </section>
+
+      <section id="modifiers">
+        <h2>Modifiers</h2>
+        <p>
+          Modifiers wrap functions with reusable checks, like access control or preconditions.
+        </p>
+
+        <pre><code>contract Ownable {
+    address public owner;
+
+    constructor() {
+        owner = msg.sender;
+    }
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Not owner");
+        _;
+    }
+}
+
+contract Example is Ownable {
+    function doAdminThing() external onlyOwner {
+        // restricted logic
+    }
+}</code></pre>
+
+        <div class="tip">
+          <div class="tip-title">Don’t overuse modifiers</div>
+          <p>
+            Modifiers are powerful, but too many nested modifiers can make logic harder to read.
+            Use them for common checks, not for complex control flow.
+          </p>
+        </div>
+      </section>
+
+      <section id="errors">
+        <h2>Errors, require & revert</h2>
+        <p>
+          Solidity uses a few mechanisms to signal failure:
+        </p>
+        <ul>
+          <li><span class="inline-code">require(condition, "message")</span> — input validation, access checks.</li>
+          <li><span class="inline-code">revert("message")</span> — explicit failure.</li>
+          <li><span class="inline-code">assert(condition)</span> — internal invariants; should never fail in correct code.</li>
+        </ul>
+
+        <h3>Custom errors</h3>
+        <p>
+          Custom errors are cheaper than strings and more structured:
+        </p>
+        <pre><code>error NotOwner();
+error InsufficientBalance(uint256 have, uint256 want);
+
+contract Example {
+    address public owner;
+    mapping(address =&gt; uint256) public balance;
+
+    constructor() {
+        owner = msg.sender;
+    }
+
+    function withdraw(uint256 amount) external {
+        if (msg.sender != owner) revert NotOwner();
+        uint256 bal = balance[msg.sender];
+        if (bal &lt; amount) revert InsufficientBalance(bal, amount);
+
+        balance[msg.sender] = bal - amount;
+    }
+}</code></pre>
+      </section>
+
+      <section id="events">
+        <h2>Events & logging</h2>
+        <p>
+          Events are logs that go into the transaction receipt and can be indexed and read by off-chain systems (indexers, UIs).
+        </p>
+
+        <pre><code>event Transfer(address indexed from, address indexed to, uint256 value);
+
+function transfer(address to, uint256 value) external {
+    // update balances...
+    emit Transfer(msg.sender, to, value);
+}</code></pre>
+
+        <p>
+          Use <span class="inline-code">indexed</span> fields for parameters you want to filter on quickly (addresses, ids).
+        </p>
+      </section>
+
+      <section id="inheritance">
+        <h2>Inheritance</h2>
+        <p>
+          Solidity supports single and multiple inheritance. This is how you compose behavior across contracts.
+        </p>
+
+        <pre><code>contract A {
+    function foo() public pure returns (string memory) {
+        return "A";
+    }
+}
+
+contract B {
+    function bar() public pure returns (string memory) {
+        return "B";
+    }
+}
+
+contract C is A, B {
+    // C has both foo() and bar()
+}</code></pre>
+
+        <p>
+          When multiple parents define the same function, you may need to use the <span class="inline-code">override</span> keyword and specify order carefully.
+        </p>
+      </section>
+
+      <section id="interfaces">
+        <h2>Interfaces</h2>
+        <p>
+          Interfaces define a contract’s external surface without implementation. They are used for interacting with other contracts.
+        </p>
+
+        <pre><code>interface IERC20 {
+    function totalSupply() external view returns (uint256);
+    function balanceOf(address who) external view returns (uint256);
+    function transfer(address to, uint256 value) external returns (bool);
+}</code></pre>
+
+        <p>
+          By using interfaces, your contract can call third-party protocols without needing the full source.
+        </p>
+      </section>
+
+      <section id="libraries">
+        <h2>Libraries</h2>
+        <p>
+          Libraries are pieces of reusable code. They can be:
+        </p>
+        <ul>
+          <li><b>Embedded</b> — compiled into the calling contract.</li>
+          <li><b>Deployed</b> — their code lives at a separate address (less common today).</li>
+        </ul>
+
+        <h3>Using a library</h3>
+        <pre><code>library Math {
+    function max(uint256 a, uint256 b) internal pure returns (uint256) {
+        return a &gt;= b ? a : b;
+    }
+}
+
+contract Example {
+    using Math for uint256;
+
+    function bigger(uint256 x, uint256 y) external pure returns (uint256) {
+        return x.max(y);
+    }
+}</code></pre>
+      </section>
+
+      <section id="fallback">
+        <h2>Fallback & receive</h2>
+        <p>
+          Contracts have two special functions for handling unknown calls and plain ETH transfers:
+        </p>
+        <ul>
+          <li><span class="inline-code">receive()</span> — triggered when contract receives ETH with empty calldata.</li>
+          <li><span class="inline-code">fallback()</span> — triggered when no other function matches, or when calldata is non-empty but no function exists.</li>
+        </ul>
+
+        <pre><code>contract FallbackExample {
+    event Received(address from, uint256 amount);
+    event Fallback(address from, uint256 value, bytes data);
+
+    receive() external payable {
+        emit Received(msg.sender, msg.value);
+    }
+
+    fallback() external payable {
+        emit Fallback(msg.sender, msg.value, msg.data);
+    }
+}</code></pre>
+
+        <div class="warning">
+          <div class="tip-title">Keep fallback light</div>
+          <p>
+            Fallback and receive should be small and cheap. Complex logic in fallback can be dangerous and expensive.
+          </p>
+        </div>
+      </section>
+
+      <section id="constructor-immutables">
+        <h2>Constructors & immutables</h2>
+        <p>
+          Constructors run once, at deployment, and cannot be called again.
+        </p>
+
+        <pre><code>contract Example {
+    address public owner;
+
+    constructor(address _owner) {
+        owner = _owner;
+    }
+}</code></pre>
+
+        <p>
+          Immutable variables are set in the constructor and then become read-only, but cheaper than regular storage:
+        </p>
+        <pre><code>contract Example {
+    address public immutable owner;
+
+    constructor(address _owner) {
+        owner = _owner;
+    }
+}</code></pre>
+      </section>
+
+      <section id="payable">
+        <h2>Payable & value transfers</h2>
+        <p>
+          Functions and addresses marked as <span class="inline-code">payable</span> can receive ETH.
+        </p>
+
+        <pre><code>contract Vault {
+    function deposit() external payable {
+        // msg.value contains the amount sent
+    }
+
+    function withdraw(address payable to, uint256 amount) external {
+        to.transfer(amount); // or call/value patterns
+    }
+}</code></pre>
+
+        <div class="tip">
+          <div class="tip-title">Prefer call over transfer/send</div>
+          <p>
+            In newer Solidity versions, <span class="inline-code">.transfer</span> and <span class="inline-code">.send</span>
+            have a fixed gas stipend. Using <span class="inline-code">(bool ok, ) = to.call{value: amount}("");</span>
+            is more flexible, but must be combined with reentrancy protection.
+          </p>
+        </div>
+      </section>
+
+      <section id="gas">
+        <h2>Gas & optimization basics</h2>
+        <p>
+          Every operation on the EVM costs gas. Gas is paid in ETH and represents computation, storage, and bandwidth.
+        </p>
+
+        <ul>
+          <li>Writing to storage is expensive; reading is cheaper.</li>
+          <li>Loops over large arrays can be very expensive.</li>
+          <li>Emitting events costs gas, but is cheaper than storing the same data on-chain.</li>
+        </ul>
+
+        <h3>Simple optimization tips</h3>
+        <ul>
+          <li>Prefer <span class="inline-code">uint256</span> everywhere on EVM chains.</li>
+          <li>Avoid unnecessary storage writes (e.g., don't write if the value doesn’t change).</li>
+          <li>Use <span class="inline-code">calldata</span> for read-only external inputs.</li>
+          <li>Pack tightly used storage variables where appropriate (but don’t sacrifice clarity for tiny gains).</li>
+        </ul>
+      </section>
+
+      <section id="patterns">
+        <h2>Common patterns</h2>
+        <p>Some classic Solidity patterns you will use all the time:</p>
+
+        <h3>Checks-Effects-Interactions</h3>
+        <pre><code>function withdraw(uint256 amount) external {
+    // Checks
+    require(balance[msg.sender] &gt;= amount, "Too much");
+
+    // Effects
+    balance[msg.sender] -= amount;
+
+    // Interactions
+    (bool ok, ) = msg.sender.call{value: amount}("");
+    require(ok, "Transfer failed");
+}</code></pre>
+
+        <h3>Pull over push payments</h3>
+        <p>
+          Instead of sending ETH to many users in a loop (push), store what they are owed and let them withdraw (pull).
+        </p>
+
+        <h3>Access control via modifiers</h3>
+        <p>
+          Combine modifiers like <span class="inline-code">onlyOwner</span> / <span class="inline-code">onlyRole</span> with OpenZeppelin’s access modules.
+        </p>
+      </section>
+
+      <section id="security">
+        <h2>Security checklist</h2>
+        <p>
+          Writing Solidity is half about syntax, half about security. A short checklist:
+        </p>
+        <ul>
+          <li>Use recent Solidity versions (0.8.x) for built-in overflow checks.</li>
+          <li>Never use <span class="inline-code">tx.origin</span> for authorization.</li>
+          <li>Protect external ETH transfers with reentrancy guards and good patterns.</li>
+          <li>Be careful with delegatecall and raw assembly.</li>
+          <li>Limit who can call sensitive functions (owner/roles/multisig).</li>
+          <li>Pause critical flows when possible (using <span class="inline-code">Pausable</span> from OZ).</li>
+          <li>Write tests for failure cases, not just happy paths.</li>
+        </ul>
+
+        <div class="warning">
+          <div class="tip-title">Assume users are adversarial</div>
+          <p>
+            Anyone can call your public/external functions with any data. Design every function assuming
+            the caller is trying to break or abuse it.
+          </p>
+        </div>
+      </section>
+
+      <section id="testing">
+        <h2>Testing Solidity</h2>
+        <p>
+          Solidity by itself doesn’t include a testing framework. You usually test contracts with:
+        </p>
+        <ul>
+          <li><b>Hardhat</b> — TypeScript/JavaScript tests with Mocha + Chai + ethers.</li>
+          <li><b>Foundry</b> — tests written in Solidity with fuzzing, cheatcodes, and invariants.</li>
+        </ul>
+
+        <h3>Example: simple Hardhat test</h3>
+        <pre><code>// test/Counter.ts
+import { expect } from "chai";
+import { ethers } from "hardhat";
+
+describe("Counter", () =&gt; {
+  it("increments and decrements", async () =&gt; {
+    const Counter = await ethers.getContractFactory("Counter");
+    const counter = await Counter.deploy();
+
+    await counter.inc();
+    expect(await counter.count()).to.equal(1n);
+
+    await counter.dec();
+    expect(await counter.count()).to.equal(0n);
+  });
+});</code></pre>
+
+        <h3>Example: simple Foundry test</h3>
+        <pre><code>// test/Counter.t.sol
+pragma solidity ^0.8.20;
+
+import "forge-std/Test.sol";
+import "../src/Counter.sol";
+
+contract CounterTest is Test {
+    Counter internal counter;
+
+    function setUp() public {
+        counter = new Counter();
+    }
+
+    function testIncrement() public {
+        counter.inc();
+        assertEq(counter.count(), 1);
+    }
+}</code></pre>
+      </section>
+
+      <section id="resources">
+        <h2>Resources</h2>
+        <ul>
+          <li>Official Solidity documentation and language spec.</li>
+          <li>Solidity by Example — small, focused snippets for most concepts.</li>
+          <li>OpenZeppelin Contracts — practical implementations of common patterns.</li>
+          <li>Hardhat and Foundry docs — for compilers, testing, and tooling integration.</li>
+        </ul>
+
+        <div style="height: 160px;"></div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<footer>
+  © 2025 web3.studio — Solidity handbook for modern Web3 developers.<br>
+  <span style="opacity:0.8;">Language • Patterns • Security • Testing</span>
+</footer>
+
+<script>
+  const sections = Array.from(document.querySelectorAll("section[id]"));
+  const navLinks = document.querySelectorAll(".sidebar a");
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        navLinks.forEach(link => {
+          const href = link.getAttribute("href");
+          if (!href || !href.startsWith("#")) return;
+          link.classList.toggle("active", href === "#" + id);
+        });
+      }
+    });
+  }, {
+    threshold: 0.35
+  });
+
+  sections.forEach(section => observer.observe(section));
+</script>
+
+</body>
+</html>

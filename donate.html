@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Support the project — web3.studio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg: #020617;
+      --card: #030712;
+      --accent: #facc15;
+      --accent-soft: rgba(250, 204, 21, 0.12);
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --border: rgba(148, 163, 184, 0.35);
+      --radius-lg: 20px;
+      --radius-md: 12px;
+      --shadow: 0 16px 45px rgba(0,0,0,0.45);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: radial-gradient(circle at top left, #0f172a 0%, #020617 50%, #000 100%);
+      color: var(--text-main);
+      font-family: Inter, sans-serif;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* NAV */
+    .nav {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 1.2rem 1.4rem 0.4rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(18px);
+      background: linear-gradient(to bottom, rgba(2,6,23,0.92), rgba(2,6,23,0.65), transparent);
+    }
+
+    .nav-left { display:flex; align-items:center; gap:0.6rem; }
+    .orb {
+      width: 26px; height: 26px; border-radius: 999px;
+      background: radial-gradient(circle at 30% 20%, #fde047, #facc15 40%, #a16207 70%, #0f172a);
+      box-shadow: 0 0 30px rgba(250,204,21,0.6);
+    }
+    .nav-title { font-weight:600; letter-spacing:-0.03em; font-size:1rem; }
+    .nav-tagline { font-size:0.75rem; color:var(--text-muted); }
+
+    .nav-right { display:flex; align-items:center; gap:0.75rem; font-size:0.85rem; }
+    .nav-link {
+      padding:0.4rem 0.7rem; border-radius:999px;
+      color:var(--text-muted);
+      border:1px solid transparent; transition:0.18s ease;
+    }
+    .nav-link:hover {
+      color:var(--text-main);
+      border-color:var(--border);
+      background:rgba(15,23,42,0.75);
+    }
+
+    /* PAGE */
+    .page { max-width: 900px; margin: 0 auto; padding: 2rem 1.4rem 3rem; }
+
+    .hero {
+      text-align: center;
+      padding: 2rem 0 1.5rem;
+    }
+    .hero-title {
+      font-size: clamp(2.1rem, 3vw, 2.8rem);
+      letter-spacing: -0.04em;
+      margin-bottom: 0.7rem;
+    }
+    .hero-lead {
+      color: var(--text-muted);
+      font-size: 1rem;
+      max-width: 36rem;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    /* GRID */
+    .grid {
+      margin-top: 2.6rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.7rem;
+    }
+
+    /* DONATE CARD */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.4rem 1.4rem 1.6rem;
+      box-shadow: var(--shadow);
+    }
+
+    .card h2 {
+      font-size: 1.25rem;
+      margin: 0 0 0.5rem;
+      letter-spacing: -0.02em;
+    }
+
+    .card small { color: var(--text-muted); }
+
+    .address-box {
+      margin-top: 0.9rem;
+      padding: 0.75rem 0.9rem;
+      border-radius: var(--radius-md);
+      background: rgba(15,23,42,0.85);
+      border: 1px solid var(--border);
+      font-size: 0.85rem;
+      word-break: break-all;
+    }
+
+    .copy-btn, .send-btn {
+      margin-top: 0.9rem;
+      width: 100%;
+      cursor: pointer;
+      padding: 0.7rem 1rem;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      transition: 0.18s ease;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .copy-btn {
+      background: rgba(250,204,21,0.08);
+      border-color: rgba(250,204,21,0.22);
+      color: var(--accent);
+    }
+
+    .copy-btn:hover {
+      background: rgba(250,204,21,0.16);
+    }
+
+    .send-btn {
+      background: radial-gradient(circle at 0 0, #facc15, #f97316);
+      color: #030712;
+    }
+    .send-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 18px 40px rgba(250,204,21,0.4);
+    }
+
+    footer {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 2rem 1.4rem 2.4rem;
+      border-top: 1px solid rgba(51, 65, 85, 0.7);
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- NAV -->
+<header class="nav">
+  <div class="nav-left">
+    <div class="orb"></div>
+    <div>
+      <div class="nav-title">web3.studio</div>
+      <div class="nav-tagline">Guides • Docs • Web3</div>
+    </div>
+  </div>
+
+  <div class="nav-right">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="guides.html" class="nav-link">Guides</a>
+  </div>
+</header>
+
+<!-- PAGE -->
+<main class="page">
+
+  <section class="hero">
+    <h1 class="hero-title">Support the project 💛</h1>
+    <p class="hero-lead">
+      If these guides helped you learn Web3 faster, consider supporting the creator.  
+      100% goes directly to further development of new guides & tools.
+    </p>
+  </section>
+
+  <!-- DONATE OPTIONS -->
+  <div class="grid">
+
+    <!-- POLYGON -->
+    <div class="card">
+      <h2>Polygon • USDT</h2>
+      <small>Low fees · Instant · Recommended</small>
+
+      <div class="address-box" id="addr-polygon">
+        0xA4B0a01dB1d68D4CDB007F78bAB63Cb4ebd814bF
+      </div>
+
+      <button class="copy-btn" onclick="copyAddr('addr-polygon')">Copy Address</button>
+      <button class="send-btn" onclick="sendUSDT('polygon')">Send via MetaMask</button>
+    </div>
+
+    <!-- BASE -->
+    <div class="card">
+      <h2>Base • USDC</h2>
+      <small>Fast · Cheap · Coinbase L2</small>
+
+      <div class="address-box" id="addr-base">
+        0xA4B0a01dB1d68D4CDB007F78bAB63Cb4ebd814bF
+      </div>
+
+      <button class="copy-btn" onclick="copyAddr('addr-base')">Copy Address</button>
+      <button class="send-btn" onclick="sendUSDT('base')">Send via MetaMask</button>
+    </div>
+
+    <!-- ETH MAINNET -->
+    <div class="card">
+      <h2>Ethereum • USDT</h2>
+      <small>For chads 💸</small>
+
+      <div class="address-box" id="addr-eth">
+        0xA4B0a01dB1d68D4CDB007F78bAB63Cb4ebd814bF
+      </div>
+
+      <button class="copy-btn" onclick="copyAddr('addr-eth')">Copy Address</button>
+      <button class="send-btn" onclick="sendUSDT('ethereum')">Send via MetaMask</button>
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  © 2025 web3.studio — Thanks for supporting the project!
+</footer>
+
+<script>
+async function sendUSDT(network) {
+  if (!window.ethereum) return alert("MetaMask not detected.");
+
+  const address = "0xA4B0a01dB1d68D4CDB007F78bAB63Cb4ebd814bF";
+
+  const CHAINS = {
+    ethereum: {
+      chainId: "0x1",
+      chainName: "Ethereum Mainnet",
+      rpcUrls: ["https://rpc.ankr.com/eth"],
+      nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 }
+    },
+    polygon: {
+      chainId: "0x89",
+      chainName: "Polygon Mainnet",
+      rpcUrls: ["https://polygon-rpc.com"],
+      nativeCurrency: { name: "MATIC", symbol: "MATIC", decimals: 18 }
+    },
+    base: {
+      chainId: "0x2105",
+      chainName: "Base Mainnet",
+      rpcUrls: ["https://mainnet.base.org"],
+      nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 }
+    }
+  };
+
+  try {
+    // 1 — пробуем переключиться на сеть
+    await ethereum.request({
+      method: "wallet_switchEthereumChain",
+      params: [{ chainId: CHAINS[network].chainId }]
+    });
+  } catch (switchError) {
+    // 2 — если сети нет — добавляем
+    if (switchError.code === 4902) {
+      await ethereum.request({
+        method: "wallet_addEthereumChain",
+        params: [CHAINS[network]]
+      });
+    } else {
+      console.error("Switch error:", switchError);
+      return alert(switchError.message);
+    }
+  }
+
+  // 3 — создаём нативную пустую транзакцию для открытия MetaMask
+  try {
+    await ethereum.request({
+      method: "eth_sendTransaction",
+      params: [{
+        from: (await ethereum.request({ method: "eth_accounts" }))[0],
+        to: address,
+        value: "0x0"   // 0 ETH — просто открыть MetaMask
+      }]
+    });
+
+    alert("MetaMask opened — now send USDT manually to the address!");
+  } catch (txError) {
+    console.error("TX error:", txError);
+    alert(txError.message);
+  }
+}
+
+
+</script>
+
+
+
+</body>
+</html>

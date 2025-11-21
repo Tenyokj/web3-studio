@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Beginner Workflow Guide — Localhost → Testnet → Mainnet</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    :root {
+      --bg: #020617;
+      --bg-elevated: #020617;
+      --card: #020617;
+      --card-soft: #030712;
+      --accent: #facc15;
+      --accent-soft: rgba(250, 204, 21, 0.1);
+      --accent-strong: rgba(250, 204, 21, 0.18);
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --border-subtle: rgba(148, 163, 184, 0.3);
+      --border-soft: rgba(148, 163, 184, 0.2);
+      --radius-lg: 22px;
+      --radius-md: 14px;
+      --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.9);
+      --shadow-glow: 0 0 80px rgba(250, 204, 21, 0.18);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: radial-gradient(circle at top left, #0f172a 0, #020617 45%, #000 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* Top nav */
+    .nav {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 1.2rem 1.4rem 0.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(22px);
+      background: linear-gradient(to bottom, rgba(2, 6, 23, 0.96), rgba(2, 6, 23, 0.75), transparent);
+    }
+
+    .nav-left { display: flex; align-items: center; gap: 0.65rem; }
+    .nav-orb {
+      width: 26px; height: 26px; border-radius: 999px;
+      background: radial-gradient(circle at 30% 20%, #fde047 0, #facc15 26%, #a16207 70%, #0f172a 100%);
+      box-shadow: 0 0 30px rgba(250, 204, 21, 0.6);
+    }
+    .nav-title { font-weight: 600; letter-spacing: -0.03em; font-size: 1rem; }
+    .nav-tagline { font-size: 0.78rem; color: var(--text-muted); }
+
+    .nav-right {
+      display: flex; align-items: center; gap: 0.75rem; font-size: 0.85rem;
+    }
+    .nav-link {
+      padding: 0.4rem 0.7rem; border-radius: 999px; color: var(--text-muted);
+      border: 1px solid transparent; transition: 0.18s ease;
+    }
+    .nav-link:hover {
+      border-color: rgba(148, 163, 184, 0.5);
+      color: var(--text-main);
+      background: rgba(15, 23, 42, 0.8);
+    }
+    .nav-pill {
+      border-radius: 999px; padding: 0.4rem 0.9rem;
+      border: 1px solid var(--border-subtle);
+      background: radial-gradient(circle at top left, rgba(250, 204, 21, 0.14), rgba(15, 23, 42, 0.8));
+      color: #fefce8; display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.8rem;
+    }
+    .nav-pill-dot {
+      width: 6px; height: 6px; border-radius: 999px;
+      background: #bbf7d0; box-shadow: 0 0 11px rgba(74, 222, 128, 0.9);
+    }
+
+    /* Page shell */
+    .page { max-width: 1120px; margin: 0 auto; padding: 0 1.4rem 3.5rem; }
+
+    /* Hero */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 3.5fr) minmax(0, 2.3fr);
+      gap: 2.6rem;
+      padding: 2.2rem 0 1.4rem;
+      align-items: center;
+    }
+    @media (max-width: 920px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+
+    .hero-left-label {
+      display: inline-flex; align-items: center; gap: 0.45rem;
+      padding: 0.22rem 0.4rem; border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.8rem;
+    }
+    .hero-left-label span {
+      padding: 0.16rem 0.5rem; border-radius: 999px; background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+    }
+
+    .hero-h1 {
+      font-size: clamp(2.35rem, 3vw, 2.9rem);
+      letter-spacing: -0.05em;
+      margin: 0.15rem 0 0.65rem;
+      line-height: 1.05;
+    }
+    .hero-h1 span {
+      background: linear-gradient(120deg, #facc15, #f97316, #22c55e);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+    .hero-lead {
+      color: var(--text-muted);
+      font-size: 0.98rem;
+      max-width: 32rem;
+      line-height: 1.8;
+      margin-bottom: 1.4rem;
+    }
+    .hero-meta { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 1.8rem; }
+    .hero-chip {
+      padding: 0.32rem 0.75rem; border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.45); font-size: 0.78rem;
+      color: var(--text-muted); background: rgba(15, 23, 42, 0.85);
+    }
+    .hero-chip b { color: #e5e7eb; font-weight: 600; }
+
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; }
+    .btn-primary {
+      padding: 0.7rem 1.4rem; border-radius: 999px; border: 1px solid transparent;
+      background: radial-gradient(circle at 0 0, #facc15, #f97316);
+      color: #030712; font-weight: 600; font-size: 0.9rem;
+      box-shadow: 0 14px 35px rgba(250, 204, 21, 0.45);
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      cursor: pointer; transition: 0.18s ease;
+    }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 20px 55px rgba(250, 204, 21, 0.65); }
+
+    .btn-ghost {
+      padding: 0.65rem 1.1rem; border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.55); background: rgba(15, 23, 42, 0.9);
+      font-size: 0.85rem; color: var(--text-muted);
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      cursor: pointer; transition: 0.18s ease;
+    }
+    .btn-ghost:hover {
+      border-color: rgba(249, 250, 251, 0.9);
+      color: #e5e7eb; background: rgba(15, 23, 42, 1);
+    }
+
+    .hero-right { position: relative; }
+    .hero-card {
+      border-radius: var(--radius-lg);
+      background:
+        radial-gradient(circle at top left, rgba(250, 204, 21, 0.14), transparent 55%),
+        radial-gradient(circle at bottom right, rgba(56, 189, 248, 0.14), transparent 55%),
+        linear-gradient(to bottom right, #020617, #020617);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      box-shadow: var(--shadow-soft), var(--shadow-glow);
+      padding: 1rem 1.1rem 1.05rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 0.65rem; font-size: 0.8rem; color: var(--text-muted);
+    }
+    .hero-card-badge {
+      padding: 0.16rem 0.55rem; border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: rgba(15, 23, 42, 0.9);
+      font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em;
+      color: #e5e7eb;
+    }
+    .hero-metric-row {
+      display: flex; justify-content: space-between; gap: 0.5rem;
+      margin-bottom: 0.6rem; font-size: 0.78rem;
+    }
+    .hero-metric-label { color: var(--text-muted); }
+    .hero-metric-value { font-family: "JetBrains Mono", monospace; color: #e5e7eb; }
+
+    .hero-code-box {
+      margin-top: 0.7rem; padding: 0.75rem 0.8rem; border-radius: 16px;
+      background: rgba(15, 23, 42, 0.88);
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      font-family: "JetBrains Mono", monospace; font-size: 0.78rem; color: #e5e7eb;
+      overflow-x: auto; line-height: 1.6;
+    }
+    .hero-code-box code { white-space: pre; }
+
+    /* Sections */
+    .section { margin-top: 2.6rem; }
+    .section-label {
+      font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.14em;
+      color: var(--text-muted); margin-bottom: 0.4rem;
+    }
+    .section-title {
+      font-size: 1.25rem; letter-spacing: -0.02em; margin-bottom: 1rem;
+    }
+
+    .section-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 3.2fr) minmax(0, 2.4fr);
+      gap: 1.8rem;
+    }
+    @media (max-width: 900px) { .section-grid { grid-template-columns: minmax(0, 1fr); } }
+
+    .section-text {
+      font-size: 0.96rem; color: var(--text-muted);
+      line-height: 1.7;
+    }
+
+    .pill-list {
+      display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.7rem; font-size: 0.8rem;
+    }
+    .pill {
+      padding: 0.3rem 0.65rem; border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      background: rgba(15, 23, 42, 0.9); color: var(--text-muted);
+    }
+
+    .card {
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      background: radial-gradient(circle at top left, rgba(250, 204, 21, 0.16), transparent 60%), #020617;
+      padding: 1.2rem 1.25rem;
+      box-shadow: 0 14px 35px rgba(15, 23, 42, 0.9);
+    }
+    .card-soft {
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      background: rgba(15, 23, 42, 0.9);
+      padding: 1rem 1.05rem;
+      font-size: 0.9rem;
+    }
+
+    .card-title { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.4rem; }
+    .card-meta { font-size: 0.8rem; color: var(--text-muted); }
+
+    .step-list { list-style: none; padding: 0; margin: 0.4rem 0 0; font-size: 0.9rem; }
+    .step-list li { margin-bottom: 0.35rem; color: var(--text-muted); }
+
+    /* Code blocks */
+    pre {
+      margin: 1rem 0 1.6rem;
+      padding: 0.9rem 1rem;
+      border-radius: 16px;
+      background: rgba(15, 23, 42, 0.94);
+      border: 1px solid var(--border-soft);
+      box-shadow: 0 16px 34px rgba(15, 23, 42, 0.85);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.82rem;
+      color: #e5e7eb;
+      overflow-x: auto;
+      line-height: 1.7;
+    }
+    pre code { white-space: pre; }
+
+    .inline-code {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.82rem;
+      padding: 0.1rem 0.35rem;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      color: #e5e7eb;
+    }
+
+    .tip, .note, .warning {
+      margin: 1rem 0 1.4rem;
+      padding: 0.8rem 0.95rem;
+      border-radius: 14px;
+      font-size: 0.88rem;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+    }
+    .note {
+      border-color: rgba(56, 189, 248, 0.8);
+      background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.18), rgba(15, 23, 42, 0.9));
+    }
+    .warning {
+      border-color: rgba(248, 113, 113, 0.9);
+      background: radial-gradient(circle at top left, rgba(248, 113, 113, 0.16), rgba(15, 23, 42, 0.96));
+    }
+    .tip-title { font-weight: 600; margin-bottom: 0.25rem; color: #e5e7eb; }
+    .tip p, .note p, .warning p { margin: 0; color: var(--text-muted); }
+
+    .two-col {
+      display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.7fr); gap: 1.2rem;
+    }
+    @media (max-width: 860px) { .two-col { grid-template-columns: minmax(0, 1fr); } }
+
+    .checklist { list-style: none; padding: 0; margin: 0.4rem 0 0; font-size: 0.9rem; }
+    .checklist li { margin-bottom: 0.35rem; color: var(--text-muted); }
+    .checkmark { color: #bbf7d0; margin-right: 0.4rem; }
+
+    footer {
+      max-width: 1120px; margin: 0 auto;
+      padding: 2rem 1.4rem 2.4rem;
+      border-top: 1px solid rgba(51, 65, 85, 0.8);
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.6rem;
+    }
+    .footer-links { display: flex; flex-wrap: wrap; gap: 0.7rem; font-size: 0.84rem; }
+    .footer-links a { color: var(--text-muted); }
+    .footer-links a:hover { color: #e5e7eb; }
+
+    section[id] { scroll-margin-top: 90px; }
+
+    .nav-donate-btn {
+      padding: 0.55rem 1.2rem;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      background: radial-gradient(circle at 0 0, #facc15, #f97316);
+      color: #030712;
+      border: 1px solid transparent;
+      box-shadow: 0 10px 24px rgba(250, 204, 21, 0.45);
+      transition: 0.18s ease;
+      line-height: 1;
+      height: 32px;
+    }
+
+    .nav-donate-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 35px rgba(250, 204, 21, 0.65);
+    }
+  </style>
+</head>
+
+<body>
+  <!-- TOP NAV -->
+  <header class="nav">
+    <div class="nav-left">
+      <div class="nav-orb"></div>
+      <div>
+        <div class="nav-title">web3.studio</div>
+        <div class="nav-tagline">Guides • Workflow • Hardhat</div>
+      </div>
+    </div>
+
+    <div class="nav-right">
+      <a href="../index.html" class="nav-link">Home</a>
+      <a href="../guides.html" class="nav-link">All guides</a>
+       <a href="../donate.html" class="nav-donate-btn">Donate</a>
+      <span class="nav-pill">
+        <span class="nav-pill-dot"></span>
+        Beginner track
+      </span>
+    </div>
+  </header>
+
+  <main class="page">
+    <!-- HERO -->
+    <section class="hero">
+      <div>
+        <div class="hero-left-label">
+          <span>Beginner • Workflow</span>
+          Localhost → Testnet → Mainnet
+        </div>
+
+        <h1 class="hero-h1">
+          Learn a clean <span>deployment workflow</span><br />
+          in ~45 minutes.
+        </h1>
+
+        <p class="hero-lead">
+          This guide is not about writing a token. It’s about shipping contracts safely:
+          how to move from local development to testnets and finally to mainnet —
+          with a repeatable structure and zero chaos.
+        </p>
+
+        <div class="hero-meta">
+          <div class="hero-chip"><b>Level</b> · Beginner</div>
+          <div class="hero-chip"><b>Stack</b> · Hardhat 3, TS</div>
+          <div class="hero-chip"><b>Time</b> · ~45 minutes</div>
+        </div>
+
+        <div class="hero-actions">
+          <a href="#overview" class="btn-primary">
+            Start guide <span>↓</span>
+          </a>
+          <a href="#mainnet" class="btn-ghost">
+            Jump to mainnet
+          </a>
+        </div>
+      </div>
+
+      <div class="hero-right">
+        <div class="hero-card">
+          <div class="hero-card-header">
+            <span>What you’ll build</span>
+            <span class="hero-card-badge">WORKFLOW</span>
+          </div>
+
+          <div class="hero-metric-row">
+            <span class="hero-metric-label">Networks</span>
+            <span class="hero-metric-value">Local · Sepolia · Mainnet</span>
+          </div>
+          <div class="hero-metric-row">
+            <span class="hero-metric-label">Scripts</span>
+            <span class="hero-metric-value">Deploy · Verify · Dry-run</span>
+          </div>
+          <div class="hero-metric-row">
+            <span class="hero-metric-label">Structure</span>
+            <span class="hero-metric-value">/scripts /deployments</span>
+          </div>
+
+          <div class="hero-code-box">
+            <code>scripts/
+  deploy.ts
+  verify.ts
+deployments/
+  sepolia.json
+  mainnet.json
+.env (ignored)</code>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- OVERVIEW -->
+    <section id="overview" class="section">
+      <div class="section-label">Overview</div>
+      <h2 class="section-title">What you’ll learn</h2>
+
+      <div class="section-grid">
+        <div class="section-text">
+          <p>
+            Many beginners can write a contract… and then get stuck when it’s time to deploy.
+            This guide fixes that by teaching a simple, real-world deployment story.
+          </p>
+
+          <ul>
+            <li>How to think about networks: local vs testnet vs mainnet</li>
+            <li>A clean project structure for deploy flow</li>
+            <li>How to configure RPC + keys safely</li>
+            <li>How to deploy with repeatable scripts</li>
+            <li>How to verify and record addresses</li>
+            <li>How to avoid “oops I deployed wrong” moments</li>
+          </ul>
+
+          <div class="note">
+            <div class="tip-title">No token, no NFT, no theory dump</div>
+            <p>
+              We assume you already have any contract to deploy.
+              The focus here is workflow, not Solidity basics.
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <div class="card-title">Prerequisites</div>
+            <div class="card-meta">You should be comfortable with:</div>
+            <ul class="checklist">
+              <li><span class="checkmark">✓</span> Running Hardhat projects</li>
+              <li><span class="checkmark">✓</span> Editing config + scripts</li>
+              <li><span class="checkmark">✓</span> Basic terminal usage</li>
+            </ul>
+            <div class="card-meta" style="margin-top:0.6rem;">
+              Optional:
+            </div>
+            <ul class="checklist">
+              <li><span class="checkmark">•</span> MetaMask installed</li>
+              <li><span class="checkmark">•</span> Sepolia RPC URL</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="pill-list">
+        <div class="pill">Hardhat 3 networks</div>
+        <div class="pill">Deployment scripts</div>
+        <div class="pill">.env safety</div>
+        <div class="pill">Verification</div>
+        <div class="pill">Mainnet checklist</div>
+      </div>
+    </section>
+
+    <!-- STEP 1 -->
+    <section id="mental-model" class="section">
+      <div class="section-label">Step 1</div>
+      <h2 class="section-title">Build the right mental model</h2>
+
+      <div class="section-text">
+        <p>
+          Before touching config, you need to understand what a “network” really means in dev.
+          Think of deployment as a ladder:
+        </p>
+
+        <ul>
+          <li><b>Localhost</b> — instant feedback, zero money, fake ETH.</li>
+          <li><b>Testnet</b> — real chain rules, fake ETH, public explorer.</li>
+          <li><b>Mainnet</b> — real money, real users, no undo button.</li>
+        </ul>
+
+        <div class="tip">
+          <div class="tip-title">Why not deploy straight to testnet?</div>
+          <p>
+            Because you want fast iteration first. Local lets you break things without waiting for confirmations
+            or faucets. When local is stable, testnet validates your real-world setup.
+          </p>
+        </div>
+
+        <p>
+          The workflow we’ll follow:
+        </p>
+
+        <pre><code>1) Local deploy (fast sanity check)
+2) Testnet deploy (real chain rules)
+3) Verify + record addresses
+4) Dry-run mainnet deployment
+5) Mainnet deploy (with checklist)</code></pre>
+      </div>
+    </section>
+
+    <!-- STEP 2 -->
+    <section id="structure" class="section">
+      <div class="section-label">Step 2</div>
+      <h2 class="section-title">Set up a clean deployment structure</h2>
+
+      <div class="two-col">
+        <div class="section-text">
+          <p>
+            A small but powerful rule:
+            <b>anything repeatable should be a script.</b>
+          </p>
+
+          <p>
+            Here’s a beginner-friendly structure that scales:
+          </p>
+          <pre><code>.
+├─ contracts/
+├─ scripts/
+│  ├─ deploy.ts
+│  ├─ verify.ts
+│  └─ dry-run.ts
+├─ deployments/
+│  ├─ localhost.json
+│  ├─ sepolia.json
+│  └─ mainnet.json
+├─ hardhat.config.ts
+├─ .env              (ignored)
+└─ package.json</code></pre>
+
+          <ul>
+            <li><span class="inline-code">scripts/deploy.ts</span> deploys contracts.</li>
+            <li><span class="inline-code">scripts/verify.ts</span> verifies them.</li>
+            <li><span class="inline-code">deployments/*.json</span> stores addresses + metadata.</li>
+          </ul>
+
+          <div class="note">
+            <div class="tip-title">Why store deployments?</div>
+            <p>
+              So your frontend, tests, or future scripts can read the latest address
+              without you hunting in terminal history.
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <div class="card-soft">
+            <div class="card-title">Rules of the folder</div>
+            <ul class="step-list">
+              <li><span class="checkmark">✓</span> One deploy script per project</li>
+              <li><span class="checkmark">✓</span> Deployments saved per network</li>
+              <li><span class="checkmark">✓</span> Never hardcode private keys</li>
+              <li><span class="checkmark">✓</span> Verify only on public nets</li>
+            </ul>
+            <p style="margin-top:0.8rem;">
+              This layout is enough for 90% of real projects.
+              You can expand later with Ignition modules, but don’t start there.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 3 -->
+    <section id="config" class="section">
+      <div class="section-label">Step 3</div>
+      <h2 class="section-title">Configure networks safely</h2>
+
+      <div class="section-text">
+        <p>
+          In Hardhat 3, networks are typed by purpose:
+        </p>
+
+        <ul>
+          <li><span class="inline-code">edr-simulated</span> — local simulated networks</li>
+          <li><span class="inline-code">http</span> — real RPC networks</li>
+        </ul>
+
+        <p>
+          Here’s a minimal but correct config skeleton:
+        </p>
+
+        <pre><code>// hardhat.config.ts
+import { defineConfig, configVariable } from "hardhat/config";
+import "@nomicfoundation/hardhat-toolbox-ethers";
+
+export default defineConfig({
+  solidity: {
+    version: "0.8.28",
+    settings: { optimizer: { enabled: true, runs: 200 } },
+  },
+
+  networks: {
+    // local simulated chain
+    hardhatMainnet: {
+      type: "edr-simulated",
+      chainType: "l1",
+    },
+
+    // real testnet via RPC
+    sepolia: {
+      type: "http",
+      chainType: "l1",
+      url: configVariable("SEPOLIA_RPC_URL"),
+      accounts: [configVariable("SEPOLIA_PRIVATE_KEY")],
+    },
+
+    // mainnet via RPC
+    mainnet: {
+      type: "http",
+      chainType: "l1",
+      url: configVariable("MAINNET_RPC_URL"),
+      accounts: [configVariable("MAINNET_PRIVATE_KEY")],
+    },
+  },
+});</code></pre>
+
+        <div class="warning">
+          <div class="tip-title">Config variables ≠ .env by default</div>
+          <p>
+            Hardhat 3 supports configuration variables. If you prefer classic <span class="inline-code">dotenv</span>,
+            that’s fine too — just don’t commit secrets.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 4 -->
+    <section id="env" class="section">
+      <div class="section-label">Step 4</div>
+      <h2 class="section-title">Store secrets like a grown-up</h2>
+
+      <div class="section-text">
+        <p>
+          Whether you use Hardhat config variables or dotenv, the rule is the same:
+          keys and RPC URLs must live outside Git.
+        </p>
+
+        <p>
+          Classic beginner-friendly approach:
+        </p>
+
+        <pre><code>// .env (never commit)
+SEPOLIA_RPC_URL=https://sepolia.infura.io/v3/xxxx
+SEPOLIA_PRIVATE_KEY=0xYOUR_TESTNET_KEY
+
+MAINNET_RPC_URL=https://mainnet.infura.io/v3/xxxx
+MAINNET_PRIVATE_KEY=0xYOUR_MAINNET_KEY
+
+ETHERSCAN_API_KEY=XXXX</code></pre>
+
+        <p>
+          Add this to <span class="inline-code">.gitignore</span>:
+        </p>
+        <pre><code>.env
+deployments/*.json</code></pre>
+
+        <div class="tip">
+          <div class="tip-title">Two keys, not one</div>
+          <p>
+            Use a dedicated burner key for testnets.
+            Mainnet key should be separate and only loaded when needed.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 5 -->
+    <section id="deploy-local" class="section">
+      <div class="section-label">Step 5</div>
+      <h2 class="section-title">Deploy locally first</h2>
+
+      <div class="section-text">
+        <p>
+          Your deploy script should work on local and public networks without edits.
+          Example deploy script:
+        </p>
+
+        <pre><code>// scripts/deploy.ts
+import { network } from "hardhat";
+import fs from "fs";
+
+async function main() {
+  const { ethers, networkName } = await network.connect();
+
+  console.log("Deploying to:", networkName);
+
+  // Example: deploy any existing contract
+  const Contract = await ethers.getContractFactory("MyContract");
+  const contract = await Contract.deploy();
+  await contract.waitForDeployment();
+
+  const address = await contract.getAddress();
+  console.log("Deployed at:", address);
+
+  // Save deployment
+  const out = {
+    address,
+    deployedAt: new Date().toISOString(),
+    network: networkName,
+  };
+
+  fs.mkdirSync("deployments", { recursive: true });
+  fs.writeFileSync(`deployments/${networkName}.json`, JSON.stringify(out, null, 2));
+  console.log("Saved deployments/" + networkName + ".json");
+}
+
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});</code></pre>
+
+        <p>
+          Run on local simulated chain:
+        </p>
+
+        <pre><code>npx hardhat run scripts/deploy.ts --network hardhatMainnet</code></pre>
+
+        <div class="note">
+          <div class="tip-title">Why specify network?</div>
+          <p>
+            Because it forces you to be explicit. Beginners often deploy to the wrong network
+            by accident. Explicit is safe.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 6 -->
+    <section id="deploy-testnet" class="section">
+      <div class="section-label">Step 6</div>
+      <h2 class="section-title">Deploy to Sepolia testnet</h2>
+
+      <div class="section-text">
+        <p>
+          Once local deploy succeeds, move to testnet.
+          Same script, different network:
+        </p>
+
+        <pre><code>npx hardhat run scripts/deploy.ts --network sepolia</code></pre>
+
+        <p>
+          If your deploy fails here, it’s usually one of these:
+        </p>
+
+        <ul>
+          <li>RPC URL is wrong / rate limited</li>
+          <li>Private key has no Sepolia ETH</li>
+          <li>Constructor args mismatch</li>
+        </ul>
+
+        <div class="tip">
+          <div class="tip-title">Save your Sepolia address</div>
+          <p>
+            It’s now stored in <span class="inline-code">deployments/sepolia.json</span>.
+            This is your “source of truth” for the token or app you’re building.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 7 -->
+    <section id="verify" class="section">
+      <div class="section-label">Step 7</div>
+      <h2 class="section-title">Verify on a block explorer</h2>
+
+      <div class="section-text">
+        <p>
+          Verification is optional but recommended. It makes your source code public and readable.
+        </p>
+
+        <p>
+          If you use toolbox-ethers, verify plugin is included.
+          Add Etherscan API key in env, then:
+        </p>
+
+        <pre><code>npx hardhat verify --network sepolia &lt;address&gt; &lt;constructorArgs...&gt;</code></pre>
+
+        <p>
+          You can automate this in <span class="inline-code">scripts/verify.ts</span>:
+        </p>
+
+        <pre><code>// scripts/verify.ts
+import { network, run } from "hardhat";
+import fs from "fs";
+
+async function main() {
+  const { networkName } = await network.connect();
+  const p = `deployments/${networkName}.json`;
+
+  if (!fs.existsSync(p)) {
+    throw new Error("No deployments file: " + p);
+  }
+
+  const { address } = JSON.parse(fs.readFileSync(p, "utf8"));
+
+  console.log("Verifying:", address);
+
+  await run("verify:verify", {
+    address,
+    constructorArguments: [],
+  });
+
+  console.log("Verified!");
+}
+
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});</code></pre>
+
+        <p>Run it:</p>
+        <pre><code>npx hardhat run scripts/verify.ts --network sepolia</code></pre>
+      </div>
+    </section>
+
+    <!-- STEP 8 -->
+    <section id="dry-run" class="section">
+      <div class="section-label">Step 8</div>
+      <h2 class="section-title">Do a “dry-run” before mainnet</h2>
+
+      <div class="section-text">
+        <p>
+          A dry-run is a final rehearsal:
+          you deploy with mainnet config but to a forked state locally.
+        </p>
+
+        <p>
+          Add forking to your simulated net:
+        </p>
+
+        <pre><code>// hardhat.config.ts (snippet)
+hardhatMainnet: {
+  type: "edr-simulated",
+  chainType: "l1",
+  forking: {
+    url: configVariable("MAINNET_RPC_URL"),
+    blockNumber: 20000000,
+  },
+},</code></pre>
+
+        <p>
+          Now run deploy on fork:
+        </p>
+        <pre><code>npx hardhat run scripts/deploy.ts --network hardhatMainnet</code></pre>
+
+        <div class="note">
+          <div class="tip-title">Why fork matters</div>
+          <p>
+            Your contract runs against real mainnet state:
+            real tokens, real liquidity pools, real addresses — but locally.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 9 -->
+    <section id="mainnet" class="section">
+      <div class="section-label">Step 9</div>
+      <h2 class="section-title">Mainnet deployment checklist</h2>
+
+      <div class="section-grid">
+        <div class="section-text">
+          <p>
+            Mainnet is not scary if you follow a strict checklist.
+            Here’s a beginner-safe one:
+          </p>
+
+          <ul>
+            <li>✅ Script deployed successfully on localhost</li>
+            <li>✅ Script deployed successfully on Sepolia</li>
+            <li>✅ You verified on Sepolia</li>
+            <li>✅ You dry-ran on mainnet fork</li>
+            <li>✅ You reviewed constructor args (twice)</li>
+            <li>✅ You checked deployer balance</li>
+          </ul>
+
+          <p>
+            When ready, deploy:
+          </p>
+
+          <pre><code>npx hardhat run scripts/deploy.ts --network mainnet</code></pre>
+
+          <div class="warning">
+            <div class="tip-title">Take your time</div>
+            <p>
+              If you’re unsure — stop. Re-run fork and Sepolia again.
+              The cost of waiting is tiny compared to the cost of mistakes.
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <div class="card-soft">
+            <div class="card-title">Mainnet safety tips</div>
+            <ul class="step-list">
+              <li><span class="checkmark">→</span> Use a fresh deployer wallet</li>
+              <li><span class="checkmark">→</span> Keep backups of .env</li>
+              <li><span class="checkmark">→</span> Don’t deploy at 3AM</li>
+              <li><span class="checkmark">→</span> Save tx hash + address</li>
+              <li><span class="checkmark">→</span> Verify right after deploy</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- OPTIONAL -->
+    <section id="upgradeables" class="section">
+      <div class="section-label">Optional</div>
+      <h2 class="section-title">Upgradeable deployments (mini-intro)</h2>
+
+      <div class="section-text">
+        <p>
+          Some real projects use upgradeable proxies (UUPS / Transparent).
+          You don’t need them for learning — but you should know the flow exists.
+        </p>
+
+        <p>Install upgrades plugin:</p>
+        <pre><code>npm install --save-dev @openzeppelin/hardhat-upgrades</code></pre>
+
+        <p>Enable it:</p>
+        <pre><code>// hardhat.config.ts
+import "@openzeppelin/hardhat-upgrades";</code></pre>
+
+        <p>Deploy as a proxy:</p>
+        <pre><code>// scripts/deploy.ts (snippet)
+const Box = await ethers.getContractFactory("Box");
+const proxy = await upgrades.deployProxy(Box, [42], { kind: "uups" });
+await proxy.waitForDeployment();
+
+console.log("Proxy address:", await proxy.getAddress());</code></pre>
+
+        <div class="note">
+          <div class="tip-title">When to learn upgradeables?</div>
+          <p>
+            After you’re confident with normal deployments.
+            Proxies add complexity and should not be your step zero.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- WRAP UP -->
+    <section id="next" class="section">
+      <div class="section-label">Wrap up</div>
+      <h2 class="section-title">You now have a real workflow</h2>
+
+      <div class="section-grid">
+        <div class="section-text">
+          <p>You’ve learned:</p>
+          <ul>
+            <li>How to treat networks as a ladder</li>
+            <li>How to structure scripts and deployments</li>
+            <li>How to deploy locally, then on testnet, then mainnet</li>
+            <li>How to verify and record addresses</li>
+            <li>How to dry-run before spending real ETH</li>
+          </ul>
+
+          <p style="margin-top:0.9rem;">
+            With this, you can ship almost any Solidity project in a clean way.
+            Next, you can pick any guide (ERC-721, DeFi, Security)
+            and your deploy story will stay stable.
+          </p>
+        </div>
+
+        <div>
+          <div class="card-soft">
+            <div class="card-title">Suggested next guides</div>
+            <ul class="step-list">
+              <li><span class="checkmark">→</span> Hardhat deep dive (networks & forking)</li>
+              <li><span class="checkmark">→</span> Security basics (reentrancy, access control)</li>
+              <li><span class="checkmark">→</span> OpenZeppelin extensions in practice</li>
+            </ul>
+
+            <p style="margin-top:0.9rem; font-size:0.86rem; color:var(--text-muted);">
+              Link these to pages like
+              <span class="inline-code">hardhat.html</span>,
+              <span class="inline-code">security.html</span>,
+              <span class="inline-code">oz.html</span>
+              to build a learning path.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div>© 2025 web3.studio — beginner workflow track.</div>
+    <div class="footer-links">
+      <a href="../index.html">Home</a>
+      <span>·</span>
+      <a href="../guides.html">All guides</a>
+      <span>·</span>
+      <a href="../docs.html">Docs</a>
+    </div>
+  </footer>
+
+   <div class="guide-progress" id="guideProgress">
+  <div class="gp-label">
+    <span id="gpPercent">0%</span> · guide progress
+  </div>
+
+  <div class="gp-bar">
+    <div class="gp-bar-fill" id="gpBarFill"></div>
+  </div>
+
+  <div class="gp-actions">
+    <button id="gpTopBtn">Top</button>
+    <button id="gpNextBtn">Next</button>
+  </div>
+</div>
+
+<style>
+    .guide-progress {
+  position: fixed;
+  bottom: 22px;
+  right: 22px;
+  background: rgba(15, 23, 42, 0.82);
+  padding: 1rem 1.2rem 1.2rem;
+  border-radius: 18px;
+  border: 1px solid rgba(148,163,184,0.35);
+  backdrop-filter: blur(12px);
+  width: 180px;
+  z-index: 999;
+  box-shadow: 0 0 35px rgba(0,0,0,0.55);
+  font-size: 0.82rem;
+  color: #f3f4f6;
+}
+
+.gp-label {
+  margin-bottom: 0.6rem;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+}
+
+.gp-bar {
+  height: 8px;
+  background: #0f172a;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 0.9rem;
+  border: 1px solid rgba(148,163,184,0.35);
+}
+
+.gp-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #facc15, #f97316);
+  transition: width 0.2s ease-out;
+}
+
+.gp-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.4rem;
+}
+
+.gp-actions button {
+  flex: 1;
+  background: rgba(30,41,59,0.85);
+  border: 1px solid rgba(148,163,184,0.45);
+  color: #e5e7eb;
+  padding: 0.35rem 0.4rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.15s;
+  font-size: 0.78rem;
+}
+
+.gp-actions button:hover {
+  background: rgba(51,65,85,0.85);
+  border-color: rgba(248,250,252,0.6);
+}
+
+</style>
+
+<script>
+
+    const gpPercent = document.getElementById("gpPercent");
+const gpBarFill = document.getElementById("gpBarFill");
+const gpTopBtn = document.getElementById("gpTopBtn");
+const gpNextBtn = document.getElementById("gpNextBtn");
+
+// Собираем все секции, чтобы "Next" работал автоматически
+const guideSections = Array.from(document.querySelectorAll("section[id]"));
+
+function updateProgress() {
+  const scrollTop = window.scrollY;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+
+  let progress = Math.min(100, (scrollTop / docHeight) * 100);
+  progress = Math.floor(progress);
+
+  gpPercent.innerText = progress + "%";
+  gpBarFill.style.width = progress + "%";
+}
+
+// Обновление прогресса при прокрутке
+window.addEventListener("scroll", updateProgress);
+updateProgress();
+
+// Кнопка Top
+gpTopBtn.addEventListener("click", () => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+// Кнопка Next — ищет следующую секцию
+gpNextBtn.addEventListener("click", () => {
+  const scrollPos = window.scrollY + 40;
+
+  let next = null;
+  for (let section of guideSections) {
+    const top = section.offsetTop;
+    if (top > scrollPos) {
+      next = section;
+      break;
+    }
+  }
+
+  if (next) {
+    window.scrollTo({ top: next.offsetTop - 60, behavior: "smooth" });
+  }
+});
+
+</script>
+</body>
+</html>

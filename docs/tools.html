@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Tools — Web3 Studio Docs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg:#05060a;
+      --sidebar:#0b0e17;
+      --content-bg:#0d101b;
+      --text-main:#f5f5f7;
+      --text-muted:#9ca3af;
+      --border:rgba(148,163,184,0.2);
+      --accent:#facc15;
+      --radius:14px;
+      --code-bg:#0b1120;
+      --code-border:rgba(148,163,184,0.15);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text-main);
+      font-family: Inter, sans-serif;
+    }
+
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 280px;
+      background: var(--sidebar);
+      border-right: 1px solid var(--border);
+      padding: 1.4rem;
+      overflow-y: auto;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+
+    .sidebar h2 {
+      color: var(--accent);
+      font-size: 1.1rem;
+      margin: 0 0 0.4rem;
+      letter-spacing: -0.01em;
+    }
+
+    .sidebar-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 1.2rem;
+    }
+
+    .nav-category {
+      margin-bottom: 1.4rem;
+    }
+
+    .nav-category-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .sidebar a {
+      display: block;
+      padding: 0.3rem 0;
+      font-size: 0.9rem;
+      text-decoration: none;
+      color: var(--text-muted);
+      transition: 0.15s;
+    }
+
+    .sidebar a:hover {
+      color: var(--text-main);
+    }
+
+    .sidebar a.active {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* CONTENT */
+    .content {
+      flex: 1;
+      padding: 2rem;
+      background: var(--content-bg);
+    }
+
+    .content-inner {
+      max-width: 880px;
+      margin: 0 auto;
+    }
+
+    /* TOC */
+    .toc {
+      padding: 1rem 1.2rem;
+      margin: 1.5rem 0 2rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,0.02);
+      font-size: 0.92rem;
+    }
+
+    .toc-title {
+      font-weight: 600;
+      margin-bottom: 0.6rem;
+      color: var(--accent);
+    }
+
+    .toc a {
+      display: inline-block;
+      margin-right: 1rem;
+      margin-bottom: 0.3rem;
+      color: var(--text-muted);
+      text-decoration: none;
+    }
+
+    .toc a:hover {
+      color: var(--accent);
+    }
+
+    /* TYPOGRAPHY */
+    h1 {
+      font-size: 2.2rem;
+      margin-top: 0;
+      margin-bottom: 0.4rem;
+      letter-spacing: -0.02em;
+    }
+
+    .page-lead {
+      line-height: 1.7;
+      color: var(--text-muted);
+      margin-bottom: 0.8rem;
+    }
+
+    .page-meta {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      opacity: 0.9;
+      margin-bottom: 2rem;
+    }
+
+    h2 {
+      margin-top: 2.2rem;
+      font-size: 1.6rem;
+      color: var(--accent);
+      letter-spacing: -0.01em;
+    }
+
+    h3 {
+      margin-top: 1.4rem;
+      font-size: 1.15rem;
+    }
+
+    p {
+      line-height: 1.65;
+      color: var(--text-muted);
+    }
+
+    ul, ol {
+      padding-left: 1.2rem;
+    }
+
+    ul li, ol li {
+      margin: 0.35rem 0;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .note, .tip, .warning {
+      border-left: 3px solid var(--accent);
+      padding: 0.85rem 1rem;
+      margin: 1rem 0;
+      background: rgba(250,204,21,0.05);
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+
+    .note {
+      border-left-color: #38bdf8;
+      background: rgba(56,189,248,0.06);
+    }
+
+    .warning {
+      border-left-color: #f97316;
+      background: rgba(249,115,22,0.06);
+    }
+
+    .tip-title {
+      font-weight: 600;
+      margin-bottom: 0.2rem;
+      color: var(--text-main);
+    }
+
+    /* CODE */
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--code-border);
+      padding: 1rem;
+      border-radius: var(--radius);
+      overflow-x: auto;
+      font-family: JetBrains Mono, monospace;
+      font-size: 0.85rem;
+      margin: 0.9rem 0 1.1rem;
+    }
+
+    code {
+      font-family: JetBrains Mono, monospace;
+      font-size: 0.85rem;
+    }
+
+    .inline-code {
+      padding: 0.1rem 0.3rem;
+      border-radius: 4px;
+      background: rgba(148,163,184,0.18);
+      border: 1px solid rgba(148,163,184,0.3);
+    }
+
+    section[id] {
+      scroll-margin-top: 80px;
+      padding-bottom: 2rem;
+    }
+
+    section[id]::before {
+      content: "";
+      display: block;
+      height: 80px;
+      margin-top: -80px;
+      visibility: hidden;
+    }
+
+    footer {
+      padding: 2rem 1.5rem 2.5rem;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      text-align: center;
+      background: #05060a;
+    }
+  </style>
+</head>
+<body>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <a href="./docs.html" style="
+        display:block;
+        margin-bottom:1rem;
+        font-size:0.9rem;
+        color:var(--accent);
+        text-decoration:none;
+        font-weight:600;
+    ">← Back to main docs</a>
+
+    <h2>Tools</h2>
+    <div class="sidebar-subtitle">Web3 toolchain overview</div>
+
+          <input
+        id="searchInput"
+        type="text"
+        placeholder="Search..."
+        style="
+            width: 90%;
+            padding: 0.55rem 0.7rem;
+            margin: 0.6rem 0 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: #0f1320;
+            color: var(--text-main);
+            font-size: 0.9rem;
+        "
+    >
+    <div id="searchResults" style="margin-top:0.5rem; margin-bottom: 10px;"></div>
+
+    <script>
+  const searchInput = document.getElementById("searchInput");
+  const searchResults = document.getElementById("searchResults");
+
+  searchInput.addEventListener("input", () => {
+    const query = searchInput.value.toLowerCase();
+
+    if (query.length < 2) {
+      searchResults.innerHTML = "";
+      return;
+    }
+
+    let results = [];
+
+    document.querySelectorAll("section").forEach(section => {
+      const text = section.innerText.toLowerCase();
+
+      if (text.includes(query)) {
+        results.push({
+          id: section.id,
+          title: section.querySelector("h2")?.innerText || section.id
+        });
+      }
+    });
+
+    searchResults.innerHTML = results
+      .slice(0, 5)
+      .map(r => `<a href="#${r.id}" style="display:block; margin:4px 0; color:var(--accent);">${r.title}</a>`)
+      .join("");
+  });
+</script>
+
+    <div class="nav-category">
+      <div class="nav-category-title">Overview</div>
+      <a href="#intro" class="active">Intro</a>
+      <a href="#types">Types of tools</a>
+      <a href="#stacks">Choosing a stack</a>
+    </div>
+
+    <div class="nav-category">
+      <div class="nav-category-title">Dev environments</div>
+      <a href="#hardhat">Hardhat</a>
+      <a href="#foundry">Foundry</a>
+      <a href="#remix">Remix</a>
+      <a href="#truffle">Truffle (legacy)</a>
+    </div>
+
+    <div class="nav-category">
+      <div class="nav-category-title">Nodes & RPC</div>
+      <a href="#local-nodes">Local nodes</a>
+      <a href="#rpc-providers">RPC providers</a>
+      <a href="#explorers">Block explorers</a>
+    </div>
+
+    <div class="nav-category">
+      <div class="nav-category-title">Testing & debug</div>
+      <a href="#testing-tools">Testing tools</a>
+      <a href="#debugging">Debugging & traces</a>
+      <a href="#tenderly">Tenderly</a>
+    </div>
+
+    <div class="nav-category">
+      <div class="nav-category-title">Security & analysis</div>
+      <a href="#slither">Slither</a>
+      <a href="#echidna">Echidna</a>
+      <a href="#mythril">Mythril & others</a>
+      <a href="#linting">Linting & style</a>
+    </div>
+
+    <div class="nav-category">
+      <div class="nav-category-title">Deployment & ops</div>
+      <a href="#deploy-scripts">Deploy scripts</a>
+      <a href="#verify-tools">Verification</a>
+      <a href="#defender">OpenZeppelin Defender</a>
+      <a href="#monitoring">Monitoring & dashboards</a>
+    </div>
+
+    <div class="nav-category">
+      <div class="nav-category-title">Frontend & clients</div>
+      <a href="#ethers">ethers.js</a>
+      <a href="#viem">viem & wagmi</a>
+      <a href="#wallets">Wallets & connectors</a>
+    </div>
+
+    <div class="nav-category">
+      <div class="nav-category-title">Starter kits</div>
+      <a href="#stack-js">JS-focused stack</a>
+      <a href="#stack-ts">TS fullstack stack</a>
+      <a href="#stack-audit">Audit-focused stack</a>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main class="content">
+    <div class="content-inner">
+
+      <h1>Web3 Tools & Stack</h1>
+      <p class="page-lead">
+        This page gives you a curated, opinionated overview of Web3 tools:
+        dev environments, RPC providers, testing frameworks, security analyzers,
+        deployment automation and frontend clients.
+      </p>
+      <div class="page-meta">
+        Focus: Ethereum / EVM ecosystem · Solidity & TypeScript workflows · Real-world developer stacks.
+      </div>
+
+      <!-- TOC -->
+      <div class="toc">
+        <div class="toc-title">On this page</div>
+        <a href="#intro">Intro</a>
+        <a href="#types">Types of tools</a>
+        <a href="#stacks">Choosing a stack</a>
+        <a href="#hardhat">Hardhat</a>
+        <a href="#foundry">Foundry</a>
+        <a href="#remix">Remix</a>
+        <a href="#local-nodes">Local nodes</a>
+        <a href="#rpc-providers">RPC</a>
+        <a href="#testing-tools">Testing</a>
+        <a href="#slither">Slither</a>
+        <a href="#echidna">Echidna</a>
+        <a href="#deploy-scripts">Deployment</a>
+        <a href="#verify-tools">Verification</a>
+        <a href="#ethers">ethers.js</a>
+        <a href="#viem">viem</a>
+        <a href="#stack-js">Stacks</a>
+      </div>
+
+      <!-- OVERVIEW -->
+
+      <section id="intro">
+        <h2>Introduction</h2>
+        <p>
+          Web3 development is not about a single tool. It is about how your tools work together:
+          compiler, test runner, local node, RPC provider, block explorer, security analyzers,
+          deployment scripts, monitoring and frontend clients.
+        </p>
+        <p>
+          This page is not a marketing list — it tries to answer: “Which tools should I actually use
+          for real projects, and how do they fit together?”
+        </p>
+
+        <div class="note">
+          <div class="tip-title">You don’t need everything at once</div>
+          <p>
+            Start with 1–2 core tools (for example: Hardhat + ethers) and add the rest as your
+            project grows. Overloaded toolchains make debugging harder, not easier.
+          </p>
+        </div>
+      </section>
+
+      <section id="types">
+        <h2>Types of Web3 tools</h2>
+        <p>Most tools fall into a few categories:</p>
+        <ul>
+          <li><b>Dev environments</b> — Hardhat, Foundry, Remix, Truffle.</li>
+          <li><b>Nodes & RPC</b> — Anvil, Hardhat Network, Alchemy, Infura, local geth.</li>
+          <li><b>Testing & debug</b> — Hardhat toolbox, Foundry forge/cast, Tenderly.</li>
+          <li><b>Security & analysis</b> — Slither, Echidna, Mythril, linters.</li>
+          <li><b>Deployment & ops</b> — scripts, Ignition, OZ Defender, Etherscan APIs.</li>
+          <li><b>Frontend & clients</b> — ethers.js, viem, wagmi, wallet connectors.</li>
+        </ul>
+      </section>
+
+      <section id="stacks">
+        <h2>Choosing a stack</h2>
+        <p>
+          There is no single “best” tech stack. It depends on what you’re building and what you
+          are comfortable with. A few principles:
+        </p>
+        <ul>
+          <li>Favor tools with strong docs and community.</li>
+          <li>Use as few tools as necessary to ship safely.</li>
+          <li>Make sure every tool is reproducible in CI (no manual steps).</li>
+        </ul>
+
+        <div class="tip">
+          <div class="tip-title">Good default</div>
+          <p>
+            For most modern projects, a great starting combo is:
+            <span class="inline-code">Hardhat 3 + TS + @nomicfoundation/hardhat-toolbox-ethers</span> for contracts,
+            <span class="inline-code">Foundry</span> for advanced testing, and
+            <span class="inline-code">viem / wagmi</span> on the frontend.
+          </p>
+        </div>
+      </section>
+
+      <!-- DEV ENVIRONMENTS -->
+
+      <section id="hardhat">
+        <h2>Hardhat</h2>
+        <p>
+          Hardhat is a TypeScript/Node-based development environment for compiling, testing and
+          deploying smart contracts. It integrates well with Ethers, TypeScript and JS tooling in general.
+        </p>
+
+        <h3>Install & init</h3>
+        <pre><code>npm install --save-dev hardhat
+npx hardhat    # interactive project setup</code></pre>
+
+        <p>
+          With Hardhat 3 you typically work with a <span class="inline-code">hardhat.config.ts</span>
+          and the <span class="inline-code">@nomicfoundation/hardhat-toolbox-ethers</span> plugin
+          for tests, fixtures and extra matchers.
+        </p>
+        <p>Подробнее см. <span class="inline-code">hardhat.html</span> в твоей документации.</p>
+      </section>
+
+      <section id="foundry">
+        <h2>Foundry</h2>
+        <p>
+          Foundry is a fast, Rust-based toolkit with first-class Solidity testing, fuzzing and
+          invariant testing. It is especially popular among auditors and DeFi teams.
+        </p>
+
+        <h3>Install</h3>
+        <pre><code>curl -L https://foundry.paradigm.xyz | bash
+foundryup</code></pre>
+
+        <h3>Key components</h3>
+        <ul>
+          <li><span class="inline-code">forge</span> — compile, test, deploy.</li>
+          <li><span class="inline-code">cast</span> — CLI for calling contracts, sending txs, querying chain.</li>
+          <li><span class="inline-code">anvil</span> — local Ethereum node, similar to Hardhat Network.</li>
+        </ul>
+
+        <h3>Basic workflow</h3>
+        <pre><code>forge init my-project
+cd my-project
+forge test
+anvil      # local node
+cast call ...</code></pre>
+
+        <div class="note">
+          <div class="tip-title">Best for testing-heavy work</div>
+          <p>
+            Foundry shines when you write lots of tests, fuzzing, invariant testing and
+            low-level EVM experiments. It also integrates well with Hardhat configs via
+            the same RPC endpoints.
+          </p>
+        </div>
+      </section>
+
+      <section id="remix">
+        <h2>Remix IDE</h2>
+        <p>
+          Remix is a browser-based IDE for Solidity. Great for quick experiments,
+          proofs-of-concept and learning, but not ideal for large production systems.
+        </p>
+        <ul>
+          <li>No local Git integration by default.</li>
+          <li>Harder to integrate with CI and complex toolchains.</li>
+        </ul>
+        <p>
+          Use Remix primarily when you want to try out a small contract quickly or demo something.
+          For real projects, move to a local environment (Hardhat / Foundry).
+        </p>
+      </section>
+
+      <section id="truffle">
+        <h2>Truffle (legacy)</h2>
+        <p>
+          Truffle was one of the first Ethereum frameworks. Today it is largely replaced by
+          Hardhat and Foundry in most modern stacks. You will still see it in older tutorials
+          and legacy codebases, but you generally don’t need it for new projects.
+        </p>
+      </section>
+
+      <!-- NODES & RPC -->
+
+      <section id="local-nodes">
+        <h2>Local nodes</h2>
+        <p>
+          Local nodes simulate a blockchain on your machine. Good local node tools:
+        </p>
+        <ul>
+          <li><b>Anvil</b> (Foundry) — fast, robust; supports forking mainnet.</li>
+          <li><b>Hardhat Network</b> — built into Hardhat; powerful debugging.</li>
+        </ul>
+
+        <h3>Run Anvil</h3>
+        <pre><code>anvil</code></pre>
+
+        <h3>Run Hardhat Network</h3>
+        <pre><code>npx hardhat node</code></pre>
+
+        <p>
+          Both can be used as RPC endpoints for tests, frontends and other scripts during development.
+        </p>
+      </section>
+
+      <section id="rpc-providers">
+        <h2>RPC providers</h2>
+        <p>
+          To talk to real networks (mainnet, testnets), you need an RPC provider:
+        </p>
+        <ul>
+          <li>Alchemy</li>
+          <li>Infura</li>
+          <li>QuickNode</li>
+          <li>Ankr</li>
+          <li>Blast, Chainstack, etc.</li>
+        </ul>
+
+        <pre><code>// example Hardhat network config
+networks: {
+  sepolia: {
+    type: "http",
+    chainType: "l1",
+    url: process.env.SEPOLIA_RPC_URL,
+    accounts: [process.env.SEPOLIA_PRIVATE_KEY],
+  },
+}</code></pre>
+
+        <div class="warning">
+          <div class="tip-title">API keys</div>
+          <p>
+            Never commit RPC keys or private keys to Git. Always load them from environment
+            variables or secure config variables.
+          </p>
+        </div>
+      </section>
+
+      <section id="explorers">
+        <h2>Block explorers</h2>
+        <p>
+          Block explorers like Etherscan, Blockscout, SnowTrace let you inspect transactions,
+          contract code and logs. They are essential for debugging and verifying contracts.</p>
+        <ul>
+          <li>Used to check: did your tx revert? what events were emitted?</li>
+          <li>Used to verify: source code matches the on-chain bytecode.</li>
+        </ul>
+      </section>
+
+      <!-- TESTING & DEBUG -->
+
+      <section id="testing-tools">
+        <h2>Testing tools</h2>
+        <p>
+          Testing is where Hardhat and Foundry shine.
+        </p>
+        <ul>
+          <li><b>Hardhat toolbox</b> — Mocha, Chai, ethers.js, fixtures, matchers.</li>
+          <li><b>Foundry</b> — native Solidity tests, fuzzing, invariants.</li>
+        </ul>
+
+        <h3>Hardhat test</h3>
+        <pre><code>npx hardhat test</code></pre>
+
+        <h3>Foundry test</h3>
+        <pre><code>forge test</code></pre>
+
+        <p>
+          Use Hardhat for TypeScript tests (if you’re JS/TS centric), and Foundry for heavy
+          Solidity testing and fuzz/invariant layers.
+        </p>
+      </section>
+
+      <section id="debugging">
+        <h2>Debugging & traces</h2>
+        <p>
+          When something breaks, you want to see <b>why</b>. Tools:
+        </p>
+        <ul>
+          <li>Hardhat traces & console.log in Solidity.</li>
+          <li>Foundry debug & traces.</li>
+          <li>Tenderly transaction debugger (UI).</li>
+        </ul>
+
+        <pre><code>// Hardhat - enable console.log in Solidity with console.sol
+import "hardhat/console.sol";
+
+function foo(uint x) external {
+    console.log("foo called with", x);
+}</code></pre>
+      </section>
+
+      <section id="tenderly">
+        <h2>Tenderly</h2>
+        <p>
+          Tenderly is a Web3 platform that gives you advanced debugging, simulations,
+          gas profiling, alerting and more, with a nice UI.
+        </p>
+        <ul>
+          <li>Simulate tx before sending.</li>
+          <li>Debug historical tx with step-by-step trace.</li>
+          <li>Set up alerts for specific on-chain events.</li>
+        </ul>
+      </section>
+
+      <!-- SECURITY & ANALYSIS -->
+
+      <section id="slither">
+        <h2>Slither</h2>
+        <p>
+          Slither is a static analyzer for Solidity. It scans your code and finds
+          common bug patterns and suspicious constructs.
+        </p>
+
+        <h3>Install</h3>
+        <pre><code>pip install slither-analyzer</code></pre>
+
+        <h3>Run</h3>
+        <pre><code>slither .</code></pre>
+
+        <p>
+          You can integrate Slither into CI so every commit is scanned automatically.
+          Combine it with your manual review and tests — tools are helpers, not replacements
+          for thinking.
+        </p>
+      </section>
+
+      <section id="echidna">
+        <h2>Echidna</h2>
+        <p>
+          Echidna is a property-based fuzzer for Ethereum. You define invariants or properties
+          and it tries to break them by generating many inputs and sequences of calls.
+        </p>
+        <p>
+          In practice, many teams now use Foundry for fuzzing as a simpler entry point, but
+          Echidna remains a strong tool in security pipelines.
+        </p>
+      </section>
+
+      <section id="mythril">
+        <h2>Mythril & other analyzers</h2>
+        <p>
+          Mythril is a symbolic execution engine for EVM bytecode. It can detect certain
+          classes of vulnerabilities automatically, but requires some tuning to be effective.
+        </p>
+        <p>
+          Other analyzers and platforms (e.g. consenSys tools, commercial SaaS scanners) also
+          exist — use them as additional layers, not as a replacement for manual audits.
+        </p>
+      </section>
+
+      <section id="linting">
+        <h2>Linting & code style</h2>
+        <p>
+          Good style reduces bugs. Typical tools:</p>
+        <ul>
+          <li><b>solhint</b> — linter for Solidity.</li>
+          <li><b>prettier-plugin-solidity</b> — formatting Solidity via Prettier.</li>
+        </ul>
+
+        <pre><code>npm install --save-dev solhint prettier prettier-plugin-solidity</code></pre>
+
+        <p>
+          Add a <span class="inline-code">.solhint.json</span> and format on save in your editor.
+          Consistent formatting makes code easier to read and review.
+        </p>
+      </section>
+
+      <!-- DEPLOY & OPS -->
+
+      <section id="deploy-scripts">
+        <h2>Deployment scripts</h2>
+        <p>
+          For deployment, you typically use scripts in Hardhat or Foundry:
+        </p>
+        <ul>
+          <li>Hardhat: <span class="inline-code">npx hardhat run scripts/deploy.ts --network sepolia</span></li>
+          <li>Foundry: <span class="inline-code">forge script</span> / <span class="inline-code">forge create</span></li>
+        </ul>
+
+        <pre><code>// Hardhat deploy example (simplified)
+import { network, ethers } from "hardhat";
+
+async function main() {
+  const { networkName } = await network.connect();
+  console.log("Deploying to", networkName);
+
+  const token = await ethers.deployContract("MyToken");
+  await token.waitForDeployment();
+
+  console.log("Token deployed at", await token.getAddress());
+}
+
+main().catch((e) =&gt; {
+  console.error(e);
+  process.exit(1);
+});</code></pre>
+
+        <p>
+          Good practice: write addresses and config into a JSON file that your frontend and
+          tests can import.
+        </p>
+      </section>
+
+      <section id="verify-tools">
+        <h2>Verification tools</h2>
+        <p>
+          Verification publishes your Solidity source on explorers like Etherscan so users
+          and other contracts can inspect it.
+        </p>
+
+        <p>Typical tools:</p>
+        <ul>
+          <li>Hardhat Etherscan plugin / toolbox.</li>
+          <li>Foundry’s verification helpers.</li>
+        </ul>
+
+        <pre><code>npx hardhat verify --network sepolia &lt;deployed_address&gt; arg1 arg2 ...</code></pre>
+      </section>
+
+      <section id="defender">
+        <h2>OpenZeppelin Defender</h2>
+        <p>
+          Defender is a platform by OpenZeppelin for secure operations: upgrades, relayers,
+          admin actions, monitoring and incident response.
+        </p>
+        <ul>
+          <li>Safely execute admin transactions via multisig.</li>
+          <li>Automate routine tasks via relayers.</li>
+          <li>Monitor events and set up alerts.</li>
+        </ul>
+      </section>
+
+      <section id="monitoring">
+        <h2>Monitoring & dashboards</h2>
+        <p>
+          For production protocols, you need observability:</p>
+        <ul>
+          <li><b>Dune / Flipside</b> — analytics dashboards.</li>
+          <li><b>Tenderly</b> — real-time tx monitoring & alerts.</li>
+          <li><b>Custom scripts</b> using <span class="inline-code">ethers</span> / <span class="inline-code">viem</span> to watch events.</li>
+        </ul>
+
+        <p>
+          Monitoring is part of security: the faster you detect weird behavior, the more
+          time you have to react (pause, upgrade, communicate).
+        </p>
+      </section>
+
+      <!-- FRONTEND & CLIENTS -->
+
+      <section id="ethers">
+        <h2>ethers.js</h2>
+        <p>
+          ethers.js is a popular JavaScript/TypeScript library to interact with Ethereum:
+          send transactions, read state, listen to events.
+        </p>
+
+        <pre><code>import { ethers } from "ethers";
+
+const provider = new ethers.JsonRpcProvider(process.env.SEPOLIA_RPC_URL);
+const signer   = new ethers.Wallet(process.env.PRIVATE_KEY!, provider);
+
+const erc20 = new ethers.Contract(
+  TOKEN_ADDRESS,
+  ERC20_ABI,
+  signer
+);</code></pre>
+
+        <p>
+          ethers integrates smoothly with Hardhat (via toolbox) and is widely used in
+          both backend scripts and frontends.
+        </p>
+      </section>
+
+      <section id="viem">
+        <h2>viem & wagmi</h2>
+        <p>
+          viem is a TypeScript-first, low-level client for EVM. wagmi builds on viem
+          to provide React hooks for dapps.
+        </p>
+
+        <ul>
+          <li><b>viem</b> — great for type-safe, framework-agnostic usage.</li>
+          <li><b>wagmi</b> — great for React apps with wallet connections.</li>
+        </ul>
+
+        <p>
+          Typical pattern: wagmi + viem on frontend, reading addresses and ABIs from
+          the JSON produced by your Hardhat / Foundry deployments.
+        </p>
+      </section>
+
+      <section id="wallets">
+        <h2>Wallets & connectors</h2>
+        <p>
+          To let users connect, you use connectors on top of wallet standards:
+        </p>
+        <ul>
+          <li>WalletConnect</li>
+          <li>RainbowKit</li>
+          <li>web3modal</li>
+        </ul>
+        <p>
+          They handle provider selection, session management and UI for choosing MetaMask,
+          WalletConnect, Coinbase Wallet, etc.
+        </p>
+      </section>
+
+      <!-- STARTER STACKS -->
+
+      <section id="stack-js">
+        <h2>JS-focused stack</h2>
+        <p>
+          If you mostly live in JavaScript and want minimal friction:
+        </p>
+        <ul>
+          <li><b>Hardhat</b> for contracts (JS/TS config).</li>
+          <li><b>@nomicfoundation/hardhat-toolbox-ethers</b> for testing.</li>
+          <li><b>Anvil or Hardhat Network</b> as local chain.</li>
+          <li><b>ethers.js</b> for scripts and backend.</li>
+          <li><b>React + wagmi + viem</b> for frontend.</li>
+        </ul>
+      </section>
+
+      <section id="stack-ts">
+        <h2>TypeScript fullstack stack</h2>
+        <p>
+          For a full TS pipeline (contracts + backend + frontend):</p>
+        <ul>
+          <li>Hardhat 3 with <span class="inline-code">hardhat.config.ts</span>.</li>
+          <li>TypeScript tests for contracts.</li>
+          <li>Node-based backend with TS (NestJS / Express / Next API routes).</li>
+          <li>Frontend: Next.js + wagmi + viem.</li>
+          <li>Type-safe ABIs (for example via <span class="inline-code">typechain</span> or helpers).</li>
+        </ul>
+      </section>
+
+      <section id="stack-audit">
+        <h2>Audit-focused stack</h2>
+        <p>
+          If you want to focus on security and audits:</p>
+        <ul>
+          <li><b>Foundry</b> as core testing + fuzzing + invariants.</li>
+          <li><b>Slither</b> in CI for static analysis.</li>
+          <li><b>Hardhat</b> optionally for TS-based integration tests.</li>
+          <li><b>Tenderly</b> or similar for tx-level debugging.</li>
+          <li><b>Custom scripts</b> with <span class="inline-code">cast</span> or <span class="inline-code">ethers</span>
+              to poke live contracts.</li>
+        </ul>
+
+        <div style="height: 160px;"></div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<footer>
+  © 2025 web3.studio — Web3 tools & stack guide.<br>
+  <span style="opacity:0.8;">Build • Test • Analyze • Ship</span>
+</footer>
+
+<script>
+  const sections = Array.from(document.querySelectorAll("section[id]"));
+  const navLinks = document.querySelectorAll(".sidebar a");
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        navLinks.forEach(link => {
+          const href = link.getAttribute("href");
+          if (!href || !href.startsWith("#")) return;
+          link.classList.toggle("active", href === "#" + id);
+        });
+      }
+    });
+  }, {
+    threshold: 0.3
+  });
+
+  sections.forEach(section => observer.observe(section));
+</script>
+
+</body>
+</html>

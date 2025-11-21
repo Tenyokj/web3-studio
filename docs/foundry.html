@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Foundry — Web3 Studio Docs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Fonts (same as in docs.html / hardhat.html) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #05060a;
+      --sidebar: #0b0e17;
+      --content-bg: #0d101b;
+      --text-main: #f5f5f7;
+      --text-muted: #9ca3af;
+      --border: rgba(148, 163, 184, 0.2);
+      --accent: #facc15;
+      --radius: 14px;
+      --code-bg: #0b1120;
+      --code-border: rgba(148,163,184,0.15);
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text-main);
+      font-family: Inter, sans-serif;
+    }
+
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 280px;
+      background: var(--sidebar);
+      border-right: 1px solid var(--border);
+      padding: 1.4rem;
+      overflow-y: auto;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+
+    .sidebar h2 {
+      color: var(--accent);
+      font-size: 1.1rem;
+      margin: 0 0 0.4rem;
+      letter-spacing: -0.01em;
+    }
+
+    .sidebar-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 1.2rem;
+    }
+
+    .nav-category {
+      margin-bottom: 1.4rem;
+    }
+
+    .nav-category-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .sidebar a {
+      display: block;
+      padding: 0.3rem 0;
+      font-size: 0.9rem;
+      text-decoration: none;
+      color: var(--text-muted);
+      transition: 0.15s;
+    }
+
+    .sidebar a:hover {
+      color: var(--text-main);
+    }
+
+    .sidebar a.active {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* Content */
+    .content {
+      flex: 1;
+      padding: 2rem;
+      background: var(--content-bg);
+    }
+
+    .content-inner {
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    /* Mini TOC */
+    .toc {
+      padding: 1rem 1.2rem;
+      margin: 1.5rem 0 2rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,0.02);
+      font-size: 0.92rem;
+    }
+
+    .toc-title {
+      font-weight: 600;
+      margin-bottom: 0.6rem;
+      color: var(--accent);
+    }
+
+    .toc a {
+      display: inline-block;
+      margin-right: 1rem;
+      margin-bottom: 0.3rem;
+      color: var(--text-muted);
+      text-decoration: none;
+    }
+
+    .toc a:hover {
+      color: var(--accent);
+    }
+
+    /* Typography */
+    h1 {
+      font-size: 2.2rem;
+      margin-top: 0;
+      margin-bottom: 0.4rem;
+      letter-spacing: -0.02em;
+    }
+
+    .page-lead {
+      line-height: 1.7;
+      color: var(--text-muted);
+      margin-bottom: 0.8rem;
+    }
+
+    .page-meta {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      opacity: 0.9;
+      margin-bottom: 2rem;
+    }
+
+    h2 {
+      margin-top: 2.2rem;
+      font-size: 1.6rem;
+      color: var(--accent);
+      letter-spacing: -0.01em;
+    }
+
+    h3 {
+      margin-top: 1.4rem;
+      font-size: 1.15rem;
+    }
+
+    p {
+      line-height: 1.65;
+      color: var(--text-muted);
+    }
+
+    ul, ol {
+      padding-left: 1.2rem;
+    }
+
+    ul li, ol li {
+      margin: 0.4rem 0;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .tip, .note, .warning {
+      border-left: 3px solid var(--accent);
+      padding: 0.85rem 1rem;
+      margin: 1rem 0;
+      background: rgba(250,204,21,0.05);
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+
+    .note {
+      border-left-color: #38bdf8;
+      background: rgba(56,189,248,0.06);
+    }
+
+    .warning {
+      border-left-color: #f97316;
+      background: rgba(249,115,22,0.06);
+    }
+
+    .tip-title {
+      font-weight: 600;
+      margin-bottom: 0.2rem;
+      color: var(--text-main);
+    }
+
+    /* Code */
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--code-border);
+      padding: 1rem;
+      border-radius: var(--radius);
+      overflow-x: auto;
+      font-family: JetBrains Mono, monospace;
+      font-size: 0.85rem;
+      margin: 0.9rem 0 1.1rem;
+    }
+
+    code {
+      font-family: JetBrains Mono, monospace;
+      font-size: 0.85rem;
+    }
+
+    .inline-code {
+      padding: 0.1rem 0.3rem;
+      border-radius: 4px;
+      background: rgba(148,163,184,0.18);
+      border: 1px solid rgba(148,163,184,0.3);
+    }
+
+    section[id] {
+      scroll-margin-top: 80px;
+      padding-bottom: 2rem;
+    }
+
+    section[id]::before {
+      content: "";
+      display: block;
+      height: 80px;
+      margin-top: -80px;
+      visibility: hidden;
+    }
+
+    footer {
+      padding: 2rem 1.5rem 2.5rem;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      text-align: center;
+      background: #05060a;
+    }
+  </style>
+</head>
+<body>
+
+<div class="layout">
+  <!-- Sidebar -->
+  <nav class="sidebar">
+
+    <a href="./docs.html" style="
+        display:block;
+        margin-bottom:1rem;
+        font-size:0.9rem;
+        color:var(--accent);
+        text-decoration:none;
+        font-weight:600;
+    ">← Back to main docs</a>
+
+    <h2>Foundry</h2>
+    <div class="sidebar-subtitle">Fast, modular smart contract toolkit</div>
+
+     <input
+        id="searchInput"
+        type="text"
+        placeholder="Search..."
+        style="
+            width: 90%;
+            padding: 0.55rem 0.7rem;
+            margin: 0.6rem 0 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: #0f1320;
+            color: var(--text-main);
+            font-size: 0.9rem;
+        "
+    >
+    <div id="searchResults" style="margin-top:0.5rem; margin-bottom: 10px; border: 2px, solid, #9ca3af; box-sizing: border-box;"></div>
+
+    <script>
+  const searchInput = document.getElementById("searchInput");
+  const searchResults = document.getElementById("searchResults");
+
+  searchInput.addEventListener("input", () => {
+    const query = searchInput.value.toLowerCase();
+
+    if (query.length < 2) {
+      searchResults.innerHTML = "";
+      return;
+    }
+
+    let results = [];
+
+    document.querySelectorAll("section").forEach(section => {
+      const text = section.innerText.toLowerCase();
+
+      if (text.includes(query)) {
+        results.push({
+          id: section.id,
+          title: section.querySelector("h2")?.innerText || section.id
+        });
+      }
+    });
+
+    searchResults.innerHTML = results
+      .slice(0, 5)
+      .map(r => `<a href="#${r.id}" style="display:block; margin:4px 0; color:var(--accent);">${r.title}</a>`)
+      .join("");
+  });
+</script>
+
+    <div class="nav-category">
+      <div class="nav-category-title">Getting started</div>
+      <a href="#intro" class="active">What is Foundry</a>
+      <a href="#why">Why use Foundry</a>
+      <a href="#install">Installation</a>
+      <a href="#init">Creating a project</a>
+    </div>
+
+    <div class="nav-category">
+      <div class="nav-category-title">Core tools</div>
+      <a href="#tooling">Forge / Cast / Anvil</a>
+      <a href="#structure">Project structure</a>
+      <a href="#config">foundry.toml</a>
+      <a href="#profiles">Profiles & build flags</a>
+      <a href="#anvil">Local node (Anvil)</a>
+    </div>
+
+    <div class="nav-category">
+      <div class="nav-category-title">Testing & quality</div>
+      <a href="#tests">Unit tests</a>
+      <a href="#fuzzing">Fuzz testing</a>
+      <a href="#cheatcodes">Cheatcodes</a>
+      <a href="#invariants">Invariant testing</a>
+      <a href="#gas">Gas optimization</a>
+    </div>
+
+    <div class="nav-category">
+      <div class="nav-category-title">Deploy & integrate</div>
+      <a href="#scripts">Scripts & broadcasting</a>
+      <a href="#forking">Mainnet forking</a>
+      <a href="#hardhat">Using Foundry with Hardhat</a>
+      <a href="#ci">CI & automation</a>
+      <a href="#resources">Resources</a>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="content">
+    <div class="content-inner">
+      <h1>Foundry Documentation</h1>
+      <p class="page-lead">
+        Foundry is a blazing-fast, modular toolkit for building, testing and deploying smart contracts.
+        It is written in Rust, uses Solidity for tests, and is optimized for speed, fuzzing, and advanced testing workflows.
+      </p>
+      <div class="page-meta">
+        Requires: Rust toolchain · Solidity ≥ 0.8.x · Basic familiarity with Ethereum / EVM.
+      </div>
+
+      <!-- Mini TOC -->
+      <div class="toc">
+        <div class="toc-title">On this page</div>
+        <a href="#intro">What is Foundry</a>
+        <a href="#why">Why use Foundry</a>
+        <a href="#install">Installation</a>
+        <a href="#init">Creating a project</a>
+        <a href="#tooling">Forge / Cast / Anvil</a>
+        <a href="#structure">Project structure</a>
+        <a href="#config">Configuration</a>
+        <a href="#profiles">Profiles</a>
+        <a href="#anvil">Anvil</a>
+        <a href="#tests">Unit tests</a>
+        <a href="#fuzzing">Fuzzing</a>
+        <a href="#cheatcodes">Cheatcodes</a>
+        <a href="#invariants">Invariants</a>
+        <a href="#gas">Gas optimization</a>
+        <a href="#scripts">Scripts</a>
+        <a href="#forking">Forking</a>
+        <a href="#hardhat">Foundry + Hardhat</a>
+        <a href="#ci">CI</a>
+        <a href="#resources">Resources</a>
+      </div>
+
+      <!-- CONTENT -->
+
+      <section id="intro">
+        <h2>What is Foundry</h2>
+        <p>
+          Foundry is a smart contract development toolkit focused on speed and testability.
+          It is built around three main tools:
+        </p>
+        <ul>
+          <li><span class="inline-code">forge</span> — build, test, format, and manage Solidity projects.</li>
+          <li><span class="inline-code">cast</span> — Swiss-army knife for chain interactions (RPC calls, encodings, tx decoding).</li>
+          <li><span class="inline-code">anvil</span> — local Ethereum node with fast forking and advanced debugging features.</li>
+        </ul>
+
+        <div class="note">
+          <div class="tip-title">Solidity tests, Rust engine</div>
+          <p>
+            Foundry uses Solidity as the testing language. You write tests in the same language
+            as your contracts, while the Rust engine handles compilation, execution, fuzzing,
+            and invariant checking.
+          </p>
+        </div>
+      </section>
+
+      <section id="why">
+        <h2>Why use Foundry</h2>
+        <p>
+          Foundry is widely used by protocol teams and security auditors because it focuses on:
+        </p>
+        <ul>
+          <li><b>Speed</b> — compilation and tests are extremely fast, even for large codebases.</li>
+          <li><b>Testing power</b> — first-class fuzzing, invariant testing, and cheatcodes.</li>
+          <li><b>Low friction</b> — no Node.js required, minimal boilerplate, simple CLI.</li>
+          <li><b>Compatibility</b> — works well with existing Solidity projects, OpenZeppelin, Hardhat, and more.</li>
+        </ul>
+
+        <div class="tip">
+          <div class="tip-title">Hardhat + Foundry together</div>
+          <p>
+            Many teams use Foundry for testing and Hardhat for deployment, plugins, and JS/TS integration.
+            You don’t have to pick one — you can run both in the same repository.
+          </p>
+        </div>
+      </section>
+
+      <section id="install">
+        <h2>Installation</h2>
+        <p>
+          The recommended way to install Foundry is via the official installation script.
+          It can also install the Rust toolchain if you don’t have it yet.
+        </p>
+
+        <h3>1. Install Foundry (Unix/macOS)</h3>
+        <pre><code>curl -L https://foundry.paradigm.xyz | bash
+foundryup</code></pre>
+
+        <p>
+          The <span class="inline-code">foundryup</span> command ensures the latest Foundry version is installed
+          and available on your PATH.
+        </p>
+
+        <h3>2. Verify the installation</h3>
+        <pre><code>forge --version
+cast --version
+anvil --version</code></pre>
+
+        <div class="tip">
+          <div class="tip-title">Updating Foundry</div>
+          <p>
+            Run <span class="inline-code">foundryup</span> again to update Foundry to the latest release.
+            This is useful when new Solidity versions or Foundry features are released.
+          </p>
+        </div>
+      </section>
+
+      <section id="init">
+        <h2>Creating a project</h2>
+        <p>
+          New Foundry projects are initialized via <span class="inline-code">forge init</span>.
+        </p>
+
+        <h3>1. Create and initialize</h3>
+        <pre><code>mkdir foundry-demo
+cd foundry-demo
+
+forge init</code></pre>
+
+        <p>
+          This creates a template with sample contracts, tests, scripts, and configuration.
+          You can also initialize in an existing directory:
+        </p>
+        <pre><code>forge init .</code></pre>
+
+        <h3>2. Build and run tests</h3>
+        <pre><code>forge build
+forge test</code></pre>
+
+        <p>
+          If everything is installed correctly, you will see compilation output and passing
+          tests for the sample contracts.
+        </p>
+      </section>
+
+      <section id="tooling">
+        <h2>Forge / Cast / Anvil</h2>
+        <p>Foundry revolves around three main binaries:</p>
+
+        <h3>Forge</h3>
+        <ul>
+          <li><span class="inline-code">forge build</span> — compile contracts.</li>
+          <li><span class="inline-code">forge test</span> — run test suite.</li>
+          <li><span class="inline-code">forge fmt</span> — format Solidity code.</li>
+          <li><span class="inline-code">forge coverage</span> — generate coverage report.</li>
+          <li><span class="inline-code">forge inspect</span> — inspect ABIs, bytecode, storage layout, and more.</li>
+        </ul>
+
+        <h3>Cast</h3>
+        <ul>
+          <li><span class="inline-code">cast call</span> — read data from contracts.</li>
+          <li><span class="inline-code">cast send</span> — send transactions.</li>
+          <li><span class="inline-code">cast abi-encode</span> / <span class="inline-code">abi-decode</span> — encode/decode calldata.</li>
+          <li><span class="inline-code">cast to-hex</span>, <span class="inline-code">to-wei</span>, <span class="inline-code">from-wei</span> — utility conversions.</li>
+        </ul>
+
+        <h3>Anvil</h3>
+        <ul>
+          <li>Fast local Ethereum node with a JSON-RPC interface.</li>
+          <li>Prefunded local accounts with exposed private keys.</li>
+          <li>Built-in support for forking mainnet or other networks.</li>
+        </ul>
+
+        <pre><code>anvil --port 8545 --chain-id 31337</code></pre>
+
+        <p>
+          You can point other tools (Hardhat, Foundry scripts, frontends) to Anvil via
+          <span class="inline-code">http://127.0.0.1:8545</span>.
+        </p>
+      </section>
+
+      <section id="structure">
+        <h2>Project structure</h2>
+        <p>After <span class="inline-code">forge init</span>, a typical layout looks like this:</p>
+
+        <pre><code>.
+├─ src/
+│  └─ Counter.sol
+├─ test/
+│  └─ Counter.t.sol
+├─ script/
+│  └─ Counter.s.sol
+├─ lib/
+│  └─ (dependencies, e.g. openzeppelin-contracts)
+├─ foundry.toml
+└─ remappings.txt
+</code></pre>
+
+        <ul>
+          <li><span class="inline-code">src/</span> — main contracts.</li>
+          <li><span class="inline-code">test/</span> — Solidity test contracts ending with <span class="inline-code">.t.sol</span>.</li>
+          <li><span class="inline-code">script/</span> — Solidity scripts ending with <span class="inline-code">.s.sol</span> (deployments, admin actions).</li>
+          <li><span class="inline-code">lib/</span> — external libraries installed via <span class="inline-code">forge install</span>.</li>
+          <li><span class="inline-code">foundry.toml</span> — main configuration file.</li>
+          <li><span class="inline-code">remappings.txt</span> — import remappings (similar to Node.js path aliases).</li>
+        </ul>
+
+        <div class="tip">
+          <div class="tip-title">Remappings and libraries</div>
+          <p>
+            Libraries such as OpenZeppelin are usually installed into <span class="inline-code">lib/</span>.
+            Remappings let you write clean imports like <span class="inline-code">import "openzeppelin/token/ERC20/ERC20.sol";</span>
+            instead of long relative paths.
+          </p>
+        </div>
+      </section>
+
+      <section id="config">
+        <h2>Configuration: foundry.toml</h2>
+        <p>
+          The <span class="inline-code">foundry.toml</span> file controls compiler versions, optimization settings,
+          directories, RPC endpoints, profiles, and more.
+        </p>
+
+        <h3>Basic config</h3>
+        <pre><code>[profile.default]
+src = "src"
+test = "test"
+script = "script"
+out = "out"
+libs = ["lib"]
+
+solc_version = "0.8.28"
+optimizer = true
+optimizer_runs = 200
+
+ffi = false
+        </code></pre>
+
+        <p>Common keys you’ll use:</p>
+        <ul>
+          <li><span class="inline-code">src</span>, <span class="inline-code">test</span>, <span class="inline-code">script</span>, <span class="inline-code">out</span>, <span class="inline-code">libs</span> — paths.</li>
+          <li><span class="inline-code">solc_version</span>, <span class="inline-code">optimizer</span>, <span class="inline-code">optimizer_runs</span> — compiler settings.</li>
+          <li><span class="inline-code">via_ir</span> — enable IR pipeline for advanced optimization.</li>
+          <li><span class="inline-code">ffi</span> — enable calling external programs from tests (off by default for safety).</li>
+        </ul>
+      </section>
+
+      <section id="profiles">
+        <h2>Profiles & build flags</h2>
+        <p>
+          Foundry supports profiles so you can tweak behavior for testing, production builds, or CI.
+        </p>
+
+        <h3>Example with multiple profiles</h3>
+        <pre><code>[profile.default]
+optimizer = true
+optimizer_runs = 200
+
+[profile.ci]
+verbosity = 3
+fuzz_runs = 256
+
+[profile.production]
+optimizer_runs = 10000
+via_ir = true
+        </code></pre>
+
+        <p>Use profiles with the <span class="inline-code">--profile</span> flag:</p>
+        <pre><code>forge build --profile production
+forge test --profile ci</code></pre>
+
+        <div class="note">
+          <div class="tip-title">Profiles for “expensive” checks</div>
+          <p>
+            You can keep quick tests as the default profile and run heavy fuzzing or
+            long-running invariant tests only in a separate CI profile.
+          </p>
+        </div>
+      </section>
+
+      <section id="anvil">
+        <h2>Local node (Anvil)</h2>
+        <p>
+          <span class="inline-code">anvil</span> is a fast local Ethereum node, similar to Hardhat Network or Ganache,
+          but focused on speed and good UX.
+        </p>
+
+        <h3>Start a fresh local chain</h3>
+        <pre><code>anvil --port 8545 --chain-id 31337</code></pre>
+
+        <p>
+          By default, Anvil prints out a list of accounts and private keys you can use from scripts,
+          tests, or MetaMask.
+        </p>
+
+        <h3>Forking mainnet with Anvil</h3>
+        <pre><code>anvil --fork-url $MAINNET_RPC_URL --fork-block-number 19000000</code></pre>
+
+        <p>
+          This lets you interact with real mainnet state locally, which is perfect for testing
+          integrations with existing protocols.
+        </p>
+      </section>
+
+      <section id="tests">
+        <h2>Unit tests</h2>
+        <p>
+          In Foundry, tests are Solidity contracts placed inside the <span class="inline-code">test/</span> directory
+          with filenames ending in <span class="inline-code">.t.sol</span>.
+        </p>
+
+        <h3>Example test</h3>
+        <pre><code>// test/Counter.t.sol
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "forge-std/Test.sol";
+import "../src/Counter.sol";
+
+contract CounterTest is Test {
+    Counter internal counter;
+
+    function setUp() public {
+        counter = new Counter();
+    }
+
+    function test_Increment() public {
+        assertEq(counter.count(), 0);
+        counter.increment();
+        assertEq(counter.count(), 1);
+    }
+
+    function testFuzz_IncrementMany(uint256 x) public {
+        // Fuzz test: increment x times
+        x = bound(x, 0, 1000);
+        for (uint256 i; i &lt; x; i++) {
+            counter.increment();
+        }
+        assertEq(counter.count(), x);
+    }
+}
+</code></pre>
+
+        <p>Run tests with:</p>
+        <pre><code>forge test</code></pre>
+
+        <div class="tip">
+          <div class="tip-title">forge-std</div>
+          <p>
+            Most projects use <span class="inline-code">forge-std</span> (Foundry standard library) that provides
+            <span class="inline-code">Test</span>, <span class="inline-code">console2</span>, and many helper utilities.
+          </p>
+        </div>
+      </section>
+
+      <section id="fuzzing">
+        <h2>Fuzz testing</h2>
+        <p>
+          Fuzzing is built into Foundry. Any test function that takes arguments becomes a fuzz test.
+          Foundry will generate random inputs trying to break your assumptions.
+        </p>
+
+        <h3>Basic fuzz test</h3>
+        <pre><code>function testFuzz_AdditionIsCommutative(uint256 a, uint256 b) public {
+    uint256 x = a + b;
+    uint256 y = b + a;
+    assertEq(x, y);
+}</code></pre>
+
+        <p>Control fuzzing parameters in <span class="inline-code">foundry.toml</span>:</p>
+        <pre><code>[profile.default]
+fuzz_runs = 256
+max_test_rejects = 65536</code></pre>
+
+        <div class="tip">
+          <div class="tip-title">Bound your inputs</div>
+          <p>
+            Use the <span class="inline-code">bound</span> helper from <span class="inline-code">Test</span>
+            to keep fuzz inputs in realistic ranges (e.g. token amounts, time ranges).
+          </p>
+        </div>
+      </section>
+
+      <section id="cheatcodes">
+        <h2>Cheatcodes</h2>
+        <p>
+          Cheatcodes are special helpers exposed via the <span class="inline-code">vm</span> interface in
+          <span class="inline-code">forge-std</span>. They let you manipulate the EVM during tests:
+          change block timestamps, prank msg.sender, deal tokens, etc.
+        </p>
+
+        <h3>Common cheatcodes</h3>
+        <ul>
+          <li><span class="inline-code">vm.warp(timestamp)</span> — set the block timestamp.</li>
+          <li><span class="inline-code">vm.roll(blockNumber)</span> — set the block number.</li>
+          <li><span class="inline-code">vm.prank(addr)</span> — make the next call execute as <span class="inline-code">addr</span>.</li>
+          <li><span class="inline-code">vm.startPrank(addr)</span> / <span class="inline-code">vm.stopPrank()</span> — multiple calls as <span class="inline-code">addr</span>.</li>
+          <li><span class="inline-code">vm.deal(addr, amount)</span> — set ETH balance for an address.</li>
+          <li><span class="inline-code">vm.expectRevert()</span> — expect a revert in the next call.</li>
+        </ul>
+
+        <h3>Example using cheatcodes</h3>
+        <pre><code>function testOnlyOwnerCanCall() public {
+    address attacker = address(0xBEEF);
+    vm.prank(attacker);
+    vm.expectRevert();
+    counter.onlyOwnerFunction();
+
+    vm.prank(counter.owner());
+    counter.onlyOwnerFunction(); // no revert
+}</code></pre>
+      </section>
+
+      <section id="invariants">
+        <h2>Invariant testing</h2>
+        <p>
+          Invariant tests check that certain properties always hold, even after many random sequences
+          of actions. They are powerful for complex protocols (AMMs, lending, vaults, etc.).
+        </p>
+
+        <h3>Basic invariant setup</h3>
+        <pre><code>// test/InvariantExample.t.sol
+pragma solidity ^0.8.20;
+
+import "forge-std/Test.sol";
+import "../src/Token.sol";
+
+contract InvariantTest is Test {
+    Token internal token;
+
+    function setUp() public {
+        token = new Token();
+    }
+
+    function invariant_TotalSupplyConstant() public view {
+        assertEq(token.totalSupply(), 1_000_000 ether);
+    }
+}
+</code></pre>
+
+        <p>Run invariants with:</p>
+        <pre><code>forge test --match-path test/InvariantExample.t.sol --invariant</code></pre>
+
+        <div class="note">
+          <div class="tip-title">Designing invariants</div>
+          <p>
+            Good invariants express the core guarantees of your protocol: conservation of value,
+            bounds on debt, no unauthorized state changes, etc. They often catch bugs that unit tests miss.
+          </p>
+        </div>
+      </section>
+
+      <section id="gas">
+        <h2>Gas optimization</h2>
+        <p>
+          Foundry includes tools to measure and optimize gas usage.
+        </p>
+
+        <h3>Gas reports</h3>
+        <pre><code>forge test --gas-report</code></pre>
+
+        <p>
+          This prints gas usage per function and per test, helping you identify hot paths.
+        </p>
+
+        <h3>Inspecting sizes and layouts</h3>
+        <pre><code>forge inspect MyContract size
+forge inspect MyContract storage-layout</code></pre>
+
+        <div class="tip">
+          <div class="tip-title">Use profiles for optimization</div>
+          <p>
+            You can enable <span class="inline-code">via_ir</span> and high optimizer runs in a dedicated
+            <span class="inline-code">production</span> profile, while keeping tests fast with a lighter profile.
+          </p>
+        </div>
+      </section>
+
+      <section id="scripts">
+        <h2>Scripts & broadcasting</h2>
+        <p>
+          Foundry uses Solidity scripts (in the <span class="inline-code">script/</span> folder) to perform deployments
+          and admin actions. Scripts end with <span class="inline-code">.s.sol</span>.
+        </p>
+
+        <h3>Example deployment script</h3>
+        <pre><code>// script/DeployCounter.s.sol
+pragma solidity ^0.8.20;
+
+import "forge-std/Script.sol";
+import "../src/Counter.sol";
+
+contract DeployCounterScript is Script {
+    function run() public {
+        uint256 deployerKey = vm.envUint("DEPLOYER_PRIVATE_KEY");
+
+        vm.startBroadcast(deployerKey);
+        Counter counter = new Counter();
+        vm.stopBroadcast();
+
+        console2.log("Counter deployed at", address(counter));
+    }
+}
+</code></pre>
+
+        <h3>Simulate vs broadcast</h3>
+        <pre><code># Simulate (no on-chain writes)
+forge script script/DeployCounter.s.sol
+
+# Broadcast transactions on a network
+forge script script/DeployCounter.s.sol \
+  --rpc-url $SEPOLIA_RPC_URL \
+  --broadcast \
+  --verify</code></pre>
+
+        <p>
+          Using scripts, you keep deployment logic versioned and testable, instead of relying on ad-hoc manual steps.
+        </p>
+      </section>
+
+      <section id="forking">
+        <h2>Mainnet forking</h2>
+        <p>
+          Foundry has first-class support for mainnet forking via Anvil. You can test against real contract state
+          without touching production funds.
+        </p>
+
+        <h3>Run Anvil with a fork</h3>
+        <pre><code>anvil --fork-url $MAINNET_RPC_URL --fork-block-number 19000000</code></pre>
+
+        <p>
+          Then point <span class="inline-code">forge test</span> or <span class="inline-code">forge script</span> at this RPC:
+        </p>
+
+        <pre><code>forge test --fork-url http://127.0.0.1:8545
+forge script script/MyScript.s.sol --fork-url http://127.0.0.1:8545</code></pre>
+
+        <div class="tip">
+          <div class="tip-title">Impersonating accounts</div>
+          <p>
+            With a forked Anvil node, you can impersonate whales, protocol contracts, or governance
+            addresses using cheatcodes, which is extremely useful for testing integrations and governance flows.
+          </p>
+        </div>
+      </section>
+
+      <section id="hardhat">
+        <h2>Using Foundry with Hardhat</h2>
+        <p>
+          You can combine Hardhat and Foundry in the same project: Foundry for tests and scripts, Hardhat for plugins,
+          TypeScript tooling, and some deployment pipelines.
+        </p>
+
+        <h3>Typical integration pattern</h3>
+        <ul>
+          <li>Keep Solidity contracts in a shared <span class="inline-code">contracts/</span> or <span class="inline-code">src/</span> directory.</li>
+          <li>Use Foundry for fast, aggressive testing (fuzzing, invariants, gas reports).</li>
+          <li>Use Hardhat for JS/TS tooling, frontend integration, or specific plugins (like advanced verification).</li>
+          <li>Point both toolchains at the same RPC endpoints for testnets and forks.</li>
+        </ul>
+
+        <p>
+          Many teams also run both <span class="inline-code">forge test</span> and <span class="inline-code">npx hardhat test</span>
+          in CI to cover different test styles (Solidity-level + TypeScript-level).
+        </p>
+      </section>
+
+      <section id="ci">
+        <h2>CI & automation</h2>
+        <p>
+          Foundry is easy to integrate into CI systems (GitHub Actions, GitLab CI, CircleCI, etc.)
+          because it’s a single binary toolchain with simple CLI commands.
+        </p>
+
+        <h3>Example GitHub Actions snippet</h3>
+        <pre><code>name: Foundry
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Foundry
+        run: |
+          curl -L https://foundry.paradigm.xyz | bash
+          echo "$HOME/.foundry/bin" >> $GITHUB_PATH
+          foundryup
+
+      - name: Run tests
+        run: forge test --profile ci</code></pre>
+
+        <div class="note">
+          <div class="tip-title">Split fast and slow checks</div>
+          <p>
+            Run quick unit tests on every push, and reserve heavy fuzz / invariant suites for nightly runs
+            or specific branches to keep feedback loops fast.
+          </p>
+        </div>
+      </section>
+
+      <section id="resources">
+        <h2>Resources</h2>
+        <ul>
+          <li>Official Foundry book and reference documentation.</li>
+          <li><span class="inline-code">forge-std</span> repository with standard testing utilities.</li>
+          <li>OpenZeppelin Contracts for standard tokens, governance, and access control.</li>
+          <li>Security blogs and audits that publish example Foundry test suites.</li>
+          <li>Guides on combining Foundry with Hardhat, Viem, and modern frontend stacks.</li>
+        </ul>
+
+        <div style="height: 160px;"></div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<footer>
+  © 2025 web3.studio — Foundry handbook for modern Web3 developers.<br>
+  <span style="opacity:0.8;">Build • Test • Fuzz • Ship</span>
+</footer>
+
+<script>
+  const sections = Array.from(document.querySelectorAll("section[id]"));
+  const navLinks = document.querySelectorAll(".sidebar a");
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        navLinks.forEach(link => {
+          const href = link.getAttribute("href");
+          if (!href || !href.startsWith("#")) return;
+          link.classList.toggle("active", href === "#" + id);
+        });
+      }
+    });
+  }, {
+    threshold: 0.35
+  });
+
+  sections.forEach(section => observer.observe(section));
+</script>
+
+</body>
+</html>

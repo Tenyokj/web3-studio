@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Docs — Web3 Studio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #05060a;
+      --sidebar: #0b0e17;
+      --content-bg: #0d101b;
+      --text-main: #f5f5f7;
+      --text-muted: #9ca3af;
+      --border: rgba(148, 163, 184, 0.2);
+      --accent: #facc15;
+      --radius: 14px;
+      --code-bg: #0b1120;
+      --code-border: rgba(148,163,184,0.15);
+    }
+
+    body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text-main);
+    font-family: Inter, sans-serif;
+    }
+
+
+    /* Sidebar */
+    .sidebar {
+      width: 280px;
+      background: var(--sidebar);
+      border-right: 1px solid var(--border);
+      padding: 1.4rem;
+      overflow-y: auto;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+
+    .sidebar h2 {
+      color: var(--accent);
+      font-size: 1.1rem;
+      margin: 0 0 1rem;
+      letter-spacing: -0.01em;
+    }
+
+    .nav-category {
+      margin-bottom: 1.4rem;
+    }
+
+    .nav-category-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .sidebar a {
+      display: block;
+      padding: 0.3rem 0;
+      font-size: 0.9rem;
+      text-decoration: none;
+      color: var(--text-muted);
+      transition: 0.15s;
+    }
+
+    .sidebar a:hover {
+      color: var(--text-main);
+    }
+
+    .sidebar a.active {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* Content */
+    .content {
+      flex: 1;
+      padding: 2rem;
+      overflow-y: scroll;
+      background: var(--content-bg);
+    }
+
+    /* Mini TOC */
+    .toc {
+      padding: 1rem 1.2rem;
+      margin-bottom: 2rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,0.02);
+    }
+
+    .toc h3 {
+      margin: 0 0 0.8rem;
+      font-size: 1.1rem;
+      color: var(--accent);
+    }
+
+    .toc a {
+      display: block;
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      padding: 0.2rem 0;
+      text-decoration: none;
+    }
+
+    .toc a:hover {
+      color: var(--accent);
+    }
+
+    /* Typography */
+    h1 {
+      font-size: 2.2rem;
+      margin-top: 0;
+      margin-bottom: 0.6rem;
+      letter-spacing: -0.02em;
+    }
+
+    h2 {
+      margin-top: 2.2rem;
+      font-size: 1.6rem;
+      color: var(--accent);
+    }
+
+    h3 {
+      margin-top: 1.4rem;
+      font-size: 1.2rem;
+    }
+
+    p {
+      line-height: 1.65;
+      color: var(--text-muted);
+      max-width: 780px;
+    }
+
+    ul li {
+      margin: 0.5rem 0;
+    }
+
+    .tip {
+      border-left: 3px solid var(--accent);
+      padding: 0.8rem 1rem;
+      margin: 1rem 0;
+      background: rgba(250,204,21,0.05);
+      border-radius: 8px;
+      max-width: 760px;
+    }
+
+    /* Code */
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--code-border);
+      padding: 1rem;
+      border-radius: var(--radius);
+      overflow-x: auto;
+      font-family: JetBrains Mono, monospace;
+      font-size: 0.85rem;
+      max-width: 780px;
+    }
+
+    section[id] {
+        scroll-margin-top: 80px;
+        padding-bottom: 2rem;
+    }
+
+    section[id]::before {
+        content: "";
+        display: block;
+        height: 80px;
+        margin-top: -80px;
+        visibility: hidden;
+    }
+
+
+
+
+  </style>
+
+</head>
+<body>
+
+    <div class="layout" style="display: flex;">
+  <!-- Sidebar -->
+  <nav class="sidebar">
+
+    <a href="../index.html" style="
+        display:block;
+        margin-bottom:1rem;
+        font-size:0.9rem;
+        color:var(--accent);
+        text-decoration:none;
+        font-weight:600;
+    ">← Back to Home</a>
+    
+    <h2>Documentation</h2>
+
+    <input
+  id="searchInput"
+  type="text"
+  placeholder="Search..."
+  style="
+    width: 90%;
+    padding: 0.55rem 0.7rem;
+    margin: 0.6rem 0 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: #0f1320;
+    color: var(--text-main);
+    font-size: 0.9rem;
+  "
+>
+<div id="searchResults" style="margin-top:0.5rem; margin-bottom: 10px;"></div>
+
+<script>
+  const searchInput = document.getElementById("searchInput");
+  const searchResults = document.getElementById("searchResults");
+
+  searchInput.addEventListener("input", () => {
+    const query = searchInput.value.toLowerCase();
+
+    if (query.length < 2) {
+      searchResults.innerHTML = "";
+      return;
+    }
+
+    let results = [];
+
+    document.querySelectorAll("section").forEach(section => {
+      const text = section.innerText.toLowerCase();
+
+      if (text.includes(query)) {
+        results.push({
+          id: section.id,
+          title: section.querySelector("h2")?.innerText || section.id
+        });
+      }
+    });
+
+    searchResults.innerHTML = results
+      .slice(0, 5)
+      .map(r => `<a href="#${r.id}" style="display:block; margin:4px 0; color:var(--accent);">${r.title}</a>`)
+      .join("");
+  });
+</script>
+
+    <div class="nav-category">
+      <div class="nav-category-title">Introduction</div>
+      <a href="#overview" class="active">Overview</a>
+      <a href="#blockchain">What is Blockchain</a>
+      <a href="#ethereum">What is Ethereum</a>
+      <a href="#evm">What is EVM</a>
+      <a href="#solidity">What is Solidity</a>
+    </div>
+
+    <div class="nav-category">
+      <div class="nav-category-title">Core Concepts</div>
+      <a href="#contracts">Smart Contracts</a>
+      <a href="#abi">ABI & Bytecode</a>
+      <a href="#gas">Gas & Fees</a>
+      <a href="#transactions">Transactions</a>
+      <a href="#nonce">Nonce</a>
+      <a href="#rpc">RPC Nodes</a>
+      <a href="#testnets">Testnets</a>
+    </div>
+
+    <div class="nav-category">
+      <div class="nav-category-title">Deep Guides</div>
+      <a href="hardhat.html">Hardhat</a>
+      <a href="foundry.html">Foundry</a>
+      <a href="oz.html">OpenZeppelin</a>
+      <a href="solidity.html">Solidity Deep Guide</a>
+      <a href="security.html">Security</a>
+      <a href="tools.html">Tools</a>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="content">
+
+    <h1>Web3 Documentation</h1>
+    <p>Your foundation for understanding Web3, Ethereum, and Solidity development.</p>
+
+    <!-- Mini Table of Contents -->
+    <div class="toc">
+      <h3>Contents</h3>
+      <a href="#overview">Overview</a>
+      <a href="#blockchain">What is Blockchain</a>
+      <a href="#ethereum">What is Ethereum</a>
+      <a href="#evm">What is EVM</a>
+      <a href="#solidity">What is Solidity</a>
+      <a href="#contracts">Smart Contracts</a>
+      <a href="#abi">ABI & Bytecode</a>
+      <a href="#gas">Gas & Fees</a>
+      <a href="#transactions">Transactions</a>
+      <a href="#nonce">Nonce</a>
+      <a href="#rpc">RPC Nodes</a>
+      <a href="#testnets">Testnets</a>
+    </div>
+
+    <!-- REAL CONTENT STARTS -->
+
+    <section id="overview">
+      <h2>Overview</h2>
+      <p>
+        This documentation introduces the core concepts of Web3 development.  
+        You’ll learn how Ethereum works under the hood: from transactions and gas  
+        to smart contracts and the EVM itself.
+      </p>
+
+      <div class="tip">
+         <b>Tip:</b>  
+        If you're new — start with this page.  
+        After that continue with Hardhat → Foundry → OpenZeppelin.
+      </div>
+    </section>
+
+    <section id="blockchain">
+      <h2>What is Blockchain?</h2>
+      <p>
+        Blockchain is a distributed database with no central owner. Every node  
+        in the network holds a copy of the same state (balances, contracts, data).
+      </p>
+
+      <h3>Key Properties</h3>
+      <ul>
+        <li>Decentralized</li>
+        <li>Immutable</li>
+        <li>Transparent</li>
+        <li>Secure through cryptography</li>
+      </ul>
+
+      <div class="tip">
+        <b>Important:</b>  
+        Ethereum is not “just a blockchain”.  
+        It is a programmable blockchain.
+      </div>
+    </section>
+
+    <section id="ethereum">
+      <h2>What is Ethereum?</h2>
+      <p>
+        Ethereum is a global, decentralized computer.  
+        Developers can deploy programs (smart contracts) that run on the Ethereum Virtual Machine.
+      </p>
+
+      <h3>Ethereum consists of:</h3>
+      <ul>
+        <li>Execution Layer (EVM)</li>
+        <li>Consensus Layer</li>
+        <li>Networking Layer</li>
+        <li>Storage (state trie)</li>
+      </ul>
+    </section>
+
+    <section id="evm">
+      <h2>What is EVM?</h2>
+      <p>
+        EVM — Ethereum Virtual Machine — is a sandboxed runtime environment  
+        where all smart contracts execute.
+      </p>
+
+      <div class="tip">
+        <b>EVM is deterministic:</b>  
+        Every node must execute contracts and produce the same output.
+      </div>
+
+      <h3>EVM executes bytecode</h3>
+      <pre><code>600A600C80600A39...</code></pre>
+
+      <p>
+        Solidity compiles into bytecode → EVM executes it during transactions.
+      </p>
+    </section>
+
+    <section id="solidity">
+      <h2>What is Solidity?</h2>
+      <p>
+        Solidity is the most popular smart contract language for Ethereum.
+        Created by Gavin Wood (2014).
+      </p>
+
+      <h3>Example:</h3>
+      <pre><code>pragma solidity ^0.8.20;
+
+contract Counter {
+    uint256 public count;
+
+    function inc() external {
+        count++;
+    }
+}</code></pre>
+
+      <p>
+        Solidity is similar to JavaScript + C++, but with strict types  
+        and deterministic behavior.
+      </p>
+    </section>
+
+    <section id="contracts">
+      <h2>Smart Contracts</h2>
+      <p>
+        Smart contracts are programs stored on the blockchain.  
+        Each contract has:
+      </p>
+
+      <ul>
+        <li>Address</li>
+        <li>Storage (state)</li>
+        <li>Code (bytecode)</li>
+      </ul>
+
+      <h3>Contract structure</h3>
+      <pre><code>contract MyContract {
+    uint public value;
+
+    function set(uint x) external {
+        value = x;
+    }
+}</code></pre>
+
+    </section>
+
+    <section id="abi">
+      <h2>ABI & Bytecode</h2>
+      <p>
+        ABI (Application Binary Interface) describes how to interact  
+        with a contract: functions, arguments, outputs.
+      </p>
+
+      <h3>ABI Example</h3>
+      <pre><code>[
+  {
+    "inputs": [],
+    "name": "value",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256"}],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]</code></pre>
+    </section>
+
+    <section id="gas">
+      <h2>Gas & Fees</h2>
+      <p>
+        Gas is the cost of performing operations on Ethereum.
+      </p>
+
+      <h3>Basic formula</h3>
+      <pre><code>Fee = GasUsed * GasPrice</code></pre>
+
+      <div class="tip">
+        ⚡ <b>Gas tip:</b>  
+        Writing to storage is the most expensive operation.
+      </div>
+
+    </section>
+
+    <section id="transactions">
+      <h2>Transactions</h2>
+      <p>
+        A transaction is a signed instruction from a user to the network  
+        (send ETH, call contract function).
+      </p>
+
+      <pre><code>to: "0xabc..."
+data: "0x095ea7b3..."
+gas: 21000</code></pre>
+    </section>
+
+    <section id="nonce">
+      <h2>Nonce</h2>
+      <p>
+        Nonce is a transaction counter for each wallet.  
+        Prevents double-spending and ensures order.
+      </p>
+    </section>
+
+    <section id="rpc">
+      <h2>RPC Nodes</h2>
+      <p>
+        RPC nodes allow you to read blockchain state and send transactions.
+      </p>
+
+      <h3>Popular RPC Providers</h3>
+      <ul>
+        <li>Alchemy</li>
+        <li>Infura</li>
+        <li>Tenderly</li>
+        <li>Ankr</li>
+      </ul>
+    </section>
+
+    <section id="testnets" style="min-height: 300px;">
+      <h2>Testnets</h2>
+      <p>
+        Testnets allow developers to test contracts without using real ETH.
+      </p>
+
+      <h3>Main testnets:</h3>
+      <ul>
+        <li>Sepolia</li>
+        <li>Holesky</li>
+      </ul>
+
+    </section>
+    
+
+
+
+  </main>
+</div>
+
+    <footer style="
+    padding: 2rem 0;
+    border-top: 1px solid var(--code-bg);
+    color: var(--text-muted);
+    font-size: 0.88rem;
+    text-align: center;
+    width: 100%;
+    ">
+    © 2025 web3.studio — a minimal handbook for modern Web3 devs.<br>
+    <span style="opacity:0.8;">Overview • Stack • Compare • Learn</span>
+    </footer>
+
+<script>
+  const sections = Array.from(document.querySelectorAll("section[id]"));
+  const navLinks = document.querySelectorAll(".sidebar a");
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+
+        navLinks.forEach(link => {
+          link.classList.toggle(
+            "active",
+            link.getAttribute("href") === `#${id}`
+          );
+        });
+      }
+    });
+  }, {
+    threshold: 0.35    // ниже → стабильнее
+  });
+
+  sections.forEach(section => observer.observe(section));
+</script>
+
+
+</body>
+</html>
